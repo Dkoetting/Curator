@@ -13,23 +13,24 @@ const defaultWatermarks = [
 ];
 
 const defaultPoints = [
-  'Regulatorische Entwicklungen, KRITIS-Signale und Marktbewegungen werden in einen ruhigen, entscheidungsfaehigen Arbeitsfluss ueberfuehrt.',
-  'Quellen, Themen und Freigaben bleiben nachvollziehbar, damit aus Recherche belastbare Veroeffentlichungen werden.',
+  'Regulatorische Entwicklungen, KRITIS-Signale und Marktbewegungen werden in einen ruhigen, entscheidungsfähigen Arbeitsfluss überführt.',
+  'Quellen, Themen und Freigaben bleiben nachvollziehbar, damit aus Recherche belastbare Veröffentlichungen werden.',
 ];
 
 export default function SplashScreen({
   logoSrc = '/assets/Logo.jpg',
   portraitSrc = '/assets/dirk-portrait.jpg',
   visibleDuration = 5000,
+  heroVariant = 'portrait',
   brandKicker = 'Institute Workbench',
   brandName = 'Dr. DirKInstitute',
-  personName = 'Dr. Dirk Koetting',
+  personName = 'Dr. Dirk Kötting',
   personRole = 'KI-Governance, IT-Sicherheit und kuratierte Entscheidungsgrundlagen',
-  title = 'Content Intelligence fuer belastbare Entscheidungen.',
-  text = 'Der Curator verdichtet priorisierte Recherche, redaktionell anschlussfaehige Entwuerfe und ein belastbares Lagebild fuer KI-Governance im DACH-Raum.',
+  title = 'Content Intelligence für belastbare Entscheidungen.',
+  text = 'Der Curator verdichtet priorisierte Recherche, redaktionell anschlussfähige Entwürfe und ein belastbares Lagebild für KI-Governance im DACH-Raum.',
   points = defaultPoints,
   statusText = 'Research Briefing wird vorbereitet',
-  footerText = 'Kuratiertes Monitoring, redaktionelle Vorbereitung und Freigabe in einer belastbaren Arbeitsoberflaeche.',
+  footerText = 'Kuratiertes Monitoring, redaktionelle Vorbereitung und Freigabe in einer belastbaren Arbeitsoberfläche.',
   onComplete,
 }) {
   const [hidden, setHidden] = useState(false);
@@ -60,13 +61,35 @@ export default function SplashScreen({
       ))}
 
       <div className="splash-shell">
-        <div className="splash-portrait">
-          <img src={portraitSrc} alt={`${personName} Portrait`} />
-          <div className="splash-portrait-badge">
-            <strong>{personName}</strong>
-            <span>{personRole}</span>
+        {heroVariant === 'logo' ? (
+          <div className="splash-logo-stage">
+            <div className="splash-logo-glow"></div>
+            <div className="splash-logo-hero">
+              <img src={logoSrc} alt={`${brandName} Logo`} />
+            </div>
+            <div className="splash-logo-orbit orbit-a">
+              <img src={logoSrc} alt="" />
+            </div>
+            <div className="splash-logo-orbit orbit-b">
+              <img src={logoSrc} alt="" />
+            </div>
+            <div className="splash-logo-orbit orbit-c">
+              <img src={logoSrc} alt="" />
+            </div>
+            <div className="splash-portrait-badge logo-badge">
+              <strong>{brandName}</strong>
+              <span>{personRole}</span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="splash-portrait">
+            <img src={portraitSrc} alt={`${personName} Portrait`} />
+            <div className="splash-portrait-badge">
+              <strong>{personName}</strong>
+              <span>{personRole}</span>
+            </div>
+          </div>
+        )}
 
         <div className="splash-card">
           <div className="splash-brand">
