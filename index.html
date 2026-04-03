@@ -58,9 +58,12 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
   transition:opacity .7s ease, visibility .7s ease;
 }
 .splash-screen.is-hidden{opacity:0;visibility:hidden;pointer-events:none;}
-.splash-watermark{position:absolute;right:-4vw;bottom:-10vh;width:min(50vw,640px);aspect-ratio:1/1;opacity:.18;filter:grayscale(1) brightness(1.8) contrast(1.08);mix-blend-mode:screen;pointer-events:none;transform:rotate(-12deg);}
+.splash-watermark{position:absolute;aspect-ratio:1/1;filter:grayscale(1) brightness(1.85) contrast(1.1);mix-blend-mode:screen;pointer-events:none;transform-origin:center;z-index:0;}
+.splash-watermark.primary{right:-3vw;bottom:-8vh;width:min(52vw,680px);opacity:.24;transform:rotate(-11deg);}
+.splash-watermark.secondary{left:-6vw;top:-9vh;width:min(32vw,380px);opacity:.14;transform:rotate(18deg);}
+.splash-watermark.tertiary{right:28vw;top:32vh;width:min(18vw,220px);opacity:.12;transform:rotate(-6deg);}
 .splash-watermark img{width:100%;height:100%;object-fit:contain;display:block;}
-.splash-shell{width:min(1040px,100%);display:grid;grid-template-columns:minmax(260px,.9fr) minmax(320px,1.1fr);gap:var(--space-6);align-items:stretch;}
+.splash-shell{position:relative;z-index:1;width:min(1040px,100%);display:grid;grid-template-columns:minmax(260px,.9fr) minmax(320px,1.1fr);gap:var(--space-6);align-items:stretch;}
 .splash-portrait{position:relative;min-height:460px;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,0.16);background:#132858;box-shadow:0 28px 70px rgba(3,11,35,0.34);}
 .splash-portrait img{width:100%;height:100%;object-fit:cover;display:block;}
 .splash-portrait::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(9,19,47,0.02) 0%, rgba(9,19,47,0.12) 38%, rgba(9,19,47,0.56) 100%);}
@@ -188,7 +191,9 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
   .splash-shell{grid-template-columns:1fr;}
   .splash-portrait{min-height:320px;max-height:380px;}
   .splash-card{order:-1;}
-  .splash-watermark{width:min(62vw,500px);right:-10vw;bottom:-6vh;opacity:.16;}
+  .splash-watermark.primary{width:min(66vw,540px);right:-12vw;bottom:-5vh;opacity:.22;}
+  .splash-watermark.secondary{width:min(44vw,320px);left:-10vw;top:-5vh;opacity:.12;}
+  .splash-watermark.tertiary{width:min(26vw,180px);right:16vw;top:34vh;opacity:.11;}
   .overview-row{grid-template-columns:1fr;gap:10px;}
   .overview-row.head{display:none;}
 }
@@ -286,7 +291,9 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 
 @media (max-width: 640px){
   .splash-screen{padding:var(--space-4);}
-  .splash-watermark{width:82vw;right:-16vw;bottom:-1vh;opacity:.15;}
+  .splash-watermark.primary{width:88vw;right:-24vw;bottom:0;opacity:.2;}
+  .splash-watermark.secondary{width:54vw;left:-18vw;top:-1vh;opacity:.1;}
+  .splash-watermark.tertiary{width:34vw;right:8vw;top:38vh;opacity:.09;}
   .splash-card{padding:var(--space-5);}
   .splash-brand{align-items:flex-start;}
   .splash-brand img{width:52px;height:52px;}
@@ -305,7 +312,13 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 </head>
 <body>
 <div class="splash-screen" id="splash-screen" aria-hidden="true">
-  <div class="splash-watermark">
+  <div class="splash-watermark primary">
+    <img src="./assets/Logo.jpg" alt="">
+  </div>
+  <div class="splash-watermark secondary">
+    <img src="./assets/Logo.jpg" alt="">
+  </div>
+  <div class="splash-watermark tertiary">
     <img src="./assets/Logo.jpg" alt="">
   </div>
   <div class="splash-shell">
