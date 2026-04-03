@@ -312,7 +312,7 @@
   background: linear-gradient(90deg, #2147aa 0%, #3c6ee0 42%, #8eb7ff 72%, #d9e6ff 100%);
   box-shadow: 0 0 18px rgba(76, 120, 226, 0.35);
   transform-origin: left center;
-  animation: splashLoad 15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: splashLoad 10s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .splash-meta {
