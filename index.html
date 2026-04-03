@@ -1603,6 +1603,21 @@ async function loadSheetData() {
   }
 }
 
+async function writeSheetRow(kind, data) {
+  const response = await fetch('/api/sheet-write', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ kind, data })
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.error || 'Google Sheets konnten nicht beschrieben werden.');
+  }
+
+  return payload;
+}
+
 function nav(id, el) {
   document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
@@ -1855,32 +1870,55 @@ function addSrc() {
   document.getElementById('src-url').value = '';
 }
 
-function addT() {
+async function addT() {
   const n = prompt('Neues Thema:');
   if(!n) return;
-  currentTopics.push({
+
+  const topic = {
     Thema: n,
+    Kategorie: 'Weitere Themen',
+    Region: 'DACH / EU',
     Prioritaet: 'Mittel',
     Aktiv: 'Ja',
+    Notizen: 'Manuell aus dem Curator ergaenzt',
     countLabel: '0 heute'
-  });
-  renderTopics(currentTopics);
+  };
+
+  try {
+    await writeSheetRow('topic', topic);
+    currentTopics.push(topic);
+    renderTopics(currentTopics);
+    const topicNote = document.getElementById('topic-source-note');
+    if (topicNote) topicNote.textContent = `Google Sheets aktiv · ${currentTopics.length} Themen geladen`;
+  } catch (error) {
+    alert(error?.message || 'Thema konnte nicht in Google Sheets gespeichert werden.');
+  }
 }
 
-function addSrc() {
+async function addSrc() {
   const v = document.getElementById('src-url').value.trim();
   if(!v) return;
-  currentSources.push({
+
+  const source = {
     Titel: 'Eigene Quelle',
     URL: v,
     Kategorie: 'Custom',
     Region: 'Eigene Quelle',
     Primaerquelle: 'Nein',
     Aktiv: 'Ja',
-    Kommentar: 'Manuell ergaenzt fuer die naechste Rechercherunde.'
-  });
-  renderSources(currentSources);
-  document.getElementById('src-url').value = '';
+    Kommentar: 'Manuell aus dem Curator ergaenzt'
+  };
+
+  try {
+    await writeSheetRow('source', source);
+    currentSources.push(source);
+    renderSources(currentSources);
+    document.getElementById('src-url').value = '';
+    const sourceNote = document.getElementById('source-registry-note');
+    if (sourceNote) sourceNote.textContent = `Google Sheets aktiv · ${currentSources.length} Quellen geladen`;
+  } catch (error) {
+    alert(error?.message || 'Quelle konnte nicht in Google Sheets gespeichert werden.');
+  }
 }
 
 loadSheetData();
