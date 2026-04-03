@@ -20,7 +20,7 @@ const defaultPoints = [
 export default function SplashScreen({
   logoSrc = '/assets/Logo.jpg',
   portraitSrc = '/assets/dirk-portrait.jpg',
-  visibleDuration = 7000,
+  visibleDuration = 5000,
   brandKicker = 'Institute Workbench',
   brandName = 'Dr. DirKInstitute',
   personName = 'Dr. Dirk Koetting',
