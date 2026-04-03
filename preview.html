@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fahrtenbuch – K-CB 2130</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── CSS VARIABLES (dark default) ── */
+:root {
+  --bg:       #0f1219;
+  --bg2:      #141924;
+  --bg3:      #0f1821;
+  --border:   #1e2736;
+  --border2:  #141f2e;
+  --text:     #e2e8f0;
+  --text2:    #94a3b8;
+  --text3:    #475569;
+  --card:     #141924;
+  --card-hov: #17202e;
+  --th-bg:    #0f1821;
+  --input-bg: #0a0e16;
+  --wknd:     #111827;
+  --wknd-hov: #151f2e;
+  --sum-row:  #0f1821;
+  --accent:   #3b82f6;
+  --accent2:  #60a5fa;
+  --biz-bg:   #1e3560;  --biz-fg:   #60a5fa;
+  --prv-bg:   #2e1b52;  --prv-fg:   #c084fc;
+  --warn:     #ef4444;
+  --ok:       #10b981;
+  --sb-bg:    #0d1117;
+  --sb-bdr:   #1a2236;
+  --sb-text:  #64748b;
+  --sb-act:   #60a5fa;
+  --sb-act-bg:#1a2a4a20;
+  --sb-hov:   #161e2e;
+  --modal-bg: #141924;
+}
+body.light {
+  --bg:       #f0f4f8;
+  --bg2:      #ffffff;
+  --bg3:      #f8fafc;
+  --border:   #dde3ec;
+  --border2:  #e8edf3;
+  --text:     #0f172a;
+  --text2:    #334155;
+  --text3:    #64748b;
+  --card:     #ffffff;
+  --card-hov: #f8fafc;
+  --th-bg:    #f1f5f9;
+  --input-bg: #f8fafc;
+  --wknd:     #f4f6f9;
+  --wknd-hov: #edf0f5;
+  --sum-row:  #eef2f7;
+  --accent:   #2563eb;
+  --accent2:  #3b82f6;
+  --biz-bg:   #dbeafe;  --biz-fg:   #1d4ed8;
+  --prv-bg:   #ede9fe;  --prv-fg:   #7c3aed;
+  --warn:     #dc2626;
+  --ok:       #059669;
+  --sb-bg:    #1e293b;
+  --sb-bdr:   #243347;
+  --sb-text:  #94a3b8;
+  --sb-act:   #60a5fa;
+  --sb-act-bg:#1d4ed820;
+  --sb-hov:   #273447;
+  --modal-bg: #ffffff;
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+html,body { height:100% }
+body { font-family:'Inter',system-ui,sans-serif; font-size:14px; background:var(--bg); color:var(--text); display:flex; min-height:100vh; transition:background .25s,color .25s }
+
+/* ── SIDEBAR ── */
+.sidebar { width:220px; min-height:100vh; background:var(--sb-bg); border-right:1px solid var(--sb-bdr); display:flex; flex-direction:column; position:sticky; top:0; height:100vh; flex-shrink:0; transition:background .25s }
+.sb-header { padding:22px 20px; border-bottom:1px solid var(--sb-bdr) }
+.sb-logo { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:6px }
+.sb-car { font-size:17px; font-weight:700; color:#f1f5f9; letter-spacing:.02em }
+.sb-driver { font-size:12px; color:#64748b; margin-top:2px }
+.sb-nav { flex:1; padding:12px 0 }
+.nav-item { display:flex; align-items:center; gap:11px; padding:10px 20px; cursor:pointer; color:var(--sb-text); font-size:13px; font-weight:500; border-left:3px solid transparent; transition:all .15s; user-select:none }
+.nav-item:hover { background:var(--sb-hov); color:#cbd5e1 }
+.nav-item.active { background:var(--sb-act-bg); border-left-color:var(--accent); color:var(--sb-act) }
+.nav-icon { font-size:15px; width:18px; text-align:center; flex-shrink:0 }
+.sb-footer { padding:10px 0; border-top:1px solid var(--sb-bdr) }
+
+/* ── MAIN ── */
+.main { flex:1; overflow-y:auto; min-height:100vh }
+.page { display:none; padding:32px; max-width:1400px }
+.page.active { display:block }
+.ph { margin-bottom:24px }
+.ph-title { font-size:22px; font-weight:700; color:var(--text) }
+.ph-sub { font-size:13px; color:var(--text3); margin-top:3px }
+
+/* ── CARDS ── */
+.card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:20px }
+.card-title { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:14px }
+
+/* ── GRID ── */
+.g2 { display:grid; grid-template-columns:repeat(2,1fr); gap:16px }
+.g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px }
+.g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px }
+.mb20 { margin-bottom:20px }
+.mb28 { margin-bottom:28px }
+
+/* ── STAT CARDS ── */
+.stat { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:20px }
+.stat-lbl { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:8px }
+.stat-val { font-size:26px; font-weight:700; color:var(--text); line-height:1 }
+.stat-unit { font-size:14px; font-weight:400; color:var(--text2); margin-left:3px }
+.stat-sub { font-size:12px; color:var(--text3); margin-top:5px }
+.warn { color:var(--warn)!important }
+.ok   { color:var(--ok)!important }
+.pbar { height:5px; background:var(--border); border-radius:3px; overflow:hidden; margin-top:8px }
+.pfill { height:100%; border-radius:3px; background:var(--accent) }
+.pfill.biz { background:var(--accent2) }
+.pfill.prv { background:#a855f7 }
+
+/* ── TABLES ── */
+.tw { overflow-x:auto; border-radius:10px; border:1px solid var(--border) }
+table { width:100%; border-collapse:collapse; background:var(--card) }
+thead th { background:var(--th-bg); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap }
+tbody td { padding:9px 14px; border-bottom:1px solid var(--border2); color:var(--text2); font-size:13px; vertical-align:middle }
+tbody tr:last-child td { border-bottom:none }
+tbody tr:hover td { background:var(--card-hov) }
+tr.wknd td { background:var(--wknd) }
+tr.wknd:hover td { background:var(--wknd-hov) }
+tr.sum-row td { background:var(--sum-row); font-weight:600; color:var(--text); border-top:2px solid var(--border) }
+
+/* ── BADGES ── */
+.badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; white-space:nowrap }
+.biz-badge { background:var(--biz-bg); color:var(--biz-fg) }
+.prv-badge { background:var(--prv-bg); color:var(--prv-fg) }
+
+/* ── BUTTONS ── */
+.btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; border:none; transition:all .15s; white-space:nowrap; font-family:inherit }
+.btn-primary { background:#1d4ed8; color:#fff }
+.btn-primary:hover { background:#1e40af }
+.btn-sec { background:var(--bg3); color:var(--text2); border:1px solid var(--border) }
+.btn-sec:hover { background:var(--card-hov); color:var(--text) }
+.btn-success { background:#065f46; color:#6ee7b7; border:1px solid #047857 }
+.btn-success:hover { background:#047857 }
+.btn-warn { background:#78350f; color:#fcd34d; border:1px solid #92400e }
+.btn-warn:hover { background:#92400e }
+.btn-danger { background:#450a0a; color:#fca5a5; border:1px solid #7f1d1d }
+.btn-danger:hover { background:#7f1d1d }
+.btn-sm { padding:5px 10px; font-size:12px }
+.btn-ico { padding:5px 7px; background:transparent; color:var(--text3); border:none; cursor:pointer; border-radius:4px; line-height:1; font-size:13px; font-family:inherit }
+.btn-ico:hover { color:var(--text); background:var(--bg3) }
+.btn-ico.del:hover { color:var(--warn) }
+
+/* ── TOOLBAR ── */
+.toolbar { display:flex; align-items:center; gap:8px; margin-bottom:16px; flex-wrap:wrap }
+.spacer { flex:1 }
+
+/* ── FORMS ── */
+.fg { margin-bottom:14px }
+.flbl { display:block; font-size:11px; font-weight:600; color:var(--text3); margin-bottom:5px; letter-spacing:.03em }
+.fc { width:100%; background:var(--input-bg); border:1px solid var(--border); border-radius:6px; color:var(--text); padding:8px 11px; font-size:13px; font-family:inherit; outline:none; transition:border-color .15s }
+.fc:focus { border-color:var(--accent) }
+select.fc { cursor:pointer }
+.frow { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px }
+.info-box { background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:12px; font-size:12px; color:var(--text3); line-height:1.6; margin-bottom:14px }
+.info-box code { color:var(--accent2); font-family:monospace; font-size:11px }
+
+/* ── MODAL ── */
+.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:1000; align-items:center; justify-content:center; padding:20px }
+.overlay.open { display:flex }
+.modal { background:var(--modal-bg); border:1px solid var(--border); border-radius:12px; padding:28px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.4) }
+.modal-hd { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px }
+.modal-title { font-size:17px; font-weight:700; color:var(--text) }
+.modal-ft { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; padding-top:16px; border-top:1px solid var(--border) }
+
+/* ── CONFIRM ── */
+.conf-box { background:var(--modal-bg); border:1px solid var(--border); border-radius:10px; padding:24px; max-width:400px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,.4) }
+.conf-txt { font-size:14px; color:var(--text); line-height:1.5; margin-bottom:20px }
+.conf-btns { display:flex; justify-content:flex-end; gap:10px }
+
+/* ── NOTIFICATION ── */
+.notif { position:fixed; top:20px; right:20px; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 18px; color:var(--text); font-size:13px; z-index:3000; box-shadow:0 8px 24px rgba(0,0,0,.4); transform:translateX(120px); opacity:0; transition:all .3s; pointer-events:none }
+.notif.show { transform:translateX(0); opacity:1 }
+.notif.ok  { border-left:3px solid var(--ok) }
+.notif.err { border-left:3px solid var(--warn) }
+
+/* ── CHART ── */
+.chart-wrap { display:flex; align-items:flex-end; gap:6px; height:160px; padding:4px 0 }
+.cbar-g { display:flex; flex-direction:column; align-items:center; flex:1; height:100%; justify-content:flex-end; gap:3px }
+.cbar { width:100%; border-radius:3px 3px 0 0; transition:height .4s; min-height:2px }
+.clbl { font-size:10px; color:var(--text3); text-align:center }
+.cval { font-size:10px; color:var(--text2); text-align:center }
+
+/* ── MISC ── */
+.empty { text-align:center; padding:40px 20px; color:var(--text3); font-size:14px }
+hr.div { border:none; border-top:1px solid var(--border); margin:18px 0 }
+.section { margin-bottom:24px }
+.txt-muted { color:var(--text3) }
+.txt2 { color:var(--text2) }
+.txt-sm { font-size:12px }
+.fw6 { font-weight:600 }
+.theme-toggle { display:flex; align-items:center; gap:8px; padding:8px 20px; cursor:pointer; color:var(--sb-text); font-size:13px; transition:all .15s }
+.theme-toggle:hover { color:#cbd5e1 }
+
+/* ── IMPORT RESULT ── */
+.import-result { background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:10px 14px; font-size:13px; color:var(--text2); margin-top:12px; display:none }
+.import-result.show { display:block }
+
+/* ── EXPORT ROW ── */
+.export-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px }
+
+@media(max-width:900px) {
+  .sidebar { width:60px }
+  .sb-header,.nav-label { display:none }
+  .page { padding:16px }
+  .g4 { grid-template-columns:repeat(2,1fr) }
+  .g3 { grid-template-columns:repeat(2,1fr) }
+}
+@media(max-width:600px) {
+  .g2,.g3,.g4 { grid-template-columns:1fr }
+}
+</style>
+</head>
+<body>
+
+<!-- Notification -->
+<div class="notif" id="notif"></div>
+
+<!-- Confirm overlay -->
+<div class="overlay" id="confOverlay">
+  <div class="conf-box">
+    <p class="conf-txt" id="confTxt"></p>
+    <div class="conf-btns">
+      <button class="btn btn-sec" onclick="_confResolve(false)">Abbrechen</button>
+      <button class="btn btn-danger" onclick="_confResolve(true)">Bestätigen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Form modal -->
+<div class="overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-hd">
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <button class="btn-ico" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modalBody"></div>
+    <div class="modal-ft" id="modalFt"></div>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">Fahrtenbuch</div>
+    <div class="sb-car"  id="sbCar">K-CB 2130</div>
+    <div class="sb-driver" id="sbDriver">Dirk Kötting</div>
+  </div>
+  <div class="sb-nav">
+    <div class="nav-item active" data-page="dashboard"    onclick="nav('dashboard')">   <span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></div>
+    <div class="nav-item"        data-page="fahrtenbuch" onclick="nav('fahrtenbuch')"> <span class="nav-icon">🚗</span><span class="nav-label">Fahrtenbuch</span></div>
+    <div class="nav-item"        data-page="helper"      onclick="nav('helper')">      <span class="nav-icon">📍</span><span class="nav-label">Helper-Routen</span></div>
+    <div class="nav-item"        data-page="tanken"      onclick="nav('tanken')">      <span class="nav-icon">⛽</span><span class="nav-label">Tanken</span></div>
+    <div class="nav-item"        data-page="auswertung"  onclick="nav('auswertung')">  <span class="nav-icon">📈</span><span class="nav-label">Auswertung</span></div>
+    <div class="nav-item"        data-page="soll-ist"    onclick="nav('soll-ist')">    <span class="nav-icon">🎯</span><span class="nav-label">Soll/Ist</span></div>
+  </div>
+  <div class="sb-footer">
+    <div class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Hell/Dunkel wechseln">
+      <span id="themeIcon">☀️</span><span class="nav-label" id="themeTxt">Hell-Modus</span>
+    </div>
+    <div class="nav-item" data-page="settings" onclick="nav('settings')">
+      <span class="nav-icon">⚙️</span><span class="nav-label">Einstellungen</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="ph"><div class="ph-title">Dashboard</div><div class="ph-sub" id="dashSub"></div></div>
+    <div class="g4 mb28" id="dashStats"></div>
+    <div class="g2">
+      <div class="card" id="dashVerbrauch"></div>
+      <div class="card" id="dashTankung"></div>
+    </div>
+  </div>
+
+  <!-- FAHRTENBUCH -->
+  <div class="page" id="page-fahrtenbuch">
+    <div class="ph"><div class="ph-title">Fahrtenbuch</div></div>
+    <div class="toolbar">
+      <select class="fc" id="fbMon"  style="width:auto" onchange="renderFB()"></select>
+      <select class="fc" id="fbYear" style="width:auto" onchange="renderFB()"></select>
+      <div class="spacer"></div>
+      <button class="btn btn-sec btn-sm"  onclick="openImportModal('fahrten')">⬆ CSV&nbsp;importieren</button>
+      <button class="btn btn-success btn-sm" onclick="exportFahrtenbuchCSV()">⬇ CSV&nbsp;exportieren</button>
+      <button class="btn btn-warn btn-sm"    onclick="exportFahrtenbuchXLS()">⬇ Excel&nbsp;(.xls)</button>
+      <button class="btn btn-primary btn-sm" onclick="openFahrtModal(null,null)">+ Neue&nbsp;Fahrt</button>
+    </div>
+    <div id="fbContent"></div>
+  </div>
+
+  <!-- HELPER -->
+  <div class="page" id="page-helper">
+    <div class="ph"><div class="ph-title">Helper-Routen</div><div class="ph-sub">Gespeicherte Strecken für schnelle Erfassung</div></div>
+    <div class="toolbar">
+      <div class="spacer"></div>
+      <button class="btn btn-sec btn-sm"  onclick="openImportModal('routen')">⬆ CSV&nbsp;importieren</button>
+      <button class="btn btn-primary btn-sm" onclick="openHelperModal(null)">+ Neue&nbsp;Route</button>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Name</th><th>Startort</th><th>Zielort</th><th>km</th><th>Std.-Zweck</th><th>Kategorie</th><th>Status</th><th></th></tr></thead>
+        <tbody id="helperBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TANKEN -->
+  <div class="page" id="page-tanken">
+    <div class="ph"><div class="ph-title">Tanken</div><div class="ph-sub" id="tankSub"></div></div>
+    <div class="toolbar">
+      <select class="fc" id="tankYear" style="width:auto" onchange="renderTank()"></select>
+      <div class="spacer"></div>
+      <button class="btn btn-sec btn-sm"  onclick="openImportModal('tankungen')">⬆ CSV&nbsp;importieren</button>
+      <button class="btn btn-primary btn-sm" onclick="openTankModal(null)">+ Tankeintrag</button>
+    </div>
+    <div class="tw mb28">
+      <table>
+        <thead><tr><th>Datum</th><th>Ort / Tankstelle</th><th>Liter</th><th>€/L</th><th>Gesamt</th><th>Notiz</th><th></th></tr></thead>
+        <tbody id="tankBody"></tbody>
+      </table>
+    </div>
+    <div class="card mb20">
+      <div class="card-title">Reichweiten-Check – gefahrene km vs. Reichweite aus getankten Litern</div>
+      <div id="tankCheck"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Monatsübersicht</div>
+      <div id="tankMonth"></div>
+    </div>
+  </div>
+
+  <!-- AUSWERTUNG -->
+  <div class="page" id="page-auswertung">
+    <div class="ph"><div class="ph-title">Auswertung</div></div>
+    <div class="toolbar">
+      <select class="fc" id="auswYear" style="width:auto" onchange="renderAusw()"></select>
+      <div class="spacer"></div>
+      <button class="btn btn-success btn-sm" onclick="exportJahresCSV()">⬇ Jahres-CSV</button>
+    </div>
+    <div id="auswContent"></div>
+  </div>
+
+  <!-- SOLL/IST -->
+  <div class="page" id="page-soll-ist">
+    <div class="ph"><div class="ph-title">Soll/Ist-Vergleich</div><div class="ph-sub">Geschäftlich 75 % · Privat 25 % – Basis: gefahrene km aus Tankdaten</div></div>
+    <div class="toolbar">
+      <select class="fc" id="sollIstYear" style="width:auto" onchange="renderSollIst()"></select>
+    </div>
+    <div id="sollIstContent"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="ph"><div class="ph-title">Einstellungen</div><div class="ph-sub">Fahrzeug-Stammdaten & Datenverwaltung</div></div>
+    <div class="g2 mb20">
+      <div class="card">
+        <div class="card-title">Stammdaten</div>
+        <div id="settingsForm"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Datenverwaltung (JSON)</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+          <button class="btn btn-sec" onclick="exportJSON()">⬇ Komplett-Export (JSON)</button>
+          <label class="btn btn-sec" style="cursor:pointer">
+            ⬆ Komplett-Import (JSON)
+            <input type="file" accept=".json" style="display:none" onchange="importJSON(event)">
+          </label>
+          <hr class="div">
+          <div class="card-title" style="margin-bottom:8px">CSV-Import (je Bereich)</div>
+          <button class="btn btn-sec" onclick="openImportModal('fahrten')">⬆ Fahrten importieren (CSV)</button>
+          <button class="btn btn-sec" onclick="openImportModal('routen')">⬆ Routen importieren (CSV)</button>
+          <button class="btn btn-sec" onclick="openImportModal('tankungen')">⬆ Tankdaten importieren (CSV)</button>
+          <hr class="div">
+          <button class="btn btn-danger" onclick="resetAll()">🗑 Alle Daten löschen</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Zweck-Optionen <span style="font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">(Dropdown bei Fahrt-Erfassung – individuell erweiterbar)</span></div>
+      <div id="zweckMgr"></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// STORAGE & DATA
+// ════════════════════════════════════════════════════════════
+const SK = 'fahrtenbuch_v2';
+
+function load()    { try { const r=localStorage.getItem(SK); if(r) return JSON.parse(r); } catch(e){} return null; }
+function save(d)   { localStorage.setItem(SK,JSON.stringify(d)); }
+function db()      { return window._db; }
+function commit()  { save(window._db); }
+
+function defaults() {
+  return {
+    meta: { kennzeichen:'K-CB 2130', fahrer:'Dirk Kötting', verbrauch:7.0, tankVol:60, anfangsKm:29475,
+            zweckOptionen:['Akquise','Projektbesprechung','Projektauftrag','Vorstellungstermin','Interview'] },
+    fahrten: [],
+    routen: [
+      { id:uid(), name:'Zeppelin',                von:'Bad Tölz', nach:'Garching', km:149, kat:'geschäftlich', zweck:'Kundenbesuch Zeppelin',          aktiv:true },
+      { id:uid(), name:'Aquise Bergwacht',         von:'Bad Tölz', nach:'Bad Tölz',km:9,   kat:'geschäftlich', zweck:'Akquise Bergwacht',              aktiv:true },
+      { id:uid(), name:'Aquise Hays',              von:'Bad Tölz', nach:'München', km:138, kat:'geschäftlich', zweck:'Akquise Hays',                   aktiv:true },
+      { id:uid(), name:'Aquise Krongaard München', von:'Bad Tölz', nach:'München', km:110, kat:'geschäftlich', zweck:'Akquise Krongaard München',      aktiv:true }
+    ],
+    tankungen: [
+      { id:uid(), datum:'2026-01-16', ort:'Bad Tölz', liter:35.85, ppl:1.709, gesamt:61.32, notiz:'' }
+    ]
+  };
+}
+
+function boot() {
+  let d = load();
+  if (!d) { d=defaults(); save(d); }
+  // Migration: zweckOptionen für ältere Datensätze ergänzen
+  if (!d.meta.zweckOptionen) d.meta.zweckOptionen=[...ZWECK_OPTS];
+  window._db = d;
+  applyTheme(localStorage.getItem('fb_theme')||'dark');
+  updateSB();
+}
+
+// ════════════════════════════════════════════════════════════
+// THEME
+// ════════════════════════════════════════════════════════════
+function applyTheme(t) {
+  document.body.classList.toggle('light', t==='light');
+  document.getElementById('themeIcon').textContent = t==='light' ? '🌙' : '☀️';
+  document.getElementById('themeTxt').textContent  = t==='light' ? 'Dunkel-Modus' : 'Hell-Modus';
+  localStorage.setItem('fb_theme', t);
+}
+function toggleTheme() {
+  const cur = document.body.classList.contains('light') ? 'light' : 'dark';
+  applyTheme(cur==='light' ? 'dark' : 'light');
+}
+
+// ════════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════════
+function uid()  { return crypto.randomUUID(); }
+
+function n(v, dec=0) {
+  if (v===null||v===undefined||isNaN(+v)) return '–';
+  return (+v).toLocaleString('de-DE',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+}
+function nde(v, dec=0) { // German decimal for CSV
+  if (!v&&v!==0) return '';
+  return (+v).toFixed(dec).replace('.',',');
+}
+function fdate(s) {
+  if (!s) return '–';
+  const d=new Date(s+'T00:00:00');
+  return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+function today()    { return new Date().toISOString().split('T')[0]; }
+function monthLabel(m) { return ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][m-1]; }
+function daysIn(y,m)   { return new Date(y,m,0).getDate(); }
+function dow(y,m,d)    { return new Date(y,m-1,d).getDay(); }
+function isWE(y,m,d)   { const w=dow(y,m,d); return w===0||w===6; }
+function dowStr(y,m,d) { return ['So','Mo','Di','Mi','Do','Fr','Sa'][dow(y,m,d)]; }
+function esc(s)        { return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+// ── Zweck-Dropdown ──
+const ZWECK_OPTS = ['Akquise','Projektbesprechung','Projektauftrag','Vorstellungstermin','Interview'];
+function getZweckOpts() { return db().meta.zweckOptionen || ZWECK_OPTS; }
+function matchZweck(val) {
+  const opts = getZweckOpts();
+  if (!val) return opts[0];
+  const v = val.toLowerCase();
+  const exact = opts.find(o => o.toLowerCase() === v);
+  if (exact) return exact;
+  const partial = opts.find(o => v.includes(o.toLowerCase()));
+  return partial || opts[0];
+}
+
+// Parse a date string DD.MM.YYYY or YYYY-MM-DD → YYYY-MM-DD
+function parseDate(s) {
+  if (!s) return '';
+  s = s.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if (m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  return s;
+}
+
+// Parse German number "1.234,56" or "1234,56" or "1234.56" → float
+function parseNum(s) {
+  if (!s) return NaN;
+  s = String(s).trim();
+  // German: dot = thousands, comma = decimal
+  if (/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(s)) s = s.replace(/\./g,'').replace(',','.');
+  else s = s.replace(',','.');
+  return parseFloat(s);
+}
+
+// ════════════════════════════════════════════════════════════
+// NOTIFICATIONS & CONFIRM
+// ════════════════════════════════════════════════════════════
+function notify(msg,type='ok') {
+  const el=document.getElementById('notif');
+  el.textContent=msg; el.className=`notif ${type} show`;
+  setTimeout(()=>{ el.className='notif'; },3200);
+}
+
+let _confResolve;
+function showConfirm(msg) {
+  return new Promise(res=>{
+    document.getElementById('confTxt').textContent=msg;
+    document.getElementById('confOverlay').classList.add('open');
+    _confResolve=v=>{ document.getElementById('confOverlay').classList.remove('open'); res(v); };
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// MODAL
+// ════════════════════════════════════════════════════════════
+function openModal(title,body,footer) {
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalBody').innerHTML=body;
+  document.getElementById('modalFt').innerHTML=footer;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+// ════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelector('[data-page="'+page+'"]')?.classList.add('active');
+  ({dashboard:renderDash,fahrtenbuch:renderFB,helper:renderHelper,tanken:renderTank,auswertung:renderAusw,'soll-ist':renderSollIst,settings:renderSettings})[page]?.();
+}
+
+function updateSB() {
+  const m=db().meta;
+  document.getElementById('sbCar').textContent    = m.kennzeichen;
+  document.getElementById('sbDriver').textContent = m.fahrer;
+}
+
+// ════════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════════
+function renderDash() {
+  const d=db(), now=new Date(), y=now.getFullYear(), mo=now.getMonth()+1;
+  const pre=`${y}-${String(mo).padStart(2,'0')}`;
+  document.getElementById('dashSub').textContent=`${monthLabel(mo)} ${y}`;
+
+  const fMon = d.fahrten.filter(f=>f.datum.startsWith(pre));
+  const kmT  = fMon.reduce((s,f)=>s+(f.km||0),0);
+  const kmB  = fMon.filter(f=>f.art==='geschäftlich').reduce((s,f)=>s+(f.km||0),0);
+  const kmP  = fMon.filter(f=>f.art==='privat').reduce((s,f)=>s+(f.km||0),0);
+  const pctB = kmT>0?Math.round(kmB/kmT*100):0;
+  const pctP = kmT>0?Math.round(kmP/kmT*100):0;
+
+  const sortTank=[...d.tankungen].sort((a,b)=>b.datum.localeCompare(a.datum));
+  const letzte=sortTank[0]||null;
+  let rest=null, kmSeit=0, maxKm=null, pctUsed=0, tankWarn=0;
+  // tankWarn: 0=ok, 1=bald tanken (≥80%), 2=kritisch (≥95%), 3=überschritten (>100%)
+  if (letzte) {
+    kmSeit=d.fahrten.filter(f=>f.datum>=letzte.datum).reduce((s,f)=>s+(f.km||0),0);
+    // Reichweite aus tatsächlich getankten Litern (nicht Tankvolumen)
+    if (letzte.liter) {
+      maxKm = Math.round(letzte.liter / d.meta.verbrauch * 100);
+      rest   = maxKm - kmSeit;
+      pctUsed= Math.min(110, Math.round(kmSeit / maxKm * 100));
+    } else {
+      // Fallback: Tankvolumen
+      maxKm  = Math.round(d.meta.tankVol / d.meta.verbrauch * 100);
+      rest   = Math.round(((d.meta.tankVol - kmSeit*d.meta.verbrauch/100) / d.meta.verbrauch)*100);
+      pctUsed= Math.min(110, Math.round(kmSeit / maxKm * 100));
+    }
+    tankWarn = pctUsed>=100 ? 3 : pctUsed>=95 ? 2 : pctUsed>=80 ? 1 : 0;
+  }
+  const tankBarCol = tankWarn===0?'var(--ok)': tankWarn===1?'#f59e0b': tankWarn===2?'var(--warn)':'#dc2626';
+  const tankMsg    = tankWarn===3 ? '🔴 Reichweite überschritten – bitte tanken!'
+                   : tankWarn===2 ? '🟠 Kritisch – sofort tanken!'
+                   : tankWarn===1 ? '🟡 Bald tanken'
+                   : rest!==null  ? `${n(kmSeit)} km seit Tankung · noch ca. ${n(Math.max(0,rest))} km`
+                   : 'Keine Tankdaten';
+
+  document.getElementById('dashStats').innerHTML=`
+    <div class="stat">
+      <div class="stat-lbl">Gesamt-km ${monthLabel(mo)}</div>
+      <div class="stat-val">${n(kmT)}<span class="stat-unit">km</span></div>
+      <div class="stat-sub">${fMon.length} Fahrten</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Geschäftlich</div>
+      <div class="stat-val">${n(kmB)}<span class="stat-unit">km</span></div>
+      <div class="stat-sub">${pctB}% Anteil</div>
+      <div class="pbar"><div class="pfill biz" style="width:${pctB}%"></div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Privat</div>
+      <div class="stat-val">${n(kmP)}<span class="stat-unit">km</span></div>
+      <div class="stat-sub">${pctP}% Anteil</div>
+      <div class="pbar"><div class="pfill prv" style="width:${pctP}%"></div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Reichweite seit letzter Tankung</div>
+      <div class="stat-val" style="color:${tankBarCol}">${rest!==null?n(Math.max(0,rest)):'–'}<span class="stat-unit" style="color:${tankBarCol}">km</span></div>
+      <div style="font-size:11px;margin-top:4px;color:${tankWarn>0?tankBarCol:'var(--text3)'}">${tankMsg}</div>
+      ${maxKm?`<div class="pbar" style="margin-top:6px"><div class="pfill" style="width:${Math.min(100,pctUsed)}%;background:${tankBarCol};transition:width .4s"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:2px"><span>0</span><span>${n(kmSeit)} / ${n(maxKm)} km (${pctUsed}%)</span></div>`:''}
+    </div>`;
+
+  const tMon=d.tankungen.filter(t=>t.datum.startsWith(pre));
+  const tatsL=tMon.reduce((s,t)=>s+(t.liter||0),0);
+  const erwL=kmT*d.meta.verbrauch/100;
+  const diff=tatsL-erwL;
+
+  document.getElementById('dashVerbrauch').innerHTML=`
+    <div class="card-title">Verbrauch ${monthLabel(mo)}</div>
+    <table style="width:100%">
+      <tr><td class="txt-muted">Erwartet (${d.meta.verbrauch} L/100 km):</td><td style="text-align:right;font-weight:500">${n(erwL,1)} L</td></tr>
+      <tr><td class="txt-muted">Tatsächlich getankt:</td><td style="text-align:right;font-weight:500">${n(tatsL,1)} L</td></tr>
+      <tr><td class="txt-muted">Differenz:</td><td style="text-align:right;font-weight:600;color:${diff>0?'var(--warn)':'var(--ok)'}">${diff>0?'+':''}${n(diff,1)} L</td></tr>
+    </table>`;
+
+  document.getElementById('dashTankung').innerHTML=letzte?`
+    <div class="card-title">Letzte Tankung</div>
+    <div style="font-size:22px;font-weight:700;color:var(--text)">${n(letzte.liter,2)} L</div>
+    <div class="txt-muted txt-sm" style="margin-top:4px">${fdate(letzte.datum)} · ${letzte.ort||'–'}</div>
+    ${letzte.ppl?`<div class="txt-muted txt-sm" style="margin-top:2px">${n(letzte.ppl,3)} €/L · ${n(letzte.gesamt,2)} €</div>`:''}
+  `:`<div class="card-title">Letzte Tankung</div><div class="txt-muted">Noch keine Einträge</div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// FAHRTENBUCH
+// ════════════════════════════════════════════════════════════
+function initFBSelects() {
+  const mEl=document.getElementById('fbMon'), yEl=document.getElementById('fbYear'), now=new Date();
+  if (!mEl.options.length) { for(let m=1;m<=12;m++) mEl.add(new Option(monthLabel(m),m)); mEl.value=now.getMonth()+1; }
+  if (!yEl.options.length) { for(let y=2024;y<=2030;y++) yEl.add(new Option(y,y)); yEl.value=now.getFullYear(); }
+}
+
+function renderFB() {
+  initFBSelects();
+  const mo=parseInt(document.getElementById('fbMon').value);
+  const yr=parseInt(document.getElementById('fbYear').value);
+  const d=db(), days=daysIn(yr,mo);
+  const pre=`${yr}-${String(mo).padStart(2,'0')}`;
+  const fMon=d.fahrten.filter(f=>f.datum.startsWith(pre));
+  const byDay={};
+  fMon.forEach(f=>{ const day=parseInt(f.datum.split('-')[2]); (byDay[day]=byDay[day]||[]).push(f); });
+  const totKm=fMon.reduce((s,f)=>s+(f.km||0),0);
+  const bizKm=fMon.filter(f=>f.art==='geschäftlich').reduce((s,f)=>s+(f.km||0),0);
+  const prvKm=fMon.filter(f=>f.art==='privat').reduce((s,f)=>s+(f.km||0),0);
+
+  let rows='';
+  for (let day=1;day<=days;day++) {
+    const ds=`${yr}-${String(mo).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const we=isWE(yr,mo,day), fl=byDay[day]||[];
+    if (!fl.length) {
+      rows+=`<tr class="${we?'wknd':''}">
+        <td style="color:var(--text3);white-space:nowrap">${String(day).padStart(2,'0')}. ${dowStr(yr,mo,day)}</td>
+        <td colspan="6" style="color:var(--border)">–</td>
+        <td><button class="btn-ico" onclick="openFahrtModal('${ds}',null)">+</button></td>
+      </tr>`;
+    } else {
+      fl.forEach((f,i)=>{
+        rows+=`<tr class="${we?'wknd':''}">
+          <td style="white-space:nowrap">${i===0?`<b>${String(day).padStart(2,'0')}. ${dowStr(yr,mo,day)}</b>`:''}</td>
+          <td>${n(f.anfKm)}</td><td>${n(f.endKm)}</td>
+          <td style="font-weight:600">${n(f.km)}</td>
+          <td>${f.art==='geschäftlich'?'<span class="badge biz-badge">geschäftl.</span>':'<span class="badge prv-badge">privat</span>'}</td>
+          <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(f.zweck)}">${f.zweck||'–'}</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(f.strecke)}">${f.strecke||'–'}</td>
+          <td style="white-space:nowrap">
+            ${i===0?`<button class="btn-ico" onclick="openFahrtModal('${ds}',null)" title="+">+</button>`:''}
+            <button class="btn-ico" onclick="openFahrtModal('${ds}','${f.id}')">✎</button>
+            <button class="btn-ico del" onclick="delFahrt('${f.id}')">✕</button>
+          </td>
+        </tr>`;
+      });
+    }
+  }
+
+  document.getElementById('fbContent').innerHTML=`
+    <div class="tw">
+      <table>
+        <thead><tr><th>Tag</th><th>Anfangs-km</th><th>End-km</th><th>km</th><th>Art</th><th>Zweck</th><th>Strecke / Route</th><th></th></tr></thead>
+        <tbody>
+          ${rows}
+          <tr class="sum-row">
+            <td colspan="3"><b>Monat gesamt</b></td>
+            <td><b>${n(totKm)} km</b></td>
+            <td colspan="4">
+              <span class="badge biz-badge">Geschäftlich: ${n(bizKm)} km</span>&nbsp;
+              <span class="badge prv-badge">Privat: ${n(prvKm)} km</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// lastEndKm: EndKm der letzten Fahrt VOR dem Zieldatum.
+// Fallback 1: letzter Eintrag vor ds (überspringt Wochenende / Lücken automatisch)
+// Fallback 2: meta.anfangsKm (wenn noch keine Fahrten vorhanden)
+function lastEndKm(ds) {
+  const d=db(), fs=d.fahrten;
+  const anfFb = d.meta.anfangsKm||null;          // Fallback: Anfangskilometerstand
+  if (!fs.length) return anfFb;
+  const sorted=[...fs].sort((a,b)=>a.datum!==b.datum?a.datum.localeCompare(b.datum):(a.anfKm||0)-(b.anfKm||0));
+  if (ds) {
+    const before=sorted.filter(f=>f.datum<ds);   // alle Einträge vor diesem Tag (inkl. "Freitag vor Montag")
+    if (before.length) return before.at(-1).endKm;
+    return anfFb;                                 // noch keine Einträge: nimm Anfangskilometerstand
+  }
+  return sorted.at(-1).endKm;
+}
+
+function openFahrtModal(ds, fahrtId) {
+  const d=db(), f=fahrtId?d.fahrten.find(x=>x.id===fahrtId):null;
+  const edit=!!f;
+  // Für neue Fahrt: datumsbezogenes Auto-AnfKm
+  const lkm = edit ? null : lastEndKm(ds||today());
+  const anf=f?f.anfKm:(lkm!=null?lkm:'');
+  const aktR=d.routen.filter(r=>r.aktiv);
+  // data-Attribute: km, strecke, zweck, kat für Vollautomatik
+  const hOpts=aktR.map(r=>`<option value="${r.id}" data-km="${r.km}" data-str="${esc(r.von+' → '+r.nach)}" data-zweck="${esc(r.zweck||r.name)}" data-kat="${r.kat}">${r.name} (${r.km} km)</option>`).join('');
+
+  // Datum der Fahrt (für Anzeige im Formular)
+  const fDatum = f ? f.datum : (ds||today());
+  // Wochenend-Erkennung
+  const fDow = new Date(fDatum+'T00:00:00').getDay(); // 0=So, 6=Sa
+  const isWE = fDow===0 || fDow===6;
+  const weDayName = fDow===6 ? 'Samstag' : 'Sonntag';
+  // Art: beim Bearbeiten beibehalten; neu + Wochenende → privat vorschlagen
+  const defArt = f ? f.art : (isWE ? 'privat' : 'geschäftlich');
+  // Zweck-Datalist: Optionen aus DB als Vorschläge, freie Eingabe möglich
+  const zweckList = getZweckOpts();
+  const curZweck  = f ? (f.zweck||'') : zweckList[0];
+  const zweckDataOpts = zweckList.map(o=>`<option value="${esc(o)}">`).join('');
+  // Hinweis: AnfKm Quelle
+  const anfSrc = (!edit && lkm!=null)
+    ? (isWE
+        ? `<span style="font-size:11px;color:var(--ok);margin-left:6px">✓ Auto – letzter Werktag</span>`
+        : `<span style="font-size:11px;color:var(--ok);margin-left:6px">✓ Auto – Vortag</span>`)
+    : (!edit && lkm==null
+        ? `<span style="font-size:11px;color:var(--warn);margin-left:6px">⚠ Bitte manuell eingeben</span>`
+        : '');
+  // Wochenend-Banner
+  const weBanner = (!edit && isWE)
+    ? `<div style="background:var(--prv-bg);border:1px solid var(--border);border-radius:6px;padding:9px 13px;
+                  margin-bottom:14px;font-size:12px;color:var(--prv-fg);display:flex;align-items:center;gap:8px">
+        <span>🏖</span>
+        <span><b>${weDayName}</b> erkannt – Art auf <b>Privat</b> voreingestellt.
+        Kilometerstände vom letzten Werktag werden übernommen.</span>
+       </div>`
+    : '';
+
+  openModal(edit?'Fahrt bearbeiten':'Neue Fahrt erfassen',`
+    ${weBanner}
+    <div class="frow">
+      <div class="fg"><label class="flbl">Datum *</label><input type="date" class="fc" id="fd" value="${fDatum}"></div>
+      <div class="fg"><label class="flbl">Art *</label>
+        <select class="fc" id="fa">
+          <option value="geschäftlich"${defArt==='geschäftlich'?' selected':''}>Geschäftlich</option>
+          <option value="privat"${defArt==='privat'?' selected':''}>Privat</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="flbl">Helper-Route übernehmen <span style="font-size:11px;font-weight:400;color:var(--text3)">(befüllt km, Strecke, Zweck & Art automatisch)</span></label>
+      <select class="fc" id="fh" onchange="applyRoute()">
+        <option value="">– keine –</option>${hOpts}
+      </select>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flbl">Anfangskilometer *${anfSrc}</label><input type="number" class="fc" id="fak" value="${anf}" min="0" oninput="calcKm()"></div>
+      <div class="fg"><label class="flbl">Endkilometer *</label><input type="number" class="fc" id="fek" value="${f?f.endKm:''}" min="0" oninput="calcKm()"></div>
+      <div class="fg"><label class="flbl">Gefahrene km</label><input type="number" class="fc" id="fkm" value="${f?f.km:''}" readonly style="opacity:.5;background:var(--bg3)"></div>
+    </div>
+    <div class="fg"><label class="flbl">Zweck der Fahrt <span style="font-size:11px;font-weight:400;color:var(--text3)">(Auswahl oder freie Eingabe – wird durch Route auto-befüllt)</span></label>
+      <input type="text" class="fc" id="fz" list="fzDatalist" value="${esc(curZweck)}" placeholder="Zweck wählen oder eingeben …" autocomplete="off">
+      <datalist id="fzDatalist">${zweckDataOpts}</datalist>
+    </div>
+    <div class="fg"><label class="flbl">Strecke / Route</label><input type="text" class="fc" id="fst" value="${esc(f?f.strecke||'':'')}" placeholder="z.B. Bad Tölz → München → Bad Tölz"></div>
+    ${f?`<input type="hidden" id="fid" value="${f.id}">`:''}`,
+    `<button class="btn btn-sec" onclick="closeModal()">Abbrechen</button>
+     <button class="btn btn-primary" onclick="saveFahrt(${edit})">Speichern</button>`);
+  calcKm();
+}
+
+function applyRoute() {
+  const sel=document.getElementById('fh'), opt=sel.options[sel.selectedIndex];
+  if (!opt.value) return;
+
+  const km   = parseInt(opt.dataset.km)||0;
+  const anf  = parseFloat(document.getElementById('fak').value)||0;
+  const kat  = opt.dataset.kat||'geschäftlich';
+  const zweck= opt.dataset.zweck||'';
+  const str  = opt.dataset.str||'';
+
+  // EndKm = AnfKm + Standard-km der Route
+  document.getElementById('fek').value  = anf + km;
+  // Strecke aus Route
+  document.getElementById('fst').value  = str;
+  // Zweck aus Route direkt in Textfeld (freie Eingabe + Datalist)
+  document.getElementById('fz').value = zweck;
+  // Art automatisch auf Kategorie der Route setzen (wenn nicht "beide")
+  if (kat !== 'beide') {
+    document.getElementById('fa').value = kat;
+  }
+  calcKm();
+}
+function calcKm() {
+  const a=parseFloat(document.getElementById('fak').value)||0;
+  const e=parseFloat(document.getElementById('fek').value)||0;
+  document.getElementById('fkm').value=Math.max(0,e-a)||'';
+}
+
+function saveFahrt(edit) {
+  const datum=document.getElementById('fd').value;
+  const anfKm=parseFloat(document.getElementById('fak').value);
+  const endKm=parseFloat(document.getElementById('fek').value);
+  const art=document.getElementById('fa').value;
+  if (!datum)       { notify('Datum fehlt','err'); return; }
+  if (isNaN(anfKm)) { notify('Anfangskilometer fehlt','err'); return; }
+  if (isNaN(endKm)) { notify('Endkilometer fehlt','err'); return; }
+  if (endKm<anfKm)  { notify('Endkilometer < Anfangskilometer','err'); return; }
+  const d=db();
+  const obj={ datum,anfKm,endKm,km:Math.max(0,endKm-anfKm),art,
+    zweck:document.getElementById('fz').value.trim(),
+    strecke:document.getElementById('fst').value.trim(),
+    routeId:document.getElementById('fh')?.value||'' };
+  if (edit) {
+    const id=document.getElementById('fid').value, i=d.fahrten.findIndex(x=>x.id===id);
+    if (i!==-1) { d.fahrten[i]={...d.fahrten[i],...obj}; notify('Fahrt gespeichert'); }
+  } else { obj.id=uid(); d.fahrten.push(obj); notify('Fahrt erfasst'); }
+  commit(); closeModal(); renderFB();
+}
+
+async function delFahrt(id) {
+  if (!await showConfirm('Fahrt wirklich löschen?')) return;
+  db().fahrten=db().fahrten.filter(f=>f.id!==id);
+  commit(); renderFB(); notify('Fahrt gelöscht');
+}
+
+// ════════════════════════════════════════════════════════════
+// HELPER-ROUTEN
+// ════════════════════════════════════════════════════════════
+function renderHelper() {
+  const d=db(), tb=document.getElementById('helperBody');
+  if (!d.routen.length) { tb.innerHTML='<tr><td colspan="8" class="empty">Keine Routen vorhanden</td></tr>'; return; }
+  tb.innerHTML=d.routen.map(r=>`
+    <tr style="${!r.aktiv?'opacity:.4':''}">
+      <td style="font-weight:500">${r.name}</td>
+      <td>${r.von}</td><td>${r.nach}</td>
+      <td>${n(r.km)} km</td>
+      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)" title="${esc(r.zweck)}">${r.zweck||'–'}</td>
+      <td>${r.kat==='geschäftlich'?'<span class="badge biz-badge">geschäftl.</span>':r.kat==='privat'?'<span class="badge prv-badge">privat</span>':'<span class="badge" style="background:var(--bg3);color:var(--text2)">beide</span>'}</td>
+      <td>${r.aktiv?'<span style="color:var(--ok)">● Aktiv</span>':'<span style="color:var(--text3)">○ Inaktiv</span>'}</td>
+      <td style="white-space:nowrap">
+        <button class="btn-ico" onclick="openHelperModal('${r.id}')">✎</button>
+        <button class="btn-ico" onclick="toggleRoute('${r.id}')" title="${r.aktiv?'Deaktivieren':'Aktivieren'}">${r.aktiv?'⏸':'▶'}</button>
+        <button class="btn-ico del" onclick="delRoute('${r.id}')">✕</button>
+      </td>
+    </tr>`).join('');
+}
+
+function openHelperModal(id) {
+  const d=db(), r=id?d.routen.find(x=>x.id===id):null, edit=!!r;
+  openModal(edit?'Route bearbeiten':'Neue Route',`
+    <div class="fg"><label class="flbl">Name *</label>
+      <input type="text" class="fc" id="rn" value="${esc(r?r.name:'')}" placeholder="z.B. Aquise Hays">
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flbl">Startort</label><input type="text" class="fc" id="rv" value="${esc(r?r.von:'')}"></div>
+      <div class="fg"><label class="flbl">Zielort</label><input type="text" class="fc" id="rna" value="${esc(r?r.nach:'')}"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flbl">Standard-km *</label><input type="number" class="fc" id="rkm" value="${r?r.km:''}" min="0"></div>
+      <div class="fg"><label class="flbl">Kategorie</label>
+        <select class="fc" id="rk">
+          <option value="geschäftlich"${(!r||r.kat==='geschäftlich')?' selected':''}>Geschäftlich</option>
+          <option value="privat"${r&&r.kat==='privat'?' selected':''}>Privat</option>
+          <option value="beide"${r&&r.kat==='beide'?' selected':''}>Beide</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label class="flbl">Standard-Zweck (wird bei Fahrt-Erfassung auto-befüllt)</label>
+      <input type="text" class="fc" id="rz" value="${esc(r?r.zweck||'':'')}" placeholder="z.B. Kundenbesuch, Akquise...">
+    </div>
+    ${r?`<input type="hidden" id="rid" value="${r.id}">`:''}`,
+    `<button class="btn btn-sec" onclick="closeModal()">Abbrechen</button>
+     <button class="btn btn-primary" onclick="saveRoute(${edit})">Speichern</button>`);
+}
+
+function saveRoute(edit) {
+  const name=document.getElementById('rn').value.trim(), km=parseFloat(document.getElementById('rkm').value);
+  if (!name) { notify('Name fehlt','err'); return; }
+  if (isNaN(km)) { notify('km fehlt','err'); return; }
+  const d=db(), obj={
+    name,
+    von:   document.getElementById('rv').value.trim(),
+    nach:  document.getElementById('rna').value.trim(),
+    km,
+    kat:   document.getElementById('rk').value,
+    zweck: document.getElementById('rz').value.trim(),
+    aktiv: true
+  };
+  if (edit) { const id=document.getElementById('rid').value, i=d.routen.findIndex(x=>x.id===id); if(i!==-1){d.routen[i]={...d.routen[i],...obj};notify('Route gespeichert');} }
+  else { obj.id=uid(); d.routen.push(obj); notify('Route angelegt'); }
+  commit(); closeModal(); renderHelper();
+}
+function toggleRoute(id) { const r=db().routen.find(x=>x.id===id); if(r){r.aktiv=!r.aktiv;commit();renderHelper();} }
+async function delRoute(id) {
+  if (!await showConfirm('Route wirklich löschen?')) return;
+  db().routen=db().routen.filter(x=>x.id!==id); commit(); renderHelper(); notify('Route gelöscht');
+}
+
+// ════════════════════════════════════════════════════════════
+// TANKEN
+// ════════════════════════════════════════════════════════════
+function initTankYearSelect() {
+  const yEl=document.getElementById('tankYear');
+  if (!yEl) return null;
+
+  const years=new Set();
+  db().tankungen.forEach(t=>{ if (t?.datum) years.add(parseInt(t.datum.substring(0,4))); });
+  db().fahrten.forEach(f=>{ if (f?.datum) years.add(parseInt(f.datum.substring(0,4))); });
+
+  const nowY=new Date().getFullYear();
+  years.add(nowY);
+
+  const sorted=[...years].filter(Boolean).sort((a,b)=>a-b);
+  const curVal=parseInt(yEl.value)||null;
+  yEl.innerHTML='';
+  sorted.forEach(y=>yEl.add(new Option(y,y)));
+
+  const fallback=sorted.includes(nowY) ? nowY : sorted[sorted.length-1];
+  yEl.value = (curVal && sorted.includes(curVal)) ? curVal : fallback;
+  return parseInt(yEl.value);
+}
+
+function renderTank() {
+  const d=db(), tb=document.getElementById('tankBody');
+  const year=initTankYearSelect();
+  const yearStr=String(year);
+  const tankSub=document.getElementById('tankSub');
+  if (tankSub) tankSub.textContent=`Tankdaten für ${yearStr}`;
+
+  const tankungenYear=d.tankungen.filter(t=>t.datum&&t.datum.startsWith(yearStr+'-'));
+  const sorted=[...tankungenYear].sort((a,b)=>b.datum.localeCompare(a.datum));
+  tb.innerHTML=sorted.length?sorted.map(t=>`
+    <tr>
+      <td>${fdate(t.datum)}</td><td>${t.ort||'–'}</td>
+      <td>${n(t.liter,2)} L</td><td>${t.ppl?n(t.ppl,3)+' €/L':'–'}</td>
+      <td>${t.gesamt?n(t.gesamt,2)+' €':'–'}</td>
+      <td class="txt-muted">${t.notiz||'–'}</td>
+      <td style="white-space:nowrap">
+        <button class="btn-ico" onclick="openTankModal('${t.id}')">✎</button>
+        <button class="btn-ico del" onclick="delTank('${t.id}')">✕</button>
+      </td>
+    </tr>`).join(''):`<tr><td colspan="7" class="empty">Keine Tankeinträge für ${yearStr} vorhanden</td></tr>`;
+
+  const byMon={};
+  tankungenYear.forEach(t=>{ const k=t.datum.substring(0,7); if(!byMon[k])byMon[k]={l:0,k:0}; byMon[k].l+=(t.liter||0); byMon[k].k+=(t.gesamt||0); });
+  const keys=Object.keys(byMon).sort().reverse();
+  if (!keys.length) {
+    document.getElementById('tankMonth').innerHTML=`<div class="txt-muted">Noch keine Tankdaten für ${yearStr}</div>`;
+    document.getElementById('tankCheck').innerHTML=`<div class="txt-muted">Keine Tankdaten für ${yearStr} vorhanden</div>`;
+    return;
+  }
+
+  const rows=keys.map(k=>{
+    const [y,m]=k.split('-'), kmM=d.fahrten.filter(f=>f.datum&&f.datum.startsWith(k)).reduce((s,f)=>s+(f.km||0),0);
+    const erw=kmM*d.meta.verbrauch/100, diff=byMon[k].l-erw;
+    return `<tr>
+      <td>${monthLabel(+m)} ${y}</td><td>${n(byMon[k].l,1)} L</td><td>${n(byMon[k].k,2)} €</td>
+      <td class="txt-muted">${n(kmM)} km → erw. ${n(erw,1)} L</td>
+      <td style="color:${diff>0?'var(--warn)':'var(--ok)'}">${diff>0?'+':''}${n(diff,1)} L</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('tankMonth').innerHTML=`
+    <div class="tw" style="border:none"><table>
+      <thead><tr><th>Monat</th><th>Getankt</th><th>Kosten</th><th>Basis</th><th>Differenz</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+
+  // ── Reichweiten-Check pro Tankvorgang innerhalb des gewählten Jahres ──
+  const sortedAsc=[...tankungenYear].sort((a,b)=>a.datum.localeCompare(b.datum));
+  const vbr=d.meta.verbrauch;
+  const checkRows=sortedAsc.map((t,i)=>{
+    const nextT=sortedAsc[i+1]||null;
+    const bisDatum=nextT?nextT.datum:null;
+    const kmGef=d.fahrten.filter(f=>f.datum&&f.datum>=t.datum&&(!bisDatum||f.datum<bisDatum)).reduce((s,f)=>s+(f.km||0),0);
+    const maxKm=t.liter?Math.round(t.liter/vbr*100):null;
+    const pct=maxKm&&maxKm>0?Math.min(110,Math.round(kmGef/maxKm*100)):null;
+    const status=pct===null?'–':pct>=100?'🔴 Überschritten':pct>=95?'🟠 Kritisch':pct>=80?'🟡 Bald tanken':'🟢 OK';
+    const barCol=pct===null?'var(--border)':pct>=100?'#dc2626':pct>=95?'var(--warn)':pct>=80?'#f59e0b':'var(--ok)';
+    return `<tr>
+      <td>${fdate(t.datum)}<br><span class="txt-muted txt-sm">${t.ort||''}</span></td>
+      <td>${n(t.liter,2)} L<br><span class="txt-muted txt-sm">${maxKm?'max ~'+n(maxKm)+' km':'–'}</span></td>
+      <td>${n(kmGef)} km
+        ${maxKm?`<div class="pbar" style="margin-top:4px;width:120px"><div class="pfill" style="width:${Math.min(100,pct||0)}%;background:${barCol}"></div></div>`:''}
+      </td>
+      <td style="color:${barCol};font-weight:600">${status}</td>
+      <td class="txt-muted txt-sm">${nextT?'→ Nächste Tankung: '+fdate(nextT.datum):'→ Aktuell'}</td>
+    </tr>`;
+  }).join('');
+
+  const checkDiv=document.getElementById('tankCheck');
+  if(checkDiv) checkDiv.innerHTML=sortedAsc.length?`
+    <div class="tw" style="border:none"><table>
+      <thead><tr><th>Tankdatum</th><th>Getankt / max. Reichweite</th><th>Gefahrene km</th><th>Status</th><th>Zeitraum</th></tr></thead>
+      <tbody>${checkRows}</tbody>
+    </table></div>
+  `:`<div class="txt-muted">Keine Tankdaten für ${yearStr} vorhanden</div>`;
+}
+
+function openTankModal(id) {
+  const d=db(), t=id?d.tankungen.find(x=>x.id===id):null, edit=!!t;
+  openModal(edit?'Tankeintrag bearbeiten':'Neuer Tankeintrag',`
+    <div class="frow">
+      <div class="fg"><label class="flbl">Datum *</label><input type="date" class="fc" id="td" value="${t?t.datum:today()}"></div>
+      <div class="fg"><label class="flbl">Ort / Tankstelle</label><input type="text" class="fc" id="to" value="${esc(t?t.ort||'':'')}" placeholder="z.B. Bad Tölz"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flbl">Liter *</label><input type="number" class="fc" id="tl" value="${t?t.liter:''}" min="0" step="0.01" oninput="calcTank()"></div>
+      <div class="fg"><label class="flbl">€ / Liter</label><input type="number" class="fc" id="tp" value="${t?t.ppl||'':''}" min="0" step="0.001" oninput="calcTank()"></div>
+      <div class="fg"><label class="flbl">Gesamt (€)</label><input type="number" class="fc" id="tg" value="${t?t.gesamt||'':''}" min="0" step="0.01"></div>
+    </div>
+    <div class="fg"><label class="flbl">Notiz</label><input type="text" class="fc" id="tn" value="${esc(t?t.notiz||'':'')}"></div>
+    ${t?`<input type="hidden" id="tid" value="${t.id}">`:''}`,
+    `<button class="btn btn-sec" onclick="closeModal()">Abbrechen</button>
+     <button class="btn btn-primary" onclick="saveTank(${edit})">Speichern</button>`);
+}
+
+function calcTank() {
+  const l=parseFloat(document.getElementById('tl').value)||0, p=parseFloat(document.getElementById('tp').value)||0;
+  if (l&&p) document.getElementById('tg').value=(l*p).toFixed(2);
+}
+
+function saveTank(edit) {
+  const datum=document.getElementById('td').value, liter=parseFloat(document.getElementById('tl').value);
+  if (!datum) { notify('Datum fehlt','err'); return; }
+  if (isNaN(liter)||liter<=0) { notify('Liter fehlt','err'); return; }
+  const d=db(), obj={datum,ort:document.getElementById('to').value.trim(),liter,
+    ppl:parseFloat(document.getElementById('tp').value)||null,
+    gesamt:parseFloat(document.getElementById('tg').value)||null,
+    notiz:document.getElementById('tn').value.trim()};
+  if (edit) { const id=document.getElementById('tid').value, i=d.tankungen.findIndex(x=>x.id===id); if(i!==-1){d.tankungen[i]={...d.tankungen[i],...obj};notify('Tankeintrag gespeichert');} }
+  else { obj.id=uid(); d.tankungen.push(obj); notify('Tankeintrag erfasst'); }
+  commit(); closeModal(); renderTank();
+}
+
+async function delTank(id) {
+  if (!await showConfirm('Tankeintrag wirklich löschen?')) return;
+  db().tankungen=db().tankungen.filter(x=>x.id!==id); commit(); renderTank(); notify('Tankeintrag gelöscht');
+}
+
+// ════════════════════════════════════════════════════════════
+// AUSWERTUNG
+// ════════════════════════════════════════════════════════════
+function initAuswYear() {
+  const el=document.getElementById('auswYear');
+  if (!el.options.length) { const y=new Date().getFullYear(); for(let i=2024;i<=2030;i++) el.add(new Option(i,i)); el.value=y; }
+}
+
+function renderAusw() {
+  initAuswYear();
+  const yr=parseInt(document.getElementById('auswYear').value), d=db();
+  const months=Array.from({length:12},(_,i)=>i+1).map(m=>{
+    const pre=`${yr}-${String(m).padStart(2,'0')}`;
+    const fs=d.fahrten.filter(f=>f.datum.startsWith(pre));
+    const ts=d.tankungen.filter(t=>t.datum.startsWith(pre));
+    const kmT=fs.reduce((s,f)=>s+(f.km||0),0);
+    const kmB=fs.filter(f=>f.art==='geschäftlich').reduce((s,f)=>s+(f.km||0),0);
+    const kmP=fs.filter(f=>f.art==='privat').reduce((s,f)=>s+(f.km||0),0);
+    return {m,kmT,kmB,kmP,pctP:kmT>0?Math.round(kmP/kmT*100):0,tK:ts.reduce((s,t)=>s+(t.gesamt||0),0)};
+  });
+
+  const maxKm=Math.max(...months.map(m=>m.kmT),1);
+  const totKm=months.reduce((s,m)=>s+m.kmT,0);
+  const totB=months.reduce((s,m)=>s+m.kmB,0);
+  const totP=months.reduce((s,m)=>s+m.kmP,0);
+  const totTK=months.reduce((s,m)=>s+m.tK,0);
+
+  const bars=months.map(m=>{
+    const pct=Math.round(m.kmT/maxKm*100);
+    return `<div class="cbar-g">
+      <div class="cval">${m.kmT>0?n(m.kmT):''}</div>
+      <div class="cbar" style="height:${Math.max(pct,m.kmT>0?2:0)}%;background:${m.kmT>0?'var(--accent)':'var(--border)'}"></div>
+      <div class="clbl">${monthLabel(m.m).substring(0,3)}</div>
+    </div>`;
+  }).join('');
+
+  const rows=months.map(m=>`
+    <tr>
+      <td>${monthLabel(m.m)}</td>
+      <td>${m.kmT>0?n(m.kmT)+' km':'–'}</td><td>${m.kmB>0?n(m.kmB)+' km':'–'}</td>
+      <td>${m.kmP>0?n(m.kmP)+' km':'–'}</td><td>${m.kmT>0?m.pctP+' %':'–'}</td>
+      <td>${m.tK>0?n(m.tK,2)+' €':'–'}</td><td>${m.kmT>0?n(m.kmT*d.meta.verbrauch/100,1)+' L':'–'}</td>
+    </tr>`).join('');
+
+  document.getElementById('auswContent').innerHTML=`
+    <div class="g4 mb28">
+      <div class="stat"><div class="stat-lbl">Gesamt-km ${yr}</div><div class="stat-val">${n(totKm)}<span class="stat-unit">km</span></div></div>
+      <div class="stat"><div class="stat-lbl">Geschäftlich</div><div class="stat-val">${n(totB)}<span class="stat-unit">km</span></div><div class="stat-sub">${totKm>0?Math.round(totB/totKm*100):0}%</div></div>
+      <div class="stat"><div class="stat-lbl">Privat</div><div class="stat-val">${n(totP)}<span class="stat-unit">km</span></div><div class="stat-sub">${totKm>0?Math.round(totP/totKm*100):0}%</div></div>
+      <div class="stat"><div class="stat-lbl">Tankkosten ${yr}</div><div class="stat-val">${n(totTK,2)}<span class="stat-unit">€</span></div></div>
+    </div>
+    <div class="card mb28"><div class="card-title">km pro Monat ${yr}</div><div class="chart-wrap">${bars}</div></div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Monat</th><th>Gesamt-km</th><th>Geschäftlich</th><th>Privat</th><th>Privatanteil</th><th>Tankkosten</th><th>Erw. Verbrauch</th></tr></thead>
+        <tbody>
+          ${rows}
+          <tr class="sum-row">
+            <td><b>Gesamt ${yr}</b></td><td><b>${n(totKm)} km</b></td><td><b>${n(totB)} km</b></td>
+            <td><b>${n(totP)} km</b></td><td><b>${totKm>0?Math.round(totP/totKm*100):0} %</b></td>
+            <td><b>${n(totTK,2)} €</b></td><td><b>${n(totKm*d.meta.verbrauch/100,1)} L</b></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// SOLL/IST-VERGLEICH
+// ════════════════════════════════════════════════════════════
+function initSollIstYear() {
+  const el=document.getElementById('sollIstYear');
+  if (!el.options.length) { const y=new Date().getFullYear(); for(let i=2024;i<=2030;i++) el.add(new Option(i,i)); el.value=y; }
+}
+
+function renderSollIst() {
+  initSollIstYear();
+  const yr=parseInt(document.getElementById('sollIstYear').value), d=db();
+  const vbr=d.meta.verbrauch||7;
+
+  const months=Array.from({length:12},(_,i)=>i+1).map(m=>{
+    const pre=`${yr}-${String(m).padStart(2,'0')}`;
+    // km-Basis aus Tankdaten des Monats (Liter → km)
+    const literMon=d.tankungen.filter(t=>t.datum.startsWith(pre)).reduce((s,t)=>s+(t.liter||0),0);
+    const kmTank=literMon>0?Math.round(literMon/vbr*100):0;
+    // Ist-Werte aus eingetragenen Fahrten
+    const fs=d.fahrten.filter(f=>f.datum.startsWith(pre));
+    const kmBiz=fs.filter(f=>f.art==='geschäftlich').reduce((s,f)=>s+(f.km||0),0);
+    const kmPrv=fs.filter(f=>f.art==='privat').reduce((s,f)=>s+(f.km||0),0);
+    const sollBiz=kmTank*0.75, sollPrv=kmTank*0.25;
+    const abwBiz=kmBiz-sollBiz, abwPrv=kmPrv-sollPrv;
+    const quote=kmTank>0?kmBiz/kmTank:null;
+    const ampel=kmTank===0?'–':quote>=0.75?'🟢':quote>0?'🟡':'🔴';
+    return {m,kmTank,sollBiz,sollPrv,kmBiz,kmPrv,abwBiz,abwPrv,quote,ampel};
+  });
+
+  const totKmTank =months.reduce((s,m)=>s+m.kmTank,0);
+  const totSollBiz=months.reduce((s,m)=>s+m.sollBiz,0);
+  const totSollPrv=months.reduce((s,m)=>s+m.sollPrv,0);
+  const totKmBiz  =months.reduce((s,m)=>s+m.kmBiz,0);
+  const totKmPrv  =months.reduce((s,m)=>s+m.kmPrv,0);
+  const totAbwBiz =totKmBiz-totSollBiz, totAbwPrv=totKmPrv-totSollPrv;
+  const totQuote  =totKmTank>0?totKmBiz/totKmTank:null;
+  const totAmpel  =totKmTank===0?'–':totQuote>=0.75?'🟢':totQuote>0?'🟡':'🔴';
+
+  const ra='style="text-align:right"';
+  const fmtAbw=(v,hasTank)=>hasTank?(v>=0?'<span style="color:var(--ok)">+'+n(v,1)+'</span>':'<span style="color:var(--warn)">'+n(v,1)+'</span>'):'–';
+
+  const rows=months.map(mo=>`
+    <tr>
+      <td><b>${monthLabel(mo.m)}</b></td>
+      <td ${ra}>${mo.kmTank>0?n(mo.kmTank):'0'}</td>
+      <td ${ra} style="color:var(--biz-fg)">${mo.kmTank>0?n(mo.sollBiz,1):'–'}</td>
+      <td ${ra} style="color:var(--prv-fg)">${mo.kmTank>0?n(mo.sollPrv,1):'–'}</td>
+      <td ${ra} style="color:var(--biz-fg)">${n(mo.kmBiz)}</td>
+      <td ${ra} style="color:var(--prv-fg)">${n(mo.kmPrv)}</td>
+      <td ${ra}>${fmtAbw(mo.abwBiz,mo.kmTank>0)}</td>
+      <td ${ra}>${fmtAbw(mo.abwPrv,mo.kmTank>0)}</td>
+      <td ${ra}>${mo.quote!==null?Math.round(mo.quote*100)+' %':'–'}</td>
+      <td style="text-align:center;font-size:16px">${mo.ampel}</td>
+    </tr>`).join('');
+
+  // Zusammenfassungs-Kacheln oben
+  const totQ=totKmTank>0?Math.round((totQuote||0)*100):0;
+  const qColor=totQ>=75?'var(--ok)':totQ>0?'#f59e0b':'var(--warn)';
+
+  document.getElementById('sollIstContent').innerHTML=`
+    <div class="g4 mb28">
+      <div class="stat">
+        <div class="stat-lbl">km-Basis (Tankdaten) ${yr}</div>
+        <div class="stat-val">${n(totKmTank)}<span class="stat-unit">km</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-lbl">Soll Geschäftlich (75 %)</div>
+        <div class="stat-val" style="color:var(--biz-fg)">${n(totSollBiz,0)}<span class="stat-unit">km</span></div>
+        <div class="stat-sub">Ist: ${n(totKmBiz)} km</div>
+      </div>
+      <div class="stat">
+        <div class="stat-lbl">Soll Privat (25 %)</div>
+        <div class="stat-val" style="color:var(--prv-fg)">${n(totSollPrv,0)}<span class="stat-unit">km</span></div>
+        <div class="stat-sub">Ist: ${n(totKmPrv)} km</div>
+      </div>
+      <div class="stat">
+        <div class="stat-lbl">Quote Geschäftlich ${yr}</div>
+        <div class="stat-val" style="color:${qColor}">${totQ}<span class="stat-unit">%</span></div>
+        <div class="stat-sub">Ziel: 75 %</div>
+        <div class="pbar"><div class="pfill" style="width:${Math.min(100,totQ)}%;background:${qColor}"></div></div>
+      </div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th>Monat</th>
+            <th style="text-align:right">km (Tank)</th>
+            <th style="text-align:right">Soll gesch. 75 %</th>
+            <th style="text-align:right">Soll privat 25 %</th>
+            <th style="text-align:right">Ist gesch.</th>
+            <th style="text-align:right">Ist privat</th>
+            <th style="text-align:right">Abw. gesch.</th>
+            <th style="text-align:right">Abw. privat</th>
+            <th style="text-align:right">Quote gesch.</th>
+            <th style="text-align:center">Ampel</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+          <tr class="sum-row">
+            <td><b>Gesamt ${yr}</b></td>
+            <td ${ra}><b>${n(totKmTank)}</b></td>
+            <td ${ra} style="color:var(--biz-fg)"><b>${n(totSollBiz,1)}</b></td>
+            <td ${ra} style="color:var(--prv-fg)"><b>${n(totSollPrv,1)}</b></td>
+            <td ${ra} style="color:var(--biz-fg)"><b>${n(totKmBiz)}</b></td>
+            <td ${ra} style="color:var(--prv-fg)"><b>${n(totKmPrv)}</b></td>
+            <td ${ra}>${fmtAbw(totAbwBiz,totKmTank>0)}</td>
+            <td ${ra}>${fmtAbw(totAbwPrv,totKmTank>0)}</td>
+            <td ${ra}><b>${totQuote!==null?Math.round(totQuote*100)+' %':'–'}</b></td>
+            <td style="text-align:center;font-size:16px">${totAmpel}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// EINSTELLUNGEN
+// ════════════════════════════════════════════════════════════
+function renderSettings() {
+  const m=db().meta;
+  document.getElementById('settingsForm').innerHTML=`
+    <div class="fg"><label class="flbl">Kennzeichen</label><input type="text" class="fc" id="sk" value="${esc(m.kennzeichen)}"></div>
+    <div class="fg"><label class="flbl">Fahrer</label><input type="text" class="fc" id="sf" value="${esc(m.fahrer)}"></div>
+    <div class="frow">
+      <div class="fg"><label class="flbl">Standardverbrauch (L/100km)</label><input type="number" class="fc" id="sv" value="${m.verbrauch}" step="0.1" min="1"></div>
+      <div class="fg"><label class="flbl">Tankvolumen (Liter)</label><input type="number" class="fc" id="st" value="${m.tankVol}" step="1" min="10"></div>
+    </div>
+    <div class="fg"><label class="flbl">Anfangskilometerstand</label><input type="number" class="fc" id="sa" value="${m.anfangsKm||''}" step="1" min="0"></div>
+    <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:6px">Speichern</button>`;
+  renderZweckMgr();
+}
+
+function saveSettings() {
+  const d=db().meta;
+  d.kennzeichen=document.getElementById('sk').value.trim();
+  d.fahrer=document.getElementById('sf').value.trim();
+  d.verbrauch=parseFloat(document.getElementById('sv').value)||7;
+  d.tankVol=parseFloat(document.getElementById('st').value)||60;
+  d.anfangsKm=parseFloat(document.getElementById('sa').value)||0;
+  commit(); updateSB(); notify('Stammdaten gespeichert');
+}
+
+function renderZweckMgr() {
+  const opts = getZweckOpts();
+  const items = opts.map((o,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border2)">
+      <span style="flex:1;color:var(--text);font-size:13px">${esc(o)}</span>
+      <button class="btn-ico del" onclick="delZweck(${i})" title="Entfernen">✕</button>
+    </div>`).join('');
+  document.getElementById('zweckMgr').innerHTML=`
+    <div style="margin-bottom:10px">${items}</div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <input type="text" class="fc" id="newZweckInput" placeholder="Neuer Eintrag …" style="flex:1"
+             onkeydown="if(event.key==='Enter')addZweck()">
+      <button class="btn btn-primary btn-sm" onclick="addZweck()">+ Hinzufügen</button>
+    </div>`;
+}
+
+function addZweck() {
+  const inp=document.getElementById('newZweckInput');
+  const val=(inp.value||'').trim();
+  if (!val) { notify('Bitte Text eingeben','err'); return; }
+  const d=db();
+  if (!d.meta.zweckOptionen) d.meta.zweckOptionen=[...ZWECK_OPTS];
+  if (d.meta.zweckOptionen.map(o=>o.toLowerCase()).includes(val.toLowerCase())) { notify('Bereits vorhanden','err'); return; }
+  d.meta.zweckOptionen.push(val);
+  commit(); inp.value=''; renderZweckMgr(); notify(`"${val}" hinzugefügt`);
+}
+
+function delZweck(idx) {
+  const d=db();
+  if (!d.meta.zweckOptionen) d.meta.zweckOptionen=[...ZWECK_OPTS];
+  if (d.meta.zweckOptionen.length<=1) { notify('Mindestens eine Option erforderlich','err'); return; }
+  const removed=d.meta.zweckOptionen.splice(idx,1)[0];
+  commit(); renderZweckMgr(); notify(`"${removed}" entfernt`);
+}
+
+// ════════════════════════════════════════════════════════════
+// CSV PARSER
+// ════════════════════════════════════════════════════════════
+function parseCSV(text) {
+  // Auto-detect separator: semicolon preferred, else comma
+  const firstLine = text.split(/\r?\n/)[0]||'';
+  const sep = (firstLine.split(';').length >= firstLine.split(',').length) ? ';' : ',';
+  const lines = text.split(/\r?\n/).filter(l=>l.trim());
+  return lines.map(line=>{
+    const fields=[], len=line.length;
+    let cur='', inQ=false;
+    for(let i=0;i<len;i++){
+      const c=line[i];
+      if(c==='"'){ if(inQ&&line[i+1]==='"'){cur+='"';i++;} else inQ=!inQ; }
+      else if(c===sep&&!inQ){ fields.push(cur.trim()); cur=''; }
+      else cur+=c;
+    }
+    fields.push(cur.trim());
+    return fields;
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// CSV IMPORT MODALS
+// ════════════════════════════════════════════════════════════
+function openImportModal(type) {
+  const configs = {
+    fahrten: {
+      title: 'Fahrten importieren (CSV)',
+      format: `Datum;AnfangsKm;EndKm;Art;Zweck;Strecke`,
+      example: `15.01.2026;29500;29638;geschäftlich;Kundentermin;Bad Tölz → München → Bad Tölz`,
+      note:  'Art: <code>geschäftlich</code> oder <code>privat</code> | Datum: TT.MM.JJJJ oder JJJJ-MM-TT',
+    },
+    routen: {
+      title: 'Helper-Routen importieren (CSV)',
+      format: `Name;Startort;Zielort;km;Kategorie;Zweck`,
+      example: `Aquise Hays;Bad Tölz;München;138;geschäftlich;Akquise Hays`,
+      note:  'Kategorie: <code>geschäftlich</code>, <code>privat</code> oder <code>beide</code> | Zweck ist optional',
+    },
+    tankungen: {
+      title: 'Tankdaten importieren (CSV)',
+      format: `Datum;Ort;Liter;PreisProLiter;Gesamtbetrag;Notiz`,
+      example: `16.01.2026;Bad Tölz;35,85;1,709;61,32;`,
+      note:  'PreisProLiter, Gesamtbetrag und Notiz sind optional | Dezimaltrennzeichen: Komma oder Punkt',
+    }
+  };
+  const cfg = configs[type];
+
+  openModal(cfg.title, `
+    <div class="info-box">
+      <b>Format (erste Zeile wird als Kopfzeile erkannt und übersprungen):</b><br>
+      <code>${cfg.format}</code><br><br>
+      <b>Beispiel:</b><br>
+      <code>${cfg.example}</code><br><br>
+      ${cfg.note}
+    </div>
+    <div class="fg">
+      <label class="flbl">CSV-Datei auswählen</label>
+      <input type="file" accept=".csv,.txt" class="fc" id="csvFile" style="padding:6px">
+    </div>
+    <div class="fg" style="display:flex;align-items:center;gap:8px">
+      <input type="checkbox" id="csvHasHeader" checked>
+      <label for="csvHasHeader" class="flbl" style="margin:0;cursor:pointer">Erste Zeile ist Kopfzeile (überspringen)</label>
+    </div>
+    <div class="fg" style="display:flex;align-items:center;gap:8px">
+      <input type="checkbox" id="csvAppend" checked>
+      <label for="csvAppend" class="flbl" style="margin:0;cursor:pointer">Zu bestehenden Daten hinzufügen (sonst ersetzen)</label>
+    </div>
+    <div class="import-result" id="importResult"></div>`,
+    `<button class="btn btn-sec" onclick="closeModal()">Abbrechen</button>
+     <button class="btn btn-primary" onclick="runImport('${type}')">Importieren</button>`);
+}
+
+function runImport(type) {
+  const fileEl=document.getElementById('csvFile');
+  if (!fileEl.files.length) { notify('Keine Datei ausgewählt','err'); return; }
+  const hasHeader=document.getElementById('csvHasHeader').checked;
+  const append=document.getElementById('csvAppend').checked;
+  const file=fileEl.files[0];
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const text=e.target.result.replace(/^\uFEFF/,''); // strip BOM
+    const rows=parseCSV(text);
+    const dataRows=hasHeader?rows.slice(1):rows;
+    let count=0, errors=0;
+    const d=db();
+    const result=[];
+
+    if (type==='fahrten') {
+      if (!append) d.fahrten=[];
+      dataRows.forEach((r,i)=>{
+        if (r.length<2||!r[0]) return;
+        const datum=parseDate(r[0]);
+        const anfKm=parseNum(r[1]);
+        const endKm=parseNum(r[2]);
+        const art=(r[3]||'').toLowerCase().includes('privat')?'privat':'geschäftlich';
+        const zweck=(r[4]||'').trim();
+        const strecke=(r[5]||'').trim();
+        if (!datum||isNaN(anfKm)||isNaN(endKm)) { errors++; return; }
+        d.fahrten.push({ id:uid(), datum, anfKm, endKm, km:Math.max(0,endKm-anfKm), art, zweck, strecke, routeId:'' });
+        count++;
+      });
+    } else if (type==='routen') {
+      if (!append) d.routen=[];
+      dataRows.forEach((r,i)=>{
+        if (!r[0]) return;
+        const name=(r[0]||'').trim();
+        const km=parseNum(r[3]);
+        if (!name||isNaN(km)) { errors++; return; }
+        const kat=(r[4]||'').toLowerCase().includes('privat')?'privat':(r[4]||'').toLowerCase().includes('beide')?'beide':'geschäftlich';
+        const zweck=(r[5]||name).trim(); // Spalte 6: Zweck, Fallback = Name der Route
+        d.routen.push({ id:uid(), name, von:(r[1]||'').trim(), nach:(r[2]||'').trim(), km, kat, zweck, aktiv:true });
+        count++;
+      });
+    } else if (type==='tankungen') {
+      if (!append) d.tankungen=[];
+      dataRows.forEach((r,i)=>{
+        if (!r[0]) return;
+        const datum=parseDate(r[0]);
+        const liter=parseNum(r[2]);
+        if (!datum||isNaN(liter)||liter<=0) { errors++; return; }
+        const ppl=parseNum(r[3])||null;
+        let gesamt=parseNum(r[4])||null;
+        if (!gesamt&&ppl&&liter) gesamt=+(liter*ppl).toFixed(2);
+        d.tankungen.push({ id:uid(), datum, ort:(r[1]||'').trim(), liter, ppl, gesamt, notiz:(r[5]||'').trim() });
+        count++;
+      });
+    }
+
+    commit();
+    const res=document.getElementById('importResult');
+    res.className='import-result show';
+    res.style.color=errors?'var(--warn)':'var(--ok)';
+    res.textContent=`✓ ${count} Datensätze importiert${errors?` · ${errors} Zeilen übersprungen (Pflichtfelder fehlend)`:''}.`;
+
+    // Refresh visible page
+    if (type==='fahrten') renderFB();
+    if (type==='routen') renderHelper();
+    if (type==='tankungen') renderTank();
+    notify(`${count} Einträge importiert`);
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+// ════════════════════════════════════════════════════════════
+// CSV / EXCEL EXPORT
+// ════════════════════════════════════════════════════════════
+function dlBlob(content, filename, mime) {
+  const bom=mime.includes('csv')?'\uFEFF':'';
+  const blob=new Blob([bom+content],{type:mime});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href);
+}
+
+function fahrtRows(fahrten) {
+  const d=db();
+  return [...fahrten].sort((a,b)=>a.datum.localeCompare(b.datum)||a.anfKm-b.anfKm).map(f=>{
+    const dt=new Date(f.datum+'T00:00:00');
+    const tag=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][dt.getDay()];
+    return [fdate(f.datum),tag,f.anfKm,f.endKm,f.km,f.art,f.zweck||'',f.strecke||''];
+  });
+}
+
+function exportFahrtenbuchCSV() {
+  initFBSelects();
+  const mo=parseInt(document.getElementById('fbMon').value);
+  const yr=parseInt(document.getElementById('fbYear').value);
+  const pre=`${yr}-${String(mo).padStart(2,'0')}`;
+  const d=db();
+  const fahrten=d.fahrten.filter(f=>f.datum.startsWith(pre));
+
+  const header='Datum;Wochentag;Anfangs-km;End-km;Gefahrene km;Art;Zweck;Strecke/Route';
+  const rows=fahrtRows(fahrten).map(r=>r.map(v=>typeof v==='number'?String(v).replace('.',','):csvQ(v)).join(';')).join('\r\n');
+  const meta=d.meta;
+  const bizKm=fahrten.filter(f=>f.art==='geschäftlich').reduce((s,f)=>s+(f.km||0),0);
+  const prvKm=fahrten.filter(f=>f.art==='privat').reduce((s,f)=>s+(f.km||0),0);
+  const totKm=fahrten.reduce((s,f)=>s+(f.km||0),0);
+
+  const summary=`\r\n;;;;;;\r\nFahrzeug;${meta.kennzeichen};Fahrer;${meta.fahrer}\r\nMonat;${monthLabel(mo)} ${yr};Fahrten gesamt;${fahrten.length}\r\nGesamt-km;${totKm};Geschäftlich;${bizKm};Privat;${prvKm}`;
+
+  dlBlob([header,rows,summary].filter(Boolean).join('\r\n'),
+    `fahrtenbuch_${yr}-${String(mo).padStart(2,'0')}.csv`, 'text/csv;charset=utf-8');
+  notify('CSV exportiert');
+}
+
+function csvQ(v) {
+  const s=String(v==null?'':v);
+  return s.includes(';')||s.includes('"')||s.includes('\n') ? `"${s.replace(/"/g,'""')}"` : s;
+}
+
+function exportFahrtenbuchXLS() {
+  initFBSelects();
+  const mo=parseInt(document.getElementById('fbMon').value);
+  const yr=parseInt(document.getElementById('fbYear').value);
+  const pre=`${yr}-${String(mo).padStart(2,'0')}`;
+  const d=db();
+  const fahrten=d.fahrten.filter(f=>f.datum.startsWith(pre));
+
+  const bizKm=fahrten.filter(f=>f.art==='geschäftlich').reduce((s,f)=>s+(f.km||0),0);
+  const prvKm=fahrten.filter(f=>f.art==='privat').reduce((s,f)=>s+(f.km||0),0);
+  const totKm=fahrten.reduce((s,f)=>s+(f.km||0),0);
+
+  const tdS='style="border:1px solid #ccc;padding:6px 10px;font-size:12px"';
+  const thS='style="border:1px solid #aaa;padding:7px 10px;background:#1e3a6e;color:#fff;font-size:11px;font-weight:700;text-align:left"';
+
+  let html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
+<head><meta charset="UTF-8">
+<style>
+  body{font-family:Arial,sans-serif;font-size:12px}
+  h2{color:#1e3a6e;margin-bottom:4px}
+  .sub{color:#666;font-size:12px;margin-bottom:16px}
+  table{border-collapse:collapse;width:100%;margin-bottom:20px}
+  .sum-row td{background:#f0f4f8;font-weight:700;border:1px solid #aaa;padding:7px 10px;font-size:12px}
+  .biz{background:#eff6ff;color:#1d4ed8}
+  .prv{background:#f5f3ff;color:#7c3aed}
+</style></head><body>
+<h2>Fahrtenbuch – ${d.meta.kennzeichen}</h2>
+<div class="sub">Fahrer: ${d.meta.fahrer} | Monat: ${monthLabel(mo)} ${yr} | Export: ${fdate(today())}</div>
+<table>
+<thead><tr>
+  <th ${thS}>Datum</th><th ${thS}>Wochentag</th><th ${thS}>Anfangs-km</th>
+  <th ${thS}>End-km</th><th ${thS}>Gefahrene km</th><th ${thS}>Art</th>
+  <th ${thS}>Zweck</th><th ${thS}>Strecke / Route</th>
+</tr></thead><tbody>`;
+
+  const rows=fahrtRows(fahrten);
+  const even='#f9fafb', odd='#fff';
+  rows.forEach((r,i)=>{
+    const bg=i%2===0?odd:even;
+    const isWknd=['Samstag','Sonntag'].includes(r[1]);
+    const rowS=`style="background:${isWknd?'#f3f4f6':bg}"`;
+    const artCls=r[5]==='geschäftlich'?'biz':'prv';
+    html+=`<tr ${rowS}>
+      <td ${tdS}>${r[0]}</td><td ${tdS}>${r[1]}</td>
+      <td ${tdS} align="right">${r[2]}</td><td ${tdS} align="right">${r[3]}</td>
+      <td ${tdS} align="right"><b>${r[4]}</b></td>
+      <td ${tdS}><span class="${artCls}">${r[5]}</span></td>
+      <td ${tdS}>${r[6]}</td><td ${tdS}>${r[7]}</td>
+    </tr>`;
+  });
+
+  html+=`</tbody>
+<tfoot>
+  <tr class="sum-row">
+    <td colspan="4">Monat gesamt: ${fahrten.length} Fahrten</td>
+    <td align="right">${totKm} km</td>
+    <td colspan="3">Geschäftlich: ${bizKm} km | Privat: ${prvKm} km</td>
+  </tr>
+</tfoot></table>
+</body></html>`;
+
+  dlBlob(html, `fahrtenbuch_${yr}-${String(mo).padStart(2,'0')}.xls`, 'application/vnd.ms-excel;charset=utf-8');
+  notify('Excel-Datei exportiert');
+}
+
+function exportJahresCSV() {
+  const yr=parseInt(document.getElementById('auswYear').value);
+  const d=db();
+  const fahrten=d.fahrten.filter(f=>f.datum.startsWith(String(yr)));
+  const header='Datum;Wochentag;Anfangs-km;End-km;Gefahrene km;Art;Zweck;Strecke/Route';
+  const rows=fahrtRows(fahrten).map(r=>r.map(v=>typeof v==='number'?String(v).replace('.',','):csvQ(v)).join(';')).join('\r\n');
+  dlBlob([header,rows].join('\r\n'), `fahrtenbuch_jahres_${yr}.csv`, 'text/csv;charset=utf-8');
+  notify(`Jahres-CSV ${yr} exportiert`);
+}
+
+// ════════════════════════════════════════════════════════════
+// JSON EXPORT / IMPORT
+// ════════════════════════════════════════════════════════════
+function exportJSON() {
+  dlBlob(JSON.stringify(db(),null,2), `fahrtenbuch_export_${today()}.json`, 'application/json');
+  notify('JSON exportiert');
+}
+
+async function importJSON(ev) {
+  const file=ev.target.files[0]; if (!file) return;
+  if (!await showConfirm(`"${file.name}" importieren? Alle aktuellen Daten werden überschrieben.`)) { ev.target.value=''; return; }
+  const r=new FileReader();
+  r.onload=e=>{ try { window._db=JSON.parse(e.target.result); commit(); updateSB(); nav('dashboard'); notify('Daten importiert'); } catch { notify('Ungültige JSON-Datei','err'); } };
+  r.readAsText(file); ev.target.value='';
+}
+
+async function resetAll() {
+  if (!await showConfirm('Alle Daten löschen? Dies kann nicht rückgängig gemacht werden.')) return;
+  window._db=defaults(); commit(); updateSB(); nav('dashboard'); notify('Daten zurückgesetzt');
+}
+
+// ════════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════════
+boot();
+renderDash();
+</script>
+</body>
+</html>

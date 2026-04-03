@@ -1,0 +1,481 @@
+Statusbild
+
+Der Curator ist aktuell ein fortgeschrittener UI-/Produkt-Prototyp, aber noch keine echte produktive App.
+
+Er hat bereits:
+
+eine klare Grundidee,
+eine erkennbare Informationsarchitektur,
+eine definierte visuelle Richtung,
+eine erste technische Zielarchitektur,
+ein fachlich brauchbares Quellenmodell,
+und eine erste Logik für Stil/Tonalität.
+
+Er hat noch nicht:
+
+echte Datenanbindung,
+echte Recherche-Pipeline,
+persistente Datenhaltung,
+echte Nutzerlogik,
+echte AI-gestützte Generierung auf Basis Ihrer Quellen,
+oder einen produktiven Deploy-Stand.
+
+Die aktuelle überarbeitete HTML-Version liegt hier:
+Curator App v3
+
+Was bisher erledigt ist
+1. Produktidee geschärft
+
+Der Curator wurde nicht mehr als bloßer „Content Generator“ gedacht, sondern als:
+
+Expert Curator Workbench für KI-Governance, Signale und publizierbare Einordnung
+
+Daraus ergibt sich die interne Logik:
+
+Quellen beobachten
+Signale und Artikel sammeln
+Relevanz bewerten
+redaktionell einordnen
+in Formate überführen
+
+Damit ist die Richtung klarer als am Anfang.
+
+2. UI- und Markenrichtung neu gesetzt
+
+Die ursprüngliche dunkle Tool-Anmutung wurde zugunsten einer hellen, institutstauglichen Blau-Systematik verschoben.
+
+Umgesetzt wurde:
+
+helles Blau-Grau als Arbeitsfläche,
+weiße Karten,
+kräftiges Blau für aktive Elemente,
+ruhigere, vertrauensfähige Markenwirkung,
+klarere Nähe zu Ihren bestehenden Produktseiten.
+
+Das war bewusst keine reine Kosmetik, sondern eine Markenentscheidung:
+weniger generisches AI-Tool, mehr Dr. DirKInstitute-System.
+
+3. Überarbeiteter Prototyp erstellt
+
+Es wurde eine neue HTML-Version erzeugt:
+
+helle Basis
+bessere CTA-/Navigation-Farben
+konsistentere UI-Wirkung
+Light/Dark sauberer
+visuell näher an Ihren Referenzen
+
+Datei:
+Curator App v3
+
+4. Technische Zielrichtung festgelegt
+
+Zwischenzeitlich wurde Appwrite geprüft.
+Aktueller Stand ist aber:
+
+bevorzugte Zielarchitektur
+
+GitHub für Code und Versionierung
+Vercel für den ersten Live-Betrieb
+Supabase für Datenbank, Auth, Storage
+später optional eigener VPS
+
+Der Wechsel zurück zu Supabase ist logisch, weil Sie dort:
+
+SQL direkt nutzen können,
+relational sauber modellieren können,
+später Migrationen kontrolliert versionieren können.
+
+Damit ist der Stack aktuell inhaltlich gesetzt.
+
+5. Quellenmodell fachlich strukturiert
+
+Für den Curator wurde eine integere Quellenlogik formuliert.
+
+Authority Layer
+
+Für belastbare Governance- und Regulierungsarbeit:
+
+Primärrecht
+Behörden
+Aufsicht
+Standards
+methodische Frameworks
+Vertrauensebenen
+Tier A = Primär / amtlich
+Tier B = normativ / methodisch
+Tier C = Beobachtung / Sekundär
+
+Produktregel:
+Default nur Tier A und B anzeigen. Tier C nur gefiltert.
+
+Damit wurde bereits eine fachliche Schutzlogik definiert:
+Curator soll nicht wie ein beliebiger News-Aggregator wirken.
+
+6. Zweite Quellenebene ergänzt: Signals & Trends
+
+Sie haben zu Recht ergänzt, dass Curator nicht nur Governance-Quellen, sondern auch die allgemeine Entwicklung von KI beobachten muss.
+
+Dafür wurde ein zweiter Layer konzipiert:
+
+Signals & Trends Layer
+
+Dieser Layer ist getrennt vom Authority Layer.
+
+Abgedeckte Cluster:
+
+Frontier Labs
+Agentic AI
+Robotics / Physical AI
+Enterprise AI Tooling
+Safety / Alignment
+Chips / Compute / Infrastructure
+Open Source Models
+
+Beobachtete Akteure und Quelltypen:
+
+OpenAI
+Anthropic
+Google DeepMind
+NVIDIA
+später optional weitere
+
+Wichtige Regel:
+Trendquellen stehen nie auf derselben Erkenntnisebene wie Primärrecht oder Aufsicht.
+
+Das ist produktlogisch sauber.
+
+7. Erste Datenmodell-Logik skizziert
+
+Es wurde eine erste Struktur für die spätere Datenhaltung entworfen.
+
+Kernobjekte:
+
+sources
+topics
+watch_entities
+source_items
+drafts
+generation_runs
+
+Diese Struktur ist noch nicht in Supabase angelegt, aber fachlich bereits gut genug, um sie jetzt in SQL zu gießen.
+
+8. Tonalität und Stilmodell konzipiert
+
+Ihre Frage nach Tonalität und Schreibstil wurde nicht mit „wir lassen die AI einfach schreiben“ beantwortet, sondern sauber in ein Modell überführt.
+
+Geplante drei Schichten:
+
+a) Markenstimme
+
+Die feste Stimme von Dr. DirKInstitute:
+
+sachlich
+analytisch
+entscheidungsorientiert
+keine leere Marketingsprache
+klare Trennung zwischen Beobachtung, Bewertung, Empfehlung
+b) Formatstimme
+
+Je nach Format:
+
+LinkedIn Post
+LinkedIn Artikel
+Executive Summary
+Newsletter
+Kurzanalyse
+Diskussionsgrundlage
+Blog
+c) situative Tonalität
+
+Variable Modulation:
+
+nüchtern
+pointiert
+beratend
+akademisch-praktisch
+warnend
+
+Das ist bereits ein belastbarer Ansatz für eine spätere AI-gestützte Editorial Engine.
+
+Was aktuell noch nicht erledigt ist
+
+Hier liegt der eigentliche Arbeitsblock.
+
+1. Keine echte Datenbank angebunden
+
+Es gibt aktuell noch:
+
+keine Supabase-Instanz im Einsatz,
+kein SQL-Schema,
+keine Seed-Daten,
+keine persistente Speicherung.
+2. Keine echte Recherche-Pipeline
+
+Der Prototyp zeigt aktuell Demo-Inhalte.
+Die sichtbaren Artikel, KPIs und Outputs sind noch statisch bzw. hart verdrahtet.
+
+Das bedeutet:
+
+keine echten RSS-/API-Feeds,
+keine Speicherung realer Quellenartikel,
+keine Deduplizierung,
+kein Ranking,
+keine Review-Logik.
+
+Genau deshalb sehen Sie aktuell nur wenige Artikel.
+
+3. Keine echte Research Inbox
+
+Was fehlt:
+
+Filter
+Suchlogik
+Statuswechsel
+Quelle/Datum/Layer/Cluster-Ansicht
+Auswahl für spätere Generierung
+
+Der Curator hat derzeit noch kein echtes Arbeitsmodul für redaktionelle Vorauswahl.
+
+4. Keine echte AI-Generierung
+
+Es gibt aktuell noch:
+
+keinen produktiven Model-Aufruf,
+keine Prompt-Architektur,
+kein Stilprofil in Datenform,
+keine Versionierung von Entwürfen,
+kein Quellenbezug pro Entwurf.
+
+Die Beispieltexte im Prototyp sind Demo-Outputs, nicht live erzeugte Texte.
+
+5. Keine Auth- und Rollenlogik
+
+Noch offen:
+
+Login
+Rollen
+Schreib-/Leserechte
+Workspace-Struktur
+Mehrbenutzerfähigkeit
+6. Kein produktiver Code-Stack
+
+Aktuell ist der Curator noch HTML-Prototyp, nicht:
+
+Next.js-Projekt
+Supabase-Integration
+API-Routen
+Edge Functions
+Produktionsstruktur
+7. Keine Live-Quellenliste in der UI
+
+Die Logik ist konzipiert, aber noch nicht umgesetzt als:
+
+echte Source Registry
+aktiver Filter
+Verwaltung von Layer/Tier/Status
+Anzeige im Frontend
+8. Kein Marken-Feinschliff
+
+Sie haben das selbst korrekt eingeordnet:
+Noch offen sind unter anderem
+
+Logos
+Icons
+Feinschliff
+Mikrotypografie
+Bildsprache
+kleinere UI-Details
+
+Das ist derzeit aber nachrangig.
+
+Offene Entscheidungen
+
+Einige Dinge sind schon relativ klar, andere noch nicht.
+
+Bereits relativ klar
+Curator ist kein bloßer Generator
+Authority und Signals werden getrennt
+SQL-/relationales Modell ist gewünscht
+Supabase ist aktuell die sinnvollste Richtung
+Vercel ist für Phase 1 passend
+VPS bleibt spätere Option
+Noch offen
+Exakter V1-Scope
+Welche Quellen zuerst wirklich live gehen
+Wie viele Signalquellen in V1 enthalten sind
+Welche AI-Modelle produktiv genutzt werden
+Ob zuerst nur Einzeluser oder später Multiuser
+Wie redaktionelle Freigabe/Review laufen soll
+Ob nur deutsche oder deutsch+englische Quellen in V1
+Empfohlene V1-Struktur des Produkts
+
+Der Curator sollte jetzt in vier funktionale Blöcke geschnitten werden.
+
+1. Source Intake
+
+Zweck:
+
+Quellen definieren
+Feeds/API-Quellen anbinden
+Inhalte holen
+Inhalte normalisieren
+speichern
+2. Research Inbox
+
+Zweck:
+
+alle Fundstellen sichtbar machen
+filtern
+priorisieren
+prüfen
+auswählen
+3. Editorial Engine
+
+Zweck:
+
+Thema wählen
+Blickwinkel setzen
+Format wählen
+Stilprofil anwenden
+Tonalität modulieren
+4. Draft Studio
+
+Zweck:
+
+AI-Entwurf erzeugen
+manuell überarbeiten
+Versionen speichern
+exportieren
+
+Wenn diese vier Blöcke stehen, wird aus dem Prototyp ein echtes Arbeitsinstrument.
+
+Empfohlene nächste Schritte in sinnvoller Reihenfolge
+Phase 1 – Fundament
+Supabase-Projekt anlegen
+SQL-Schema definieren
+Tabellen für V1 aufsetzen
+erste Seed-Daten einspielen
+
+Ziel: belastbare Datenbasis
+
+Phase 2 – Curator wird datenfähig
+Source Registry in DB abbilden
+Topic- und Entity-Liste anlegen
+erste Authority-Quellen erfassen
+erste Signalquellen erfassen
+
+Ziel: Curator kennt seine Quellen und Themen
+
+Phase 3 – echte Inhalte statt Demo
+Import-Logik für Quellen bauen
+Source Items speichern
+Deduplizierung einziehen
+Scores und Stati ergänzen
+
+Ziel: aus statischem Mockup wird echte Research Inbox
+
+Phase 4 – Stil- und Editorial-System
+Brand-Voice-Profil definieren
+Formatprofile definieren
+Tonalitäts-Modulatoren definieren
+Prompt-Architektur bauen
+
+Ziel: kontrollierte AI-Ausgabe
+
+Phase 5 – UI auf produktiven Stack heben
+Prototyp nach Next.js überführen
+Seitenstruktur sauber schneiden
+DB anbinden
+Curator-Module live verbinden
+
+Ziel: erstes nutzbares V1-System
+
+Mein Vorschlag für die erste echte Umsetzung in Supabase
+Tabellen V1
+sources
+topics
+watch_entities
+source_items
+drafts
+generation_runs
+Erste Inhalte
+Sources
+
+ca. 12–20 Einträge
+
+regulatorisch
+methodisch
+trendbezogen
+Topics
+
+ca. 8–12 Einträge
+
+EU AI Act
+Agentic AI
+Robotics
+Governance Deutschland
+NIS2 / KRITIS
+Frontier Labs
+Safety / Alignment
+Infrastructure / Compute
+Watch Entities
+
+ca. 6–10 Einträge
+
+OpenAI
+Anthropic
+Google DeepMind
+NVIDIA
+BSI
+OECD
+optional weitere
+Risiken / Stolperstellen
+1. Zu viel auf einmal
+
+Der Curator hat ein breites Spielfeld:
+
+Governance
+Trends
+Publishing
+Editorial AI
+Datenhaltung
+
+Wenn alles gleichzeitig gebaut wird, wird V1 zu groß.
+
+2. Quellenebenen vermischen
+
+Wenn Authority und Signals in derselben UI-Ebene erscheinen, verliert Curator fachliche Klarheit.
+
+3. AI zu früh zu frei einsetzen
+
+Wenn zuerst generiert und erst danach Qualität geprüft wird, wird der Curator beliebig.
+
+4. Zu viel UI vor zu wenig Datenlogik
+
+Der Prototyp ist visuell schon weit genug. Jetzt muss die Logik folgen.
+
+Mein Gesamturteil zum Stand
+
+Der Stand ist gut genug, um jetzt ernsthaft in die Umsetzung zu gehen.
+
+Sie haben aktuell:
+
+eine Richtung,
+eine visuelle Sprache,
+eine Produktlogik,
+eine erste Architekturentscheidung,
+und eine gute Trennung zwischen Governance-Quellen und Innovationssignalen.
+
+Was jetzt fehlt, ist nicht Idee, sondern Systembau.
+
+Der Curator ist im Moment:
+ein guter strategischer Prototyp mit klarer Richtung, aber noch ohne produktive Daten- und AI-Mechanik.
+
+Conclusio
+
+Der aktuelle Stand ist solide.
+Die Grundlagen sind gelegt: Produktidee, Markenrichtung, Architekturpräferenz, Quellenlogik, Trendlogik und Stilmodell. Noch nicht erledigt sind die technische Umsetzung in Supabase, die echte Recherche-Pipeline, die Research Inbox und die kontrollierte AI-Engine.
+
+Die sinnvollste unmittelbare Reihenfolge ist jetzt:
+Supabase-Schema → Seed-Daten → echte Source Items → Research Inbox → Stil-/Prompt-System → produktiver UI-Stack.

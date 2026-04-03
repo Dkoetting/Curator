@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KI Governance Curator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="light"]{
+  --color-bg:#eef3fb;--color-surface:#ffffff;--color-surface-2:#f8faff;
+  --color-surface-offset:#e7eefb;--color-surface-dynamic:#dfe8f8;
+  --color-divider:#d5deef;--color-border:#c9d5ee;
+  --color-text:#21324b;--color-text-muted:#5d6f93;--color-text-faint:#8b9abd;
+  --color-text-inverse:#ffffff;
+  --color-primary:#2147aa;--color-primary-hover:#18378a;--color-primary-hl:#e2eafe;
+  --color-blue:#2d63d5;--color-blue-hover:#214fb3;--color-blue-hl:#dfe8fd;
+  --color-gold:#bf7b15;--color-gold-hl:#fff1d9;
+  --shadow-sm:0 10px 24px rgba(27,53,120,0.06);
+  --shadow-md:0 18px 36px rgba(27,53,120,0.12);
+  --radius-sm:0.375rem;--radius-md:0.5rem;--radius-lg:0.75rem;--radius-xl:1rem;--radius-full:9999px;
+  --font-body:'Inter','Helvetica Neue',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --text-xs:clamp(0.75rem,0.7rem + 0.25vw,0.875rem);
+  --text-sm:clamp(0.875rem,0.8rem + 0.35vw,1rem);
+  --text-base:clamp(1rem,0.95rem + 0.25vw,1.125rem);
+  --text-lg:clamp(1.125rem,1rem + 0.75vw,1.5rem);
+  --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+  --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;
+  --space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-12:3rem;
+  --t:180ms cubic-bezier(0.16,1,0.3,1);
+}
+[data-theme="dark"]{
+  --color-bg:#0f1730;--color-surface:#162042;--color-surface-2:#1a2954;
+  --color-surface-offset:#22315e;--color-surface-dynamic:#2b3d72;
+  --color-divider:#32457f;--color-border:#3d5190;
+  --color-text:#eef3ff;--color-text-muted:#b6c4ea;--color-text-faint:#7f92c7;
+  --color-text-inverse:#ffffff;
+  --color-primary:#7ea2ff;--color-primary-hover:#6890f4;--color-primary-hl:#20346c;
+  --color-blue:#9ab7ff;--color-blue-hover:#80a3ff;--color-blue-hl:#223765;
+  --color-gold:#f0bc5a;--color-gold-hl:#4f3b16;
+  --shadow-sm:0 10px 24px rgba(0,0,0,0.22);--shadow-md:0 18px 36px rgba(0,0,0,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;}
+body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-sm);color:var(--color-text);background:var(--color-bg);display:flex;flex-direction:column;}
+a,button,[role="button"],input,select,textarea{transition:color var(--t),background var(--t),border-color var(--t),box-shadow var(--t);}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
+input,select,textarea{font:inherit;color:inherit;}
+h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
+
+.app-layout{display:grid;grid-template-columns:240px 1fr;grid-template-rows:56px 1fr;min-height:100dvh;}
+.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 var(--space-6);border-bottom:1px solid rgba(255,255,255,0.18);background:linear-gradient(90deg,#1c338b 0%,#2b5fd3 100%);box-shadow:0 12px 28px rgba(22,54,130,0.18);color:var(--color-text-inverse);position:sticky;top:0;z-index:100;--color-text-muted:rgba(255,255,255,0.82);--color-text-faint:rgba(255,255,255,0.62);--color-border:rgba(255,255,255,0.18);}
+.sidebar{background:linear-gradient(180deg,#f8fbff 0%,#eef3fb 100%);border-right:1px solid var(--color-divider);padding:var(--space-4) 0;overflow-y:auto;}
+.main-content{background:linear-gradient(180deg,#eef3fb 0%,#f4f7fc 100%);overflow-y:auto;padding:var(--space-8);}
+
+.topbar-logo{display:flex;align-items:center;gap:var(--space-3);font-weight:700;font-size:var(--text-sm);letter-spacing:-.01em;color:var(--color-text-inverse);}
+.topbar-logo svg{color:var(--color-text-inverse);}
+.topbar-actions{display:flex;align-items:center;gap:var(--space-3);}
+.theme-toggle{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--radius-md);border:1px solid var(--color-border);background:rgba(255,255,255,0.08);color:var(--color-text-inverse);backdrop-filter:blur(8px);}
+.theme-toggle:hover{background:rgba(255,255,255,0.18);color:var(--color-text-inverse);}
+.run-btn{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-4);background:#ffffff;color:#2147aa;border-radius:var(--radius-md);font-size:var(--text-xs);font-weight:700;box-shadow:0 8px 20px rgba(12,30,79,0.14);}
+.run-btn:hover{background:#eef3ff;color:#18378a;}
+.status-dot{width:7px;height:7px;border-radius:var(--radius-full);background:#6fddb0;animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+
+.sidebar-label{font-size:var(--text-xs);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-faint);padding:var(--space-3) var(--space-4) var(--space-2);}
+.sidebar-item{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-4);font-size:var(--text-sm);color:var(--color-text-muted);cursor:pointer;border-radius:0.75rem;margin:0 0.5rem;}
+.sidebar-item:hover{background:var(--color-surface-offset);color:var(--color-text);}
+.sidebar-item.active{background:var(--color-primary-hl);color:var(--color-primary);font-weight:600;box-shadow:inset 3px 0 0 var(--color-primary);}
+.sidebar-divider{height:1px;background:var(--color-divider);margin:var(--space-2) 0;}
+.badge{display:inline-flex;align-items:center;padding:0 var(--space-2);height:18px;border-radius:var(--radius-full);font-size:11px;font-weight:700;margin-left:auto;}
+.badge-p{background:var(--color-primary-hl);color:var(--color-primary);}
+.badge-g{background:var(--color-gold-hl);color:var(--color-gold);}
+
+.page-header{margin-bottom:var(--space-6);}
+.page-title{font-size:var(--text-xl);font-weight:800;letter-spacing:-.02em;line-height:1.1;color:#203878;}
+.page-subtitle{font-size:var(--text-sm);color:var(--color-text-muted);margin-top:var(--space-2);}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5);}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-bottom:var(--space-5);}
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--shadow-sm);}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);}
+.card-title{font-size:var(--text-sm);font-weight:600;}
+
+.kpi-card{background:linear-gradient(180deg,#ffffff 0%,#f9fbff 100%);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--shadow-sm);}
+.kpi-label{font-size:var(--text-xs);font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-faint);margin-bottom:var(--space-2);}
+.kpi-value{font-size:var(--text-xl);font-weight:700;letter-spacing:-.03em;line-height:1;margin-bottom:var(--space-1);}
+.kpi-delta{font-size:var(--text-xs);color:var(--color-blue);font-weight:600;}
+
+/* FORMAT CARDS — LinkedIn-first grid */
+.format-section-title{font-size:var(--text-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-faint);margin:var(--space-5) 0 var(--space-3);padding-bottom:var(--space-2);border-bottom:1px solid var(--color-divider);}
+.format-section-title:first-child{margin-top:0;}
+.format-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);margin-bottom:var(--space-2);}
+.format-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-3);margin-bottom:var(--space-2);}
+.format-card{border:2px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4) var(--space-3);cursor:pointer;text-align:center;position:relative;background:#ffffff;box-shadow:0 4px 14px rgba(24,46,110,0.04);}
+.format-card:hover{border-color:oklch(from var(--color-primary) l c h/0.5);background:var(--color-surface-offset);}
+.format-card.selected{border-color:var(--color-primary);background:var(--color-primary-hl);}
+.format-card.li-card.selected{border-color:var(--color-blue);background:var(--color-blue-hl);}
+.format-icon{font-size:1.4rem;margin-bottom:var(--space-2);}
+.format-label{font-size:var(--text-xs);font-weight:700;color:var(--color-text);}
+.format-desc{font-size:11px;color:var(--color-text-muted);margin-top:3px;line-height:1.4;}
+.format-limit{position:absolute;top:var(--space-2);right:var(--space-2);font-size:10px;font-family:var(--font-mono);color:var(--color-text-faint);background:var(--color-surface-dynamic);padding:1px 5px;border-radius:var(--radius-sm);}
+
+.input-group{margin-bottom:var(--space-4);}
+.input-label{display:block;font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);letter-spacing:.04em;text-transform:uppercase;margin-bottom:var(--space-2);}
+.input-field{width:100%;padding:var(--space-2) var(--space-3);background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--color-text);box-shadow:inset 0 1px 2px rgba(16,41,99,0.03);}
+.input-field:focus{outline:2px solid var(--color-primary);outline-offset:2px;border-color:transparent;}
+.input-field::placeholder{color:var(--color-text-faint);}
+
+.generate-btn{display:flex;align-items:center;justify-content:center;gap:var(--space-2);width:100%;padding:var(--space-3);background:linear-gradient(90deg,#2147aa 0%,#2d63d5 100%);color:var(--color-text-inverse);border-radius:var(--radius-md);font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-5);box-shadow:0 12px 22px rgba(33,71,170,0.18);}
+.generate-btn:hover{background:linear-gradient(90deg,#18378a 0%,#214fb3 100%);}
+
+.output-wrap{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--shadow-sm);}
+.output-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);}
+.output-label{font-size:var(--text-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-primary);}
+.output-actions{display:flex;gap:var(--space-2);}
+.btn-sm{padding:var(--space-1) var(--space-3);border-radius:var(--radius-md);font-size:var(--text-xs);font-weight:700;border:1px solid var(--color-border);color:var(--color-text-muted);background:#ffffff;}
+.btn-sm:hover{background:var(--color-surface-dynamic);color:var(--color-text);}
+.btn-sm.p{background:var(--color-primary);color:var(--color-text-inverse);border-color:var(--color-primary);}
+.btn-sm.p:hover{background:var(--color-primary-hover);}
+.output-box{background:linear-gradient(180deg,#f8fbff 0%,#edf3fc 100%);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-5);min-height:280px;position:relative;}
+.output-text{font-size:var(--text-sm);color:var(--color-text);line-height:1.75;white-space:pre-wrap;}
+.char-count{position:absolute;bottom:var(--space-3);right:var(--space-4);font-size:11px;color:var(--color-text-faint);font-family:var(--font-mono);}
+
+/* LI PREVIEW */
+.li-preview{background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-5);margin-top:var(--space-4);box-shadow:var(--shadow-sm);}
+.li-preview-header{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4);}
+.li-avatar{width:44px;height:44px;border-radius:var(--radius-full);background:linear-gradient(135deg,var(--color-primary),var(--color-blue));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:var(--text-sm);color:white;flex-shrink:0;}
+.li-name{font-size:var(--text-sm);font-weight:600;}
+.li-meta{font-size:var(--text-xs);color:var(--color-text-faint);}
+.li-body{font-size:var(--text-sm);color:var(--color-text);line-height:1.7;white-space:pre-wrap;}
+.li-footer{display:flex;gap:var(--space-6);margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--color-divider);}
+.li-action{font-size:var(--text-xs);color:var(--color-text-faint);display:flex;align-items:center;gap:var(--space-1);}
+
+.result-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);cursor:pointer;margin-bottom:var(--space-3);box-shadow:0 6px 18px rgba(24,46,110,0.04);}
+.result-card:hover{box-shadow:var(--shadow-md);border-color:#9db3eb;}
+.result-title{font-size:var(--text-sm);font-weight:600;line-height:1.4;display:block;margin-bottom:var(--space-2);}
+.result-source{font-size:var(--text-xs);color:var(--color-text-faint);margin-bottom:var(--space-2);}
+.result-excerpt{font-size:var(--text-xs);color:var(--color-text-muted);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.result-footer{display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-divider);}
+.tag{display:inline-flex;align-items:center;padding:0 var(--space-2);height:20px;border-radius:var(--radius-full);font-size:11px;font-weight:600;background:var(--color-surface-offset);color:var(--color-text-muted);border:1px solid var(--color-border);}
+.tag.p{background:var(--color-primary-hl);color:var(--color-primary);border-color:transparent;}
+.tag.b{background:var(--color-blue-hl);color:var(--color-blue);border-color:transparent;}
+.tag.g{background:var(--color-gold-hl);color:var(--color-gold);border-color:transparent;}
+.result-date{font-size:11px;color:var(--color-text-faint);font-family:var(--font-mono);margin-left:auto;}
+
+.progress-bar{height:6px;background:#dbe5f8;border-radius:var(--radius-full);overflow:hidden;margin-bottom:var(--space-6);}
+.progress-fill{height:100%;background:linear-gradient(90deg,#2147aa 0%,#2d63d5 100%);border-radius:var(--radius-full);width:0%;transition:width .4s ease;}
+
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+  <header class="topbar">
+    <div class="topbar-logo">
+      <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+        <rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".9"/>
+        <rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".5"/>
+        <rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".5"/>
+        <rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".2"/>
+        <circle cx="14" cy="14" r="3" fill="currentColor"/>
+      </svg>
+      KI Governance Curator
+    </div>
+    <div class="topbar-actions">
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--color-text-faint)">
+        <div class="status-dot"></div>
+        <span id="status-text">Bereit</span>
+      </div>
+      <button class="theme-toggle" data-theme-toggle aria-label="Theme">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="run-btn" id="run-btn" onclick="runResearch()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+        Recherche starten
+      </button>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="sidebar-label">Workflow</div>
+    <div class="sidebar-item active" onclick="nav('dashboard',this)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="sidebar-item" onclick="nav('results',this)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Recherche-Ergebnisse
+      <span class="badge badge-g">47</span>
+    </div>
+    <div class="sidebar-item" onclick="nav('generate',this)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Inhalte generieren
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Konfiguration</div>
+    <div class="sidebar-item" onclick="nav('sources',this)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+      Quellen & Themen
+      <span class="badge badge-p">12</span>
+    </div>
+    <div class="sidebar-item" onclick="nav('settings',this)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      APIs & Modell
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <!-- DASHBOARD -->
+    <section class="tab-content active" id="s-dashboard">
+      <div class="page-header">
+        <h1 class="page-title">Content Intelligence</h1>
+        <p class="page-subtitle">Tägliche KI-Governance Recherche · Letzte Ausführung: Heute, 06:00 Uhr</p>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="pfill"></div></div>
+      <div class="grid-3">
+        <div class="kpi-card"><div class="kpi-label">Neue Quellen</div><div class="kpi-value" id="kpi-s">47</div><div class="kpi-delta">↑ 12 heute</div></div>
+        <div class="kpi-card"><div class="kpi-label">LinkedIn-Entwürfe</div><div class="kpi-value">8</div><div class="kpi-delta">bereit zur Prüfung</div></div>
+        <div class="kpi-card"><div class="kpi-label">Artikel-Entwürfe</div><div class="kpi-value">4</div><div class="kpi-delta">Blog · Fachbeitrag</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">🔥 Trending heute</span><span style="font-size:var(--text-xs);color:var(--color-text-faint)">01. Apr 2026</span></div>
+          <div class="result-card" onclick="loadAndGenerate('EU AI Act Artikel 13: Transparenzpflichten für Hochrisiko-KI')">
+            <span class="result-title">EU AI Act: Neue Durchführungsbestimmungen Artikel 13 veröffentlicht</span>
+            <div class="result-source">euractiv.com · vor 2h</div>
+            <div class="result-excerpt">Finale technische Spezifikationen für Transparenzanforderungen bei Hochrisiko-KI-Systemen – relevant für HR, Kredit, Medizin.</div>
+            <div class="result-footer"><span class="tag p">EU AI Act</span><span class="tag">Compliance</span><span class="result-date">10:14</span></div>
+          </div>
+          <div class="result-card" onclick="loadAndGenerate('BSI NIS2 Leitfaden: KI-Sicherheit in KRITIS-Sektoren')">
+            <span class="result-title">BSI veröffentlicht NIS2-Leitfaden für KI in KRITIS</span>
+            <div class="result-source">bsi.bund.de · vor 5h</div>
+            <div class="result-excerpt">Neue Handlungsempfehlungen für KI-Systeme in kritischen Infrastrukturen – Energie, Wasser, Gesundheit.</div>
+            <div class="result-footer"><span class="tag b">NIS2</span><span class="tag">KRITIS</span><span class="result-date">07:31</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">⚡ Schnell generieren</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin-bottom:var(--space-4)">
+            <div class="format-card li-card selected" onclick="selectFmt(this,'li-post')" style="padding:var(--space-3)">
+              <div class="format-icon">🔗</div>
+              <div class="format-label">LinkedIn Post</div>
+            </div>
+            <div class="format-card" onclick="selectFmt(this,'blog')" style="padding:var(--space-3)">
+              <div class="format-icon">📝</div>
+              <div class="format-label">Blog-Artikel</div>
+            </div>
+          </div>
+          <button class="generate-btn" onclick="generate('dash')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            Aus Trending-Artikel generieren
+          </button>
+          <div class="output-box" style="min-height:160px">
+            <div class="output-text" id="dash-out" style="color:var(--color-text-faint);font-style:italic">Artikel auswählen → Format wählen → Generieren …</div>
+            <span class="char-count" id="dash-cc"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section class="tab-content" id="s-results">
+      <div class="page-header">
+        <h1 class="page-title">Recherche-Ergebnisse</h1>
+        <p class="page-subtitle">47 Artikel gefunden · Klick auf Artikel → direkt zur Generierung</p>
+      </div>
+      <div class="result-card" onclick="loadAndGenerate('EU AI Act Artikel 13: Transparenzpflichten für Hochrisiko-KI')">
+        <span class="result-title">EU AI Act: Finale Durchführungsbestimmungen – Artikel 13 Transparenz für Hochrisiko-KI</span>
+        <div class="result-source">euractiv.com · 01.04.2026</div>
+        <div class="result-excerpt">Die finalen technischen Spezifikationen definieren Informationspflichten für Betreiber von Hochrisiko-KI in Finanz-, Gesundheits- und Personalentscheidungssystemen.</div>
+        <div class="result-footer"><span class="tag p">EU AI Act</span><span class="tag">Art. 13</span><span class="tag">Compliance</span><span class="result-date">10:14</span></div>
+      </div>
+      <div class="result-card" onclick="loadAndGenerate('BSI NIS2 Leitfaden: KI in KRITIS – Sicherheitsanforderungen')">
+        <span class="result-title">BSI Leitfaden: KI-Systeme in KRITIS – NIS2-konforme Sicherheitsanforderungen</span>
+        <div class="result-source">bsi.bund.de · 01.04.2026</div>
+        <div class="result-excerpt">Neue BSI-Empfehlungen für KI-Systeme in kritischen Infrastrukturen: Risikoanalyse, Incident Management, Lieferkettensicherheit.</div>
+        <div class="result-footer"><span class="tag b">NIS2</span><span class="tag">KRITIS</span><span class="tag">BSI</span><span class="result-date">07:31</span></div>
+      </div>
+      <div class="result-card" onclick="loadAndGenerate('ISO 42001 Zertifizierung Deutschland: Erste Praxisberichte KMU')">
+        <span class="result-title">Erste ISO 42001-Zertifizierungen in Deutschland: Praxisbericht und Lessons Learned</span>
+        <div class="result-source">computerwoche.de · 01.04.2026</div>
+        <div class="result-excerpt">Drei Mittelständler berichten über Implementierung des KI-Managementsystems nach ISO/IEC 42001 – Hürden, Aufwand, Nutzen.</div>
+        <div class="result-footer"><span class="tag">ISO 42001</span><span class="tag">KMU</span><span class="tag g">Praxisbericht</span><span class="result-date">06:45</span></div>
+      </div>
+      <div class="result-card" onclick="loadAndGenerate('Agentic AI Governance: 7 Dimensionen für autonome KI-Agenten')">
+        <span class="result-title">Agentic AI: Governance-Rahmenwerk für autonome KI-Agenten – 7 Dimensionen</span>
+        <div class="result-source">heise.de · 31.03.2026</div>
+        <div class="result-excerpt">Gartner-Studie liefert Governance-Framework für autonome KI-Agenten – integrierbar in bestehende Compliance-Strukturen.</div>
+        <div class="result-footer"><span class="tag b">Agentic AI</span><span class="tag">Governance</span><span class="result-date">gestern</span></div>
+      </div>
+      <div class="result-card" onclick="loadAndGenerate('DSGVO und KI: Datenschutz-Anforderungen für LLM-basierte Systeme 2026')">
+        <span class="result-title">DSGVO trifft KI: Was LLM-Betreiber 2026 wissen müssen</span>
+        <div class="result-source">lto.de · 30.03.2026</div>
+        <div class="result-excerpt">Neue Urteile und Leitlinien zur DSGVO-Konformität bei LLM-Systemen: Trainingsdaten, Auskunftspflichten, Löschrechte.</div>
+        <div class="result-footer"><span class="tag">DSGVO</span><span class="tag p">LLM</span><span class="result-date">30.03.</span></div>
+      </div>
+    </section>
+
+    <!-- GENERATE -->
+    <section class="tab-content" id="s-generate">
+      <div class="page-header">
+        <h1 class="page-title">Inhalte generieren</h1>
+        <p class="page-subtitle">LinkedIn-Formate & Artikel aus recherchierten Themen</p>
+      </div>
+      <div class="grid-2" style="align-items:start">
+        <!-- LEFT: Config -->
+        <div>
+          <div class="card" style="margin-bottom:var(--space-5)">
+            <div class="card-header"><span class="card-title">📰 Quell-Artikel</span></div>
+            <div id="sel-article" style="padding:var(--space-3);background:var(--color-surface-offset);border-radius:var(--radius-md);border:1px solid var(--color-border);font-size:var(--text-sm);margin-bottom:var(--space-3)">
+              EU AI Act: Finale Durchführungsbestimmungen – Artikel 13 Transparenz
+            </div>
+            <div class="input-group" style="margin-bottom:var(--space-3)">
+              <label class="input-label">Schwerpunkt / Blickwinkel</label>
+              <input class="input-field" id="focus" placeholder="z.B. Auswirkungen für KMU in Deutschland" value="Praktische Umsetzung für den deutschen Mittelstand">
+            </div>
+            <div class="input-group" style="margin-bottom:0">
+              <label class="input-label">Tonalität</label>
+              <select class="input-field" id="tone">
+                <option value="auth">Autoritativ-sachlich (Dr. Kötting)</option>
+                <option value="prov">Provokativ-diskutierend</option>
+                <option value="acad">Akademisch-praktisch</option>
+                <option value="sol">Beratend-lösungsorientiert</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">📋 Format wählen</span></div>
+
+            <!-- LINKEDIN -->
+            <div class="format-section-title">🔗 LinkedIn-Formate</div>
+            <div class="format-grid">
+              <div class="format-card li-card selected" onclick="selectFmt(this,'li-post')">
+                <span class="format-limit">3.000</span>
+                <div class="format-icon">✍️</div>
+                <div class="format-label">Standard-Post</div>
+                <div class="format-desc">Hook · Inhalt · CTA</div>
+              </div>
+              <div class="format-card li-card" onclick="selectFmt(this,'li-story')">
+                <span class="format-limit">1.300</span>
+                <div class="format-icon">💡</div>
+                <div class="format-label">Meinungs-Post</div>
+                <div class="format-desc">These + Argumentation</div>
+              </div>
+              <div class="format-card li-card" onclick="selectFmt(this,'li-list')">
+                <span class="format-limit">3.000</span>
+                <div class="format-icon">📊</div>
+                <div class="format-label">Listen-Post</div>
+                <div class="format-desc">5–7 Punkte, strukturiert</div>
+              </div>
+              <div class="format-card li-card" onclick="selectFmt(this,'li-question')">
+                <span class="format-limit">1.000</span>
+                <div class="format-icon">❓</div>
+                <div class="format-label">Frage-Post</div>
+                <div class="format-desc">Diskussion anstoßen</div>
+              </div>
+              <div class="format-card li-card" onclick="selectFmt(this,'li-news')">
+                <span class="format-limit">2.000</span>
+                <div class="format-icon">📢</div>
+                <div class="format-label">News-Kommentar</div>
+                <div class="format-desc">Einordnung + Meinung</div>
+              </div>
+              <div class="format-card li-card" onclick="selectFmt(this,'li-article')">
+                <span class="format-limit">LI-Art.</span>
+                <div class="format-icon">📰</div>
+                <div class="format-label">LinkedIn Artikel</div>
+                <div class="format-desc">Langer Fachbeitrag</div>
+              </div>
+            </div>
+
+            <!-- ARTIKEL -->
+            <div class="format-section-title">📝 Artikel & Fachbeiträge</div>
+            <div class="format-grid-2">
+              <div class="format-card" onclick="selectFmt(this,'blog')">
+                <div class="format-icon">✏️</div>
+                <div class="format-label">Blog-Artikel</div>
+                <div class="format-desc">800–1.200 Wörter · SEO</div>
+              </div>
+              <div class="format-card" onclick="selectFmt(this,'fach')">
+                <div class="format-icon">🎓</div>
+                <div class="format-label">Fachbeitrag</div>
+                <div class="format-desc">1.500–2.500 Wörter</div>
+              </div>
+              <div class="format-card" onclick="selectFmt(this,'news')">
+                <div class="format-icon">📧</div>
+                <div class="format-label">Newsletter-Beitrag</div>
+                <div class="format-desc">Curated Digest, kompakt</div>
+              </div>
+              <div class="format-card" onclick="selectFmt(this,'exec')">
+                <div class="format-icon">📋</div>
+                <div class="format-label">Executive Summary</div>
+                <div class="format-desc">C-Level · 1 Seite</div>
+              </div>
+            </div>
+
+            <!-- DISKUSSION -->
+            <div class="format-section-title">💬 Diskussion & Analyse</div>
+            <div class="format-grid-2">
+              <div class="format-card" onclick="selectFmt(this,'diskussion')">
+                <div class="format-icon">🗣️</div>
+                <div class="format-label">Diskussionsgrundlage</div>
+                <div class="format-desc">Thesen · Gegenpositionen</div>
+              </div>
+              <div class="format-card" onclick="selectFmt(this,'analyse')">
+                <div class="format-icon">🔍</div>
+                <div class="format-label">Kurzanalyse</div>
+                <div class="format-desc">Handlungsempfehlung</div>
+              </div>
+            </div>
+
+            <button class="generate-btn" style="margin-top:var(--space-5);margin-bottom:0" onclick="generate('main')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+              Inhalt generieren
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT: Output -->
+        <div>
+          <div class="output-wrap">
+            <div class="output-header">
+              <span class="output-label" id="out-label">Ausgabe</span>
+              <div class="output-actions">
+                <button class="btn-sm" onclick="copyOut()">📋 Kopieren</button>
+                <button class="btn-sm" onclick="generate('main')">↺ Neu</button>
+                <button class="btn-sm p" onclick="exportOut()">↓ Export</button>
+              </div>
+            </div>
+            <div class="output-box" style="min-height:360px">
+              <div class="output-text" id="main-out" style="color:var(--color-text-faint);font-style:italic">Format wählen → "Inhalt generieren" klicken …</div>
+              <span class="char-count" id="main-cc"></span>
+            </div>
+          </div>
+
+          <!-- LinkedIn Preview -->
+          <div class="li-preview" id="li-prev" style="display:none">
+            <div class="li-preview-header">
+              <div class="li-avatar">DK</div>
+              <div>
+                <div class="li-name">Dr. Dirk Kötting</div>
+                <div class="li-meta">KI-Governance · IT-Sicherheit · Silberrücken · gerade eben</div>
+              </div>
+            </div>
+            <div class="li-body" id="li-body"></div>
+            <div class="li-footer">
+              <span class="li-action">👍 Gefällt mir</span>
+              <span class="li-action">💬 Kommentieren</span>
+              <span class="li-action">↗ Teilen</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOURCES -->
+    <section class="tab-content" id="s-sources">
+      <div class="page-header">
+        <h1 class="page-title">Quellen & Themen</h1>
+        <p class="page-subtitle">Themenfelder und Quell-URLs für die tägliche Recherche konfigurieren</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Überwachte Themen</span><button class="btn-sm" onclick="addT()">+ Thema</button></div>
+          <div id="topic-list">
+            <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3);background:var(--color-surface-offset);border-radius:var(--radius-md);margin-bottom:var(--space-2)">
+              <span style="width:8px;height:8px;border-radius:50%;background:var(--color-primary);flex-shrink:0;display:block"></span>
+              <span style="flex:1;font-size:var(--text-sm)">EU AI Act</span>
+              <span style="font-size:11px;color:var(--color-text-faint);font-family:var(--font-mono)">14 heute</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3);background:var(--color-surface-offset);border-radius:var(--radius-md);margin-bottom:var(--space-2)">
+              <span style="width:8px;height:8px;border-radius:50%;background:var(--color-blue);flex-shrink:0;display:block"></span>
+              <span style="flex:1;font-size:var(--text-sm)">KI-Governance Deutschland</span>
+              <span style="font-size:11px;color:var(--color-text-faint);font-family:var(--font-mono)">9 heute</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3);background:var(--color-surface-offset);border-radius:var(--radius-md);margin-bottom:var(--space-2)">
+              <span style="width:8px;height:8px;border-radius:50%;background:var(--color-gold);flex-shrink:0;display:block"></span>
+              <span style="flex:1;font-size:var(--text-sm)">NIS2 & KRITIS</span>
+              <span style="font-size:11px;color:var(--color-text-faint);font-family:var(--font-mono)">6 heute</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3);background:var(--color-surface-offset);border-radius:var(--radius-md);margin-bottom:var(--space-2)">
+              <span style="width:8px;height:8px;border-radius:50%;background:var(--color-text-faint);flex-shrink:0;display:block"></span>
+              <span style="flex:1;font-size:var(--text-sm)">Agentic AI & Autonome Systeme</span>
+              <span style="font-size:11px;color:var(--color-text-faint);font-family:var(--font-mono)">8 heute</span>
+            </div>
+            <button onclick="addT()" style="display:flex;align-items:center;justify-content:center;gap:var(--space-2);width:100%;padding:var(--space-3);border:1px dashed var(--color-border);border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--color-text-faint);margin-top:var(--space-2)">+ Thema hinzufügen</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Quellen-URLs</span></div>
+          <div class="input-group">
+            <label class="input-label">URL hinzufügen</label>
+            <div style="display:flex;gap:var(--space-2)">
+              <input class="input-field" id="src-url" placeholder="https://...">
+              <button class="btn-sm p" onclick="addSrc()">+ Add</button>
+            </div>
+          </div>
+          <div id="src-list">
+            <div style="font-size:var(--text-xs);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);color:var(--color-text-muted)">euractiv.com/section/digital</div>
+            <div style="font-size:var(--text-xs);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);color:var(--color-text-muted)">bsi.bund.de/DE/Themen/KI</div>
+            <div style="font-size:var(--text-xs);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);color:var(--color-text-muted)">digital-strategy.ec.europa.eu</div>
+            <div style="font-size:var(--text-xs);padding:var(--space-2) 0;color:var(--color-text-muted)">ki-strategie.de</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="tab-content" id="s-settings">
+      <div class="page-header"><h1 class="page-title">APIs & Modell</h1></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Recherche-API</span></div>
+          <div class="input-group"><label class="input-label">Provider</label>
+            <select class="input-field"><option>Perplexity API</option><option>Tavily Search API</option><option>SerpAPI</option></select>
+          </div>
+          <div class="input-group"><label class="input-label">API Key</label><input class="input-field" type="password" placeholder="pplx-..."></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Generierungs-Modell</span></div>
+          <div class="input-group"><label class="input-label">LLM</label>
+            <select class="input-field"><option>Claude 3.7 Sonnet</option><option>GPT-4o</option><option>Gemini 1.5 Pro</option></select>
+          </div>
+          <div class="input-group"><label class="input-label">API Key</label><input class="input-field" type="password" placeholder="sk-ant-..."></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+let fmt = 'li-post';
+let selectedArticle = 'EU AI Act: Finale Durchführungsbestimmungen – Artikel 13 Transparenz';
+
+const outputs = {
+  'li-post': `🔴 EU AI Act – die Uhr tickt. Und viele Unternehmen schlafen noch.
+
+Heute veröffentlichte die EU-Kommission die finalen Durchführungsbestimmungen für Hochrisiko-KI (Artikel 13). Was das bedeutet? Transparenzpflicht. Jetzt.
+
+Konkret:
+✅ KI-Systeme in HR, Kredit & Medizin brauchen vollständige Dokumentation
+✅ Jede KI-Entscheidung muss protokolliert und für Betroffene erklärbar sein
+✅ Compliance-Fenster: 12 Monate – kürzer als es klingt
+
+Die unbequeme Wahrheit: 78% der deutschen KMU haben noch kein KI-Governance-Framework.
+
+Wer nicht vorbereitet ist, riskiert nicht nur Bußgelder bis 3% des Jahresumsatzes – sondern das Vertrauen seiner Kunden und Mitarbeitenden.
+
+Ich helfe Unternehmen, diesen Weg strukturiert und effizient zu gehen.
+
+Wie weit ist Ihr Unternehmen? 👇
+
+#EUAIAct #KIGovernance #Compliance #Mittelstand #KI`,
+  'li-story': `Eine unbequeme Frage an Vorstände und Geschäftsführer:
+
+Können Sie heute in 5 Minuten erklären, wie Ihre KI-Systeme Entscheidungen treffen?
+
+Wenn nicht – dann haben Sie ein Governance-Problem. Und ab heute auch ein Compliance-Problem.
+
+Artikel 13 des EU AI Acts ist nicht mehr Zukunftsmusik. Die Durchführungsbestimmungen sind da. Die Transparenzpflicht gilt.
+
+Meine These: Unternehmen, die das als Bürokratie abtun, werden in 12 Monaten aufwachen und feststellen, dass ihre Wettbewerber mit "nachweisbarer KI-Kompetenz" Kunden gewinnen – und sie nicht.
+
+Governance ist kein Kostenfaktor. Es ist ein Wettbewerbsvorteil.
+
+#KIGovernance #EUAIAct #Leadership`,
+  'li-list': `7 Dinge, die Ihr Unternehmen jetzt wegen EU AI Act Artikel 13 tun muss:
+
+1️⃣ Inventur: Welche KI-Systeme fallen unter "Hochrisiko"?
+2️⃣ Dokumentation: Technische Beschreibung aller Systeme erstellen
+3️⃣ Logging: Automatische Protokollierung aller KI-Entscheidungen einrichten
+4️⃣ Erklärbarkeit: Verständliche Informationen für betroffene Personen entwickeln
+5️⃣ Verantwortlichkeit: KI-Governance-Rolle intern benennen
+6️⃣ Risikoklassifizierung: Eigene Systeme nach EU AI Act einordnen
+7️⃣ Aktionsplan: Compliance-Roadmap mit 12-Monats-Horizont erstellen
+
+Die meisten Unternehmen stehen bei Punkt 1. Das reicht nicht.
+
+Wo steht Ihr Unternehmen? 👇
+
+#EUAIAct #KICompliance #Governance #KMU`,
+  'li-question': `Eine Frage, die ich heute jedem CIO stelle:
+
+"Wer in Ihrem Unternehmen ist verantwortlich für die KI-Governance?"
+
+Die häufigste Antwort: Schweigen.
+
+Nach EU AI Act Artikel 13 ist das ab sofort kein Option mehr.
+
+Wer übernimmt in Ihrem Unternehmen diese Verantwortung – IT, Legal, Compliance oder jemand ganz anderes?
+
+#KIGovernance #EUAIAct #CIO #Compliance`,
+  'li-news': `📢 Wichtige News: EU AI Act Artikel 13 – finale Bestimmungen veröffentlicht.
+
+Was neu ist: Die EU-Kommission hat heute die technischen Spezifikationen für Transparenzanforderungen bei Hochrisiko-KI konkretisiert.
+
+Meine Einordnung:
+▸ Betrifft alle KI-Systeme in den Kategorien Personalselektion, Kredit-Scoring, medizinische Diagnose und Strafverfolgung
+▸ 12 Monate Übergangsfrist – realistisch nur, wenn Unternehmen jetzt starten
+▸ Bußgelder bis 3% des weltweiten Jahresumsatzes bei Nichteinhaltung
+
+Für den deutschen Mittelstand besonders relevant: Viele Unternehmen nutzen eingekaufte KI-Software, ohne zu wissen, dass sie als "Betreiber" in der Pflicht stehen.
+
+Das ist kein Schreckgespenst – das ist Realität.
+
+#EUAIAct #KIGovernance #Compliance`,
+  'li-article': `**EU AI Act Artikel 13: Was Unternehmen jetzt konkret tun müssen**
+
+*Ein Leitfaden für Führungskräfte und Compliance-Verantwortliche*
+
+**Die Ausgangslage**
+
+Mit der heutigen Veröffentlichung der finalen Durchführungsbestimmungen zu Artikel 13 des EU AI Acts ist für Unternehmen mit Hochrisiko-KI-Systemen die Uhr offiziell gestartet. 12 Monate Übergangsfrist – nicht mehr.
+
+**Was Artikel 13 fordert**
+
+Artikel 13 verpflichtet Betreiber von Hochrisiko-KI-Systemen zur umfassenden Transparenz gegenüber betroffenen Personen. Das bedeutet konkret: Wer KI zur Personalauswahl, Kreditvergabe oder medizinischen Diagnose einsetzt, muss offenlegen, wie das System entscheidet.
+
+**Die drei Kernanforderungen**
+
+Erstens: Technische Dokumentation nach Artikel 11 – vollständige Systembeschreibung inklusive Trainingsdaten, Leistungsmetriken und Grenzen des Systems.
+
+Zweitens: Protokollierung nach Artikel 12 – automatisches Logging aller KI-Entscheidungen mit Zeitstempel, Input-Parametern und Ausgaben.
+
+Drittens: Transparenzinformationen nach Artikel 13 – verständliche, nicht-technische Erklärung für betroffene Personen über Funktionsweise und Auswirkungen.
+
+**Meine Handlungsempfehlung**
+
+Starten Sie mit einer KI-Inventur. Fragen Sie: Welche unserer Systeme fallen unter "Hochrisiko"? Die Antwort überrascht oft – eingekaufte HR-Software, automatisierte Kreditentscheidungen, prädiktive Analysen können alle betroffen sein.
+
+Dann: Governance-Verantwortung intern klären. Ohne benannten Verantwortlichen scheitern Compliance-Projekte regelmäßig an internen Zuständigkeitsfragen.
+
+**Fazit**
+
+Artikel 13 ist keine bürokratische Hürde. Es ist die Grundlage für nachweisbare KI-Kompetenz – und damit für dauerhaftes Vertrauen in Ihre Systeme.`,
+  'blog': `**EU AI Act Artikel 13: Was bedeuten die neuen Transparenzpflichten für Ihr Unternehmen?**
+
+Die Europäische Kommission hat heute die finalen Durchführungsbestimmungen für Hochrisiko-KI-Systeme veröffentlicht. Wer glaubt, das betreffe nur Tech-Konzerne, irrt. Die Anforderungen treffen mittelständische Unternehmen härter als erwartet.
+
+**Was ist neu?**
+
+Artikel 13 verpflichtet Betreiber von Hochrisiko-KI-Systemen zur vollständigen Transparenz gegenüber betroffenen Personen. Konkret bedeutet das: Wer KI zur Personalauswahl, Kreditvergabe oder medizinischen Diagnose einsetzt, muss dokumentieren und erklären können, wie das System entscheidet.
+
+**Die drei kritischen Anforderungen**
+
+1. **Technische Dokumentation (Art. 11):** Vollständige Systembeschreibung inklusive Trainingsdaten, Leistungsparameter und bekannter Einschränkungen.
+2. **Protokollierung (Art. 12):** Automatisches Logging aller KI-Entscheidungen – lückenlos, nachvollziehbar, auditierbar.
+3. **Transparenzinformation (Art. 13):** Verständliche, nicht-technische Erklärung für betroffene Personen – keine IT-Dokumentation, sondern echte Kommunikation.
+
+**Was das für den Mittelstand bedeutet**
+
+Viele KMU glauben, sie seien nicht betroffen – weil sie "keine KI entwickeln". Das ist ein Irrtum. Wer eingekaufte HR-Software mit KI-Scoring nutzt, ist Betreiber im Sinne des EU AI Acts. Die Dokumentationspflicht liegt bei Ihnen, nicht beim Anbieter.
+
+**Meine Einschätzung**
+
+Unternehmen, die jetzt mit der strukturierten Implementierung beginnen, verschaffen sich einen messbaren Wettbewerbsvorteil. Kunden, Partner und Regulatoren werden zunehmend nach nachweisbarer KI-Kompetenz fragen. Wer wartet, zahlt später – in Form von Bußgeldern, Reputationsschäden und Aufholkosten.
+
+Die gute Nachricht: Mit dem richtigen Framework lässt sich Artikel-13-Compliance in 3-4 Monaten erreichbar machen.`,
+  'fach': `**Transparenzpflichten für Hochrisiko-KI nach EU AI Act Artikel 13: Analyse und Handlungsempfehlungen**
+
+*Dr. Dirk Kötting, KI-Governance-Experte*
+
+**Abstract**
+
+Mit der Veröffentlichung der finalen Durchführungsbestimmungen zu Artikel 13 des EU AI Acts konkretisiert die Europäische Kommission die Transparenzanforderungen für Hochrisiko-KI-Systeme. Der vorliegende Beitrag analysiert die regulatorischen Anforderungen, identifiziert praktische Umsetzungsherausforderungen und entwickelt einen strukturierten Implementierungsrahmen für Unternehmen.
+
+**1. Regulatorischer Rahmen**
+
+Artikel 13 EU AI Act normiert Informationspflichten für Betreiber von Hochrisiko-KI-Systemen gegenüber natürlichen Personen. Die heute veröffentlichten Durchführungsbestimmungen konkretisieren diese Anforderungen in drei Dimensionen: technische Dokumentation, automatisierte Protokollierung und nutzerorientierte Transparenzkommunikation.
+
+**2. Betroffene Systeme**
+
+Die Klassifizierung als Hochrisiko-KI ergibt sich aus Anhang III EU AI Act und umfasst inter alia Systeme zur biometrischen Identifikation, Systeme in kritischen Infrastrukturen, KI-gestützte Personalentscheidungen sowie Kreditvergabe-Scoring-Systeme. Für den deutschen Mittelstand besonders relevant: Die Betreiber-Eigenschaft entsteht unabhängig davon, ob Systeme selbst entwickelt oder eingekauft wurden.
+
+**3. Implementierungsrahmen**
+
+Ein belastbares Compliance-Framework für Artikel 13 umfasst fünf Bausteine: (1) KI-Inventur und Risikoklassifizierung, (2) technische Dokumentation nach Art. 11, (3) Logging-Infrastruktur nach Art. 12, (4) Transparenz-Kommunikationskonzept, (5) Governance-Struktur mit benanntem Verantwortlichen.
+
+**4. Fazit**
+
+Die Einhaltung von Artikel 13 ist nicht nur eine regulatorische Pflicht, sondern die Grundlage für institutionelles Vertrauen in KI-Systeme. Unternehmen, die Compliance als strategisches Asset begreifen, positionieren sich dauerhaft vorteilhaft.`,
+  'news': `📰 **KI Governance Digest – 01. April 2026**
+
+**Top-Meldung:** EU AI Act Artikel 13 – finale Durchführungsbestimmungen in Kraft.
+
+Was es bedeutet: Betreiber von Hochrisiko-KI müssen vollständige Transparenzdokumentation nachweisen. 12 Monate Übergangsfrist. Betroffen: HR-KI, Kredit-Scoring, medizinische Diagnosesysteme.
+
+**Weitere Meldungen dieser Woche:**
+→ BSI: Neuer NIS2-Leitfaden für KI in KRITIS-Sektoren
+→ ISO 42001: Erste deutsche Zertifizierungen abgeschlossen
+→ Gartner: 7-Dimensionen-Framework für Agentic AI Governance
+
+*Dr. Dirk Kötting | KI-Governance Ökosystem | Dr. DirKInstitute*`,
+  'exec': `**Executive Summary: EU AI Act Artikel 13**
+Datum: 01. April 2026
+
+**Sachverhalt:** EU-Kommission veröffentlicht finale Durchführungsbestimmungen für Hochrisiko-KI-Transparenzpflichten.
+
+**Handlungsbedarf:** Sofortige Compliance-Gap-Analyse für alle KI-Systeme in Hochrisiko-Kategorien.
+
+**Frist:** 12 Monate.
+
+**Risiko:** Bußgelder bis 3% des weltweiten Jahresumsatzes; Reputationsschaden.
+
+**Empfehlung:** KI-Governance-Framework implementieren, externe Expertise einbinden, interne Verantwortlichkeit klären.
+
+**Nächster Schritt:** KI-Inventur innerhalb von 30 Tagen abschließen.`,
+  'diskussion': `**Diskussionsgrundlage: EU AI Act Artikel 13 – Transparenz als Pflicht oder Wettbewerbsvorteil?**
+
+**Zentrale These:**
+Transparenzpflichten für KI-Systeme sind keine bürokratische Last, sondern die Grundlage für institutionelles Vertrauen – und damit langfristig ein Wettbewerbsvorteil.
+
+**Provokative Gegenthese:**
+Zu hohe Dokumentationspflichten bremsen Innovation und benachteiligen europäische KMU gegenüber US- und China-Wettbewerbern, die unter keinem vergleichbaren Regulierungsregime stehen.
+
+**Spannungsfeld:**
+Wie viel Transparenz ist zumutbar, ohne Geschäftsgeheimnisse zu gefährden? Wer haftet – Entwickler oder Betreiber? Ist ein harmonisierter EU-Standard überhaupt global durchsetzbar?
+
+**Offene Fragen:**
+1. Welche Unternehmen werden durch Artikel 13 tatsächlich härter getroffen als erwartet?
+2. Ist "erklärbare KI" technologisch für alle Hochrisiko-Anwendungen realisierbar?
+3. Welche Rolle spielen externe KI-Governance-Berater bei der Umsetzung?`,
+  'analyse': `**Kurzanalyse: EU AI Act Artikel 13 – Handlungsempfehlung**
+
+**Ausgangslage:** Finale Durchführungsbestimmungen veröffentlicht. 12 Monate Übergangsfrist.
+
+**Kritische Lücken in deutschen KMU:**
+▸ Fehlende KI-Inventur (80% der Unternehmen)
+▸ Unklare interne Governance-Verantwortung
+▸ Unterschätzung der Betreiber-Eigenschaft bei eingekaufter Software
+
+**Priorisierte Handlungsschritte:**
+1. KI-Inventur (Woche 1–2)
+2. Risikoklassifizierung nach Anhang III (Woche 3–4)
+3. Governance-Verantwortlichen benennen (Woche 1)
+4. Dokumentations-Framework implementieren (Monat 2–3)
+
+**Bottom Line:** Compliance ist in 3 Monaten erreichbar – mit dem richtigen Framework. Ohne: kritisch.`
+};
+
+const liFormats = ['li-post','li-story','li-list','li-question','li-news','li-article'];
+
+function nav(id, el) {
+  document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+function selectFmt(el, f) {
+  document.querySelectorAll('.format-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  fmt = f;
+}
+
+function loadAndGenerate(title) {
+  selectedArticle = title;
+  const el = document.getElementById('sel-article');
+  if(el) el.textContent = title;
+  // Navigate to generate
+  document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-generate').classList.add('active');
+  document.querySelectorAll('.sidebar-item')[2]?.classList.add('active');
+  generate('main');
+}
+
+function generate(target) {
+  const isLi = liFormats.includes(fmt);
+  const outEl = document.getElementById(target === 'dash' ? 'dash-out' : 'main-out');
+  const ccEl = document.getElementById(target === 'dash' ? 'dash-cc' : 'main-cc');
+  const liPrev = document.getElementById('li-prev');
+  const liBody = document.getElementById('li-body');
+  const outLabel = document.getElementById('out-label');
+
+  outEl.style.fontStyle = 'italic';
+  outEl.style.color = 'var(--color-text-faint)';
+  outEl.textContent = '⏳ Generiere …';
+  if(liPrev) liPrev.style.display = 'none';
+
+  setTimeout(() => {
+    const text = outputs[fmt] || outputs['li-post'];
+    outEl.style.fontStyle = 'normal';
+    outEl.style.color = 'var(--color-text)';
+    outEl.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    ccEl.textContent = text.length + ' Zeichen';
+    if(outLabel) outLabel.textContent = isLi ? 'LinkedIn Vorschau' : 'Ausgabe';
+    if(liPrev && isLi && target === 'main') {
+      liPrev.style.display = 'block';
+      liBody.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    }
+  }, 900);
+}
+
+function runResearch() {
+  const btn = document.getElementById('run-btn');
+  const st = document.getElementById('status-text');
+  const fill = document.getElementById('pfill');
+  btn.textContent = '⏳ Läuft…';
+  st.textContent = 'Recherche läuft…';
+  let p = 0;
+  const iv = setInterval(() => {
+    p += Math.random() * 14;
+    if(p >= 100) {
+      p = 100; clearInterval(iv);
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Recherche starten';
+      st.textContent = '47 neue Artikel';
+      document.getElementById('kpi-s').textContent = Math.floor(Math.random()*8+45);
+    }
+    fill.style.width = Math.min(p,100) + '%';
+  }, 280);
+}
+
+function copyOut() {
+  const el = document.getElementById('main-out');
+  navigator.clipboard?.writeText(el.textContent).then(() => alert('Kopiert!'));
+}
+
+function exportOut() {
+  const el = document.getElementById('main-out');
+  const blob = new Blob([el.textContent], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ki-governance-content.txt';
+  a.click();
+}
+
+function addT() {
+  const n = prompt('Neues Thema:');
+  if(!n) return;
+  const list = document.getElementById('topic-list');
+  const d = document.createElement('div');
+  d.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;background:var(--color-surface-offset);border-radius:8px;margin-bottom:8px';
+  d.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:var(--color-primary);flex-shrink:0;display:block"></span><span style="flex:1;font-size:var(--text-sm)">${n}</span><span style="font-size:11px;color:var(--color-text-faint);font-family:var(--font-mono)">0 heute</span>`;
+  list.insertBefore(d, list.lastElementChild);
+}
+
+function addSrc() {
+  const v = document.getElementById('src-url').value.trim();
+  if(!v) return;
+  const list = document.getElementById('src-list');
+  const d = document.createElement('div');
+  d.style.cssText = 'font-size:var(--text-xs);padding:8px 0;border-bottom:1px solid var(--color-divider);color:var(--color-text-muted)';
+  d.textContent = v.replace('https://','').replace('http://','');
+  list.appendChild(d);
+  document.getElementById('src-url').value = '';
+}
+
+// Theme toggle
+(function(){
+  const t = document.querySelector('[data-theme-toggle]');
+  const r = document.documentElement;
+  let d = 'light';
+  t && t.addEventListener('click', () => {
+    d = d === 'dark' ? 'light' : 'dark';
+    r.setAttribute('data-theme', d);
+    t.innerHTML = d === 'dark'
+      ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+      : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+  });
+})();
+</script>
+</body>
+</html>
