@@ -873,17 +873,52 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
       <div class="grid-2">
         <div class="card">
           <div class="card-header"><span class="card-title">Recherche-API</span></div>
-          <div class="input-group"><label class="input-label">Provider</label>
-            <select class="input-field"><option>Perplexity API</option><option>Tavily Search API</option><option>SerpAPI</option></select>
+          <div class="input-group"><label class="input-label">Research Provider</label>
+            <select class="input-field">
+              <option>Perplexity API</option>
+              <option>Tavily Search API</option>
+              <option>SerpAPI</option>
+            </select>
+          </div>
+          <div class="input-group"><label class="input-label">Fallback Provider</label>
+            <select class="input-field">
+              <option>Kein Fallback</option>
+              <option>Tavily Search API</option>
+              <option>SerpAPI</option>
+            </select>
           </div>
           <div class="input-group"><label class="input-label">API Key</label><input class="input-field" type="password" placeholder="pplx-..."></div>
         </div>
         <div class="card">
-          <div class="card-header"><span class="card-title">Generierungs-Modell</span></div>
-          <div class="input-group"><label class="input-label">LLM</label>
-            <select class="input-field"><option>Claude 3.7 Sonnet</option><option>GPT-4o</option><option>Gemini 1.5 Pro</option></select>
+          <div class="card-header"><span class="card-title">Schreib- und Review-Modelle</span></div>
+          <div class="input-group"><label class="input-label">Bevorzugter Writing Provider</label>
+            <select class="input-field">
+              <option>OpenAI</option>
+              <option>Anthropic</option>
+            </select>
           </div>
-          <div class="input-group"><label class="input-label">API Key</label><input class="input-field" type="password" placeholder="sk-ant-..."></div>
+          <div class="input-group"><label class="input-label">OpenAI Modell</label>
+            <select class="input-field">
+              <option>GPT-4o</option>
+              <option>GPT-4.1</option>
+              <option>GPT-4.1 mini</option>
+            </select>
+          </div>
+          <div class="input-group"><label class="input-label">Anthropic Modell</label>
+            <select class="input-field">
+              <option>Claude 3.7 Sonnet</option>
+              <option>Claude 3.5 Sonnet</option>
+            </select>
+          </div>
+          <div class="input-group"><label class="input-label">Fallback Writing Provider</label>
+            <select class="input-field">
+              <option>Anthropic</option>
+              <option>OpenAI</option>
+              <option>Kein Fallback</option>
+            </select>
+          </div>
+          <div class="input-group"><label class="input-label">OpenAI API Key</label><input class="input-field" type="password" placeholder="sk-openai-..."></div>
+          <div class="input-group"><label class="input-label">Anthropic API Key</label><input class="input-field" type="password" placeholder="sk-ant-..."></div>
         </div>
       </div>
     </section>
