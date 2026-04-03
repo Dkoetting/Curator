@@ -1881,6 +1881,7 @@ async function addT() {
     Prioritaet: 'Mittel',
     Aktiv: 'Ja',
     Notizen: 'Manuell aus dem Curator ergaenzt',
+    'Erfasst am': new Date().toISOString().slice(0, 10),
     countLabel: '0 heute'
   };
 
@@ -1906,7 +1907,8 @@ async function addSrc() {
     Region: 'Eigene Quelle',
     Primaerquelle: 'Nein',
     Aktiv: 'Ja',
-    Kommentar: 'Manuell aus dem Curator ergaenzt'
+    Kommentar: 'Manuell aus dem Curator ergaenzt',
+    'Erfasst am': new Date().toISOString().slice(0, 10)
   };
 
   try {

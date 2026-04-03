@@ -61,6 +61,7 @@ async function getAccessToken(serviceAccount) {
 }
 
 function buildAppendPayload(kind, data) {
+  const createdAt = String(data?.['Erfasst am'] || new Date().toISOString().slice(0, 10)).trim();
   if (kind === 'topic') {
     const title = String(data?.Thema || '').trim();
     if (!title) {
@@ -75,7 +76,8 @@ function buildAppendPayload(kind, data) {
         String(data?.Region || 'DACH / EU').trim(),
         String(data?.Prioritaet || 'Mittel').trim(),
         String(data?.Aktiv || 'Ja').trim(),
-        String(data?.Notizen || 'Manuell aus dem Curator ergaenzt').trim()
+        String(data?.Notizen || 'Manuell aus dem Curator ergaenzt').trim(),
+        createdAt
       ]]
     };
   }
@@ -87,7 +89,7 @@ function buildAppendPayload(kind, data) {
     }
 
     return {
-      range: 'Quellen!A:G',
+      range: 'Quellen!A:H',
       values: [[
         String(data?.Titel || 'Eigene Quelle').trim(),
         url,
@@ -95,7 +97,8 @@ function buildAppendPayload(kind, data) {
         String(data?.Region || 'Eigene Quelle').trim(),
         String(data?.Primaerquelle || 'Nein').trim(),
         String(data?.Aktiv || 'Ja').trim(),
-        String(data?.Kommentar || 'Manuell aus dem Curator ergaenzt').trim()
+        String(data?.Kommentar || 'Manuell aus dem Curator ergaenzt').trim(),
+        createdAt
       ]]
     };
   }
