@@ -116,6 +116,15 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 .overview-title span{font-size:var(--text-xs);line-height:1.6;color:var(--color-text-muted);}
 .overview-meta{font-size:var(--text-xs);color:var(--color-text-muted);}
 .overview-drafts{display:flex;flex-wrap:wrap;gap:var(--space-2);}
+.source-registry{display:grid;gap:var(--space-3);}
+.source-entry{padding:var(--space-4);border-radius:var(--radius-lg);border:1px solid var(--color-border);background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);box-shadow:0 6px 18px rgba(24,46,110,0.04);}
+.source-entry-top{display:flex;flex-wrap:wrap;gap:var(--space-2);align-items:center;justify-content:space-between;margin-bottom:8px;}
+.source-entry-title{font-size:var(--text-sm);font-weight:700;line-height:1.4;color:var(--color-text);}
+.source-entry-meta{display:flex;flex-wrap:wrap;gap:var(--space-2);}
+.source-entry-desc{font-size:var(--text-xs);line-height:1.6;color:var(--color-text-muted);margin-bottom:10px;}
+.source-link{display:block;font-size:12px;line-height:1.5;color:var(--color-blue);text-decoration:none;word-break:break-word;}
+.source-link:hover{text-decoration:underline;}
+.source-note{margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--color-divider);}
 
 @media (max-width: 980px){
   .overview-row{grid-template-columns:1fr;gap:10px;}
@@ -695,19 +704,85 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><span class="card-title">Quellen-URLs</span></div>
-          <div class="input-group">
-            <label class="input-label">URL hinzufügen</label>
-            <div style="display:flex;gap:var(--space-2)">
-              <input class="input-field" id="src-url" placeholder="https://...">
-              <button class="btn-sm p" onclick="addSrc()">+ Add</button>
+          <div class="card-header"><span class="card-title">Geprüfte Source Registry</span><span class="micro-note">Primärquellen zuerst</span></div>
+          <div class="source-registry" id="src-list">
+            <div class="source-entry">
+              <div class="source-entry-top">
+                <div class="source-entry-title">EU AI Act & Regulatorik</div>
+                <div class="source-entry-meta">
+                  <span class="tag p">Tier A</span>
+                  <span class="tag">EU offiziell</span>
+                </div>
+              </div>
+              <div class="source-entry-desc">Timeline, AI Office und AI Pact als belastbare Primärquellen für Gesetz, Leitlinien und Governance.</div>
+              <a class="source-link" href="https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act" target="_blank" rel="noreferrer">EU AI Act Umsetzungs-Timeline</a>
+              <a class="source-link" href="https://digital-strategy.ec.europa.eu/en/policies/ai-office" target="_blank" rel="noreferrer">AI Office der EU-Kommission</a>
+              <a class="source-link" href="https://digital-strategy.ec.europa.eu/en/policies/ai-pact" target="_blank" rel="noreferrer">EU AI Pact</a>
+            </div>
+            <div class="source-entry">
+              <div class="source-entry-top">
+                <div class="source-entry-title">NIS-2 & KRITIS</div>
+                <div class="source-entry-meta">
+                  <span class="tag p">Tier A</span>
+                  <span class="tag">Deutschland offiziell</span>
+                </div>
+              </div>
+              <div class="source-entry-desc">BSI und Bundesregierung als Kernquellen für NIS-2-Pflichten, Registrierung und KRITIS-Resilienz.</div>
+              <a class="source-link" href="https://www.bsi.bund.de/DE/Themen/Regulierte-Wirtschaft/NIS-2-regulierte-Unternehmen/nis-2-regulierte-unternehmen_node.html" target="_blank" rel="noreferrer">BSI NIS-2 Wegweiser</a>
+              <a class="source-link" href="https://www.bundesregierung.de/breg-de/aktuelles/kritis-dachgesetz-2383682" target="_blank" rel="noreferrer">KRITIS-Dachgesetz der Bundesregierung</a>
+            </div>
+            <div class="source-entry">
+              <div class="source-entry-top">
+                <div class="source-entry-title">ISMS & Standards</div>
+                <div class="source-entry-meta">
+                  <span class="tag">Tier A/B</span>
+                  <span class="tag">Normen & Praxis</span>
+                </div>
+              </div>
+              <div class="source-entry-desc">BSI als Primärquelle, ergänzt um gut verständliche Sekundärquellen zu ISO 42001 und der Integration mit ISO 27001.</div>
+              <a class="source-link" href="https://www.bsi.bund.de/DE/Themen/Unternehmen-und-Organisationen/Standards-und-Zertifizierung/IT-Grundschutz/IT-Grundschutz-Kompendium/it-grundschutz-kompendium_node.html" target="_blank" rel="noreferrer">BSI IT-Grundschutz-Kompendium</a>
+              <a class="source-link" href="https://www.isms.online/iso-42001/" target="_blank" rel="noreferrer">ISO/IEC 42001 Überblick</a>
+              <a class="source-link" href="https://www.modulos.ai/blog/iso-27001-iso-42001-integration/" target="_blank" rel="noreferrer">ISO 27001 + ISO 42001 Integration</a>
+            </div>
+            <div class="source-entry">
+              <div class="source-entry-top">
+                <div class="source-entry-title">AI Entwicklungen & Big Tech</div>
+                <div class="source-entry-meta">
+                  <span class="tag b">Tier B</span>
+                  <span class="tag">Herstellerquellen</span>
+                </div>
+              </div>
+              <div class="source-entry-desc">Direkte Hersteller- und Plattformquellen für Agenten, Copilot, Gemini und Claude.</div>
+              <a class="source-link" href="https://news.microsoft.com/ignite-2025-book-of-news/" target="_blank" rel="noreferrer">Microsoft Ignite Book of News</a>
+              <a class="source-link" href="https://cloud.google.com/blog/products/ai-machine-learning/what-google-cloud-announced-in-ai-this-month-2025" target="_blank" rel="noreferrer">Google Cloud AI News</a>
+              <a class="source-link" href="https://www.anthropic.com/events/anthropic-at-google-cloud-next-2026" target="_blank" rel="noreferrer">Anthropic Events / Cloud Next 2026</a>
+            </div>
+            <div class="source-entry">
+              <div class="source-entry-top">
+                <div class="source-entry-title">Europa, Souveränität & Future Skills</div>
+                <div class="source-entry-meta">
+                  <span class="tag">Tier A/B</span>
+                  <span class="tag">Policy & Bildung</span>
+                </div>
+              </div>
+              <div class="source-entry-desc">EuroHPC, WEF, UNESCO, KMK und ergänzende Research-Tools als Basis für Souveränität, Arbeitswelt und Bildung.</div>
+              <a class="source-link" href="https://www.eurohpc-ju.europa.eu/ai-factories_en" target="_blank" rel="noreferrer">EuroHPC AI Factories</a>
+              <a class="source-link" href="https://www.weforum.org/publications/the-future-of-jobs-report-2025/" target="_blank" rel="noreferrer">WEF Future of Jobs Report 2025</a>
+              <a class="source-link" href="https://www.unesco.org/en/artificial-intelligence/recommendation-ethics" target="_blank" rel="noreferrer">UNESCO Empfehlung zur KI-Ethik</a>
+              <a class="source-link" href="https://www.kmk.org/bildungsministerkonferenz/bildungsthemen/bildung-in-der-digitalen-welt.html" target="_blank" rel="noreferrer">KMK Bildungsstrategie digitale Welt</a>
+              <a class="source-link" href="https://www.oer-strategie.de/" target="_blank" rel="noreferrer">OER-Strategie</a>
+              <a class="source-link" href="https://www.semanticscholar.org/" target="_blank" rel="noreferrer">Semantic Scholar</a>
+              <a class="source-link" href="https://consensus.app/" target="_blank" rel="noreferrer">Consensus</a>
             </div>
           </div>
-          <div id="src-list">
-            <div style="font-size:var(--text-xs);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);color:var(--color-text-muted)">euractiv.com/section/digital</div>
-            <div style="font-size:var(--text-xs);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);color:var(--color-text-muted)">bsi.bund.de/DE/Themen/KI</div>
-            <div style="font-size:var(--text-xs);padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);color:var(--color-text-muted)">digital-strategy.ec.europa.eu</div>
-            <div style="font-size:var(--text-xs);padding:var(--space-2) 0;color:var(--color-text-muted)">ki-strategie.de</div>
+          <div class="source-note">
+            <div class="input-group" style="margin-bottom:0">
+              <label class="input-label">Eigene URL ergänzen</label>
+              <div style="display:flex;gap:var(--space-2)">
+                <input class="input-field" id="src-url" placeholder="https://...">
+                <button class="btn-sm p" onclick="addSrc()">+ Add</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1049,8 +1124,17 @@ function addSrc() {
   if(!v) return;
   const list = document.getElementById('src-list');
   const d = document.createElement('div');
-  d.style.cssText = 'font-size:var(--text-xs);padding:8px 0;border-bottom:1px solid var(--color-divider);color:var(--color-text-muted)';
-  d.textContent = v.replace('https://','').replace('http://','');
+  d.className = 'source-entry';
+  d.innerHTML = `
+    <div class="source-entry-top">
+      <div class="source-entry-title">Eigene Quelle</div>
+      <div class="source-entry-meta">
+        <span class="tag">Custom</span>
+      </div>
+    </div>
+    <div class="source-entry-desc">Manuell ergänzt für die nächste Rechercherunde.</div>
+    <a class="source-link" href="${v}" target="_blank" rel="noreferrer">${v}</a>
+  `;
   list.appendChild(d);
   document.getElementById('src-url').value = '';
 }
