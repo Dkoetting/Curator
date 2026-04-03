@@ -125,6 +125,16 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 .source-link{display:block;font-size:12px;line-height:1.5;color:var(--color-blue);text-decoration:none;word-break:break-word;}
 .source-link:hover{text-decoration:underline;}
 .source-note{margin-top:var(--space-4);padding-top:var(--space-4);border-top:1px solid var(--color-divider);}
+.section-actions{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-4);}
+.inbox-banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-5);border:1px solid var(--color-border);border-radius:var(--radius-xl);background:linear-gradient(135deg,#ffffff 0%,#eef4ff 100%);box-shadow:var(--shadow-sm);margin-bottom:var(--space-5);}
+.inbox-copy{display:grid;gap:6px;max-width:56ch;}
+.inbox-kicker{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-primary);}
+.inbox-title{font-size:var(--text-lg);font-weight:800;letter-spacing:-.02em;color:#203878;}
+.inbox-text{font-size:var(--text-sm);line-height:1.6;color:var(--color-text-muted);}
+.inbox-stats{display:flex;flex-wrap:wrap;gap:var(--space-3);}
+.inbox-stat{display:grid;gap:4px;min-width:110px;padding:var(--space-3) var(--space-4);border-radius:var(--radius-lg);background:#ffffff;border:1px solid var(--color-border);}
+.inbox-stat-value{font-size:var(--text-lg);font-weight:800;color:var(--color-primary);line-height:1;}
+.inbox-stat-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-faint);}
 
 @media (max-width: 980px){
   .overview-row{grid-template-columns:1fr;gap:10px;}
@@ -296,7 +306,10 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
     <section class="tab-content active" id="s-dashboard">
       <div class="page-header">
         <h1 class="page-title">Content Intelligence</h1>
-        <p class="page-subtitle">Tägliche KI-Governance Recherche · Letzte Ausführung: Heute, 06:00 Uhr</p>
+        <p class="page-subtitle">Priorisierte Dashboard-Ansicht · Zeigt Top-Meldungen und aktuelle Entwürfe, nicht die vollständige Recherche-Inbox</p>
+        <div class="section-actions">
+          <button class="btn-sm p" onclick="nav('results', document.querySelectorAll('.sidebar-item')[1])">Alle recherchierten Artikel öffnen</button>
+        </div>
       </div>
       <div class="research-progress" id="research-progress" data-state="idle">
         <div class="research-progress-top">
@@ -340,13 +353,13 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
         </div>
       </div>
       <div class="grid-3">
-        <div class="kpi-card"><div class="kpi-label">Neue Quellen</div><div class="kpi-value" id="kpi-s">47</div><div class="kpi-delta">↑ 12 heute</div></div>
+        <div class="kpi-card"><div class="kpi-label">Beobachtete Quellen</div><div class="kpi-value" id="kpi-s">47</div><div class="kpi-delta">Registry · Authority + Signals</div></div>
         <div class="kpi-card"><div class="kpi-label">LinkedIn-Entwürfe</div><div class="kpi-value">8</div><div class="kpi-delta">bereit zur Prüfung</div></div>
         <div class="kpi-card"><div class="kpi-label">Artikel-Entwürfe</div><div class="kpi-value">4</div><div class="kpi-delta">Blog · Fachbeitrag</div></div>
       </div>
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><span class="card-title">🔥 Trending heute</span><span style="font-size:var(--text-xs);color:var(--color-text-faint)">01. Apr 2026</span></div>
+          <div class="card-header"><span class="card-title">🔥 Top-Meldungen der Inbox</span><span style="font-size:var(--text-xs);color:var(--color-text-faint)">2 von 12 kuratierten Artikeln</span></div>
           <div class="result-card" onclick="loadAndGenerate('EU AI Act Artikel 13: Transparenzpflichten für Hochrisiko-KI')">
             <span class="result-title">EU AI Act: Neue Durchführungsbestimmungen Artikel 13 veröffentlicht</span>
             <div class="result-source">euractiv.com · vor 2h</div>
@@ -475,8 +488,29 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
     <!-- RESULTS -->
     <section class="tab-content" id="s-results">
       <div class="page-header">
-        <h1 class="page-title">Recherche-Ergebnisse</h1>
-        <p class="page-subtitle">47 Artikel gefunden · Klick auf Artikel → direkt zur Generierung</p>
+        <h1 class="page-title">Research Inbox</h1>
+        <p class="page-subtitle">Dedizierte Artikelseite für alle kuratierten Beiträge aus der Demo-Recherche · Klick auf einen Artikel führt direkt in die Generierung</p>
+      </div>
+      <div class="inbox-banner">
+        <div class="inbox-copy">
+          <span class="inbox-kicker">Vollansicht</span>
+          <div class="inbox-title">Alle recherchierten Artikel an einem Ort</div>
+          <div class="inbox-text">Diese Ansicht ist die vollständige Demo-Inbox. Das Dashboard zeigt nur die priorisierten Top-Meldungen und Entwurfszahlen, nicht die gesamte Artikelliste.</div>
+        </div>
+        <div class="inbox-stats">
+          <div class="inbox-stat">
+            <span class="inbox-stat-value">12</span>
+            <span class="inbox-stat-label">kuratierte Artikel</span>
+          </div>
+          <div class="inbox-stat">
+            <span class="inbox-stat-value">8</span>
+            <span class="inbox-stat-label">LinkedIn-Entwürfe</span>
+          </div>
+          <div class="inbox-stat">
+            <span class="inbox-stat-value">4</span>
+            <span class="inbox-stat-label">Artikelentwürfe</span>
+          </div>
+        </div>
       </div>
       <div class="result-card" onclick="loadAndGenerate('EU AI Act Artikel 13: Transparenzpflichten für Hochrisiko-KI')">
         <span class="result-title">EU AI Act: Finale Durchführungsbestimmungen – Artikel 13 Transparenz für Hochrisiko-KI</span>
@@ -507,6 +541,54 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
         <div class="result-source">lto.de · 30.03.2026</div>
         <div class="result-excerpt">Neue Urteile und Leitlinien zur DSGVO-Konformität bei LLM-Systemen: Trainingsdaten, Auskunftspflichten, Löschrechte.</div>
         <div class="result-footer"><span class="tag">DSGVO</span><span class="tag p">LLM</span><span class="result-date">30.03.</span></div>
+      </div>
+      <div class="result-card" onclick="loadAndGenerate('EU AI Office: Neue Leitlinien für GPAI-Compliance und Modelltransparenz')">
+        <span class="result-title">EU AI Office: Leitlinien konkretisieren GPAI-Compliance und Trainingsdaten-Transparenz</span>
+        <div class="result-source">digital-strategy.ec.europa.eu · 29.03.2026</div>
+        <div class="result-excerpt">Neue Hinweise zur Dokumentation von Basismodellen und zur Offenlegung von Trainingsdaten im Kontext des EU AI Acts.</div>
+        <div class="result-footer"><span class="tag p">GPAI</span><span class="tag">AI Office</span><span class="tag">EU</span><span class="result-date">29.03.</span></div>
+      </div>
+      <div class="result-card" onclick="loadAndGenerate('AI Factories in Europa: Was die EuroHPC-Initiative für Souveränität bedeutet')">
+        <span class="result-title">AI Factories in Europa: EuroHPC öffnet den nächsten Hebel für digitale Souveränität</span>
+        <div class="result-source">eurohpc-ju.europa.eu · 28.03.2026</div>
+        <div class="result-excerpt">Die europäische AI-Factories-Initiative schafft Infrastruktur für Startups, Forschung und staatliche KI-Strategien.</div>
+        <div class="result-footer"><span class="tag b">Europa</span><span class="tag">Souveränität</span><span class="result-date">28.03.</span></div>
+      </div>
+      <div class="result-card" onclick="loadAndGenerate('WEF Future of Jobs 2025: Welche KI-Skills jetzt wirklich zählen')">
+        <span class="result-title">WEF Future of Jobs 2025: Diese KI-Skills werden für Unternehmen zum Engpass</span>
+        <div class="result-source">weforum.org · 27.03.2026</div>
+        <div class="result-excerpt">Der Bericht zeigt, welche Future Skills in KI, Datenkompetenz und Transformation realen Marktdruck erzeugen.</div>
+        <div class="result-footer"><span class="tag">Future Skills</span><span class="tag">Arbeitsmarkt</span><span class="result-date">27.03.</span></div>
+      </div>
+      <div class="result-card" onclick="loadAndGenerate('UNESCO KI-Ethik: Warum Governance ohne gesellschaftliche Perspektive zu kurz greift')">
+        <span class="result-title">UNESCO KI-Ethik: Warum Governance ohne gesellschaftliche Perspektive zu kurz greift</span>
+        <div class="result-source">unesco.org · 26.03.2026</div>
+        <div class="result-excerpt">Die globale Ethik-Perspektive verschiebt den Blick von rein technischer Compliance hin zu Verantwortung, Fairness und Teilhabe.</div>
+        <div class="result-footer"><span class="tag">Ethik</span><span class="tag">UNESCO</span><span class="result-date">26.03.</span></div>
+      </div>
+      <div class="result-card" onclick="loadAndGenerate('Semantic Scholar und Consensus: Welche Recherche-Tools Kuratoren wirklich brauchen')">
+        <span class="result-title">Semantic Scholar und Consensus: Welche Recherche-Tools ein moderner Curator wirklich braucht</span>
+        <div class="result-source">semanticscholar.org / consensus.app · 25.03.2026</div>
+        <div class="result-excerpt">Vergleich zweier Research-Tools für evidenzbasierte Kuratierung wissenschaftlicher und regulatorischer Inhalte.</div>
+        <div class="result-footer"><span class="tag b">Research</span><span class="tag">Tools</span><span class="result-date">25.03.</span></div>
+      </div>
+      <div class="result-card" onclick="loadAndGenerate('Google Cloud und Anthropic: Agentic Workflows werden Enterprise-Realität')">
+        <span class="result-title">Google Cloud und Anthropic: Agentic Workflows werden Schritt für Schritt Enterprise-Realität</span>
+        <div class="result-source">cloud.google.com / anthropic.com · 24.03.2026</div>
+        <div class="result-excerpt">Neue Plattformen und Event-Ankündigungen zeigen, wie Agenten in Produktivumgebungen operationalisiert werden.</div>
+        <div class="result-footer"><span class="tag b">Agentic AI</span><span class="tag">Enterprise</span><span class="result-date">24.03.</span></div>
+      </div>
+      <div class="result-card" onclick="loadAndGenerate('BSI Grundschutz und ISO 42001: Wie Informationssicherheit und KI-Governance zusammenwachsen')">
+        <span class="result-title">BSI Grundschutz und ISO 42001: Wie Informationssicherheit und KI-Governance zusammenwachsen</span>
+        <div class="result-source">bsi.bund.de / isms.online · 23.03.2026</div>
+        <div class="result-excerpt">Warum der integrierte Blick auf ISMS und AIMS für regulierte Unternehmen organisatorisch immer relevanter wird.</div>
+        <div class="result-footer"><span class="tag">ISO 42001</span><span class="tag">ISMS</span><span class="result-date">23.03.</span></div>
+      </div>
+      <div class="result-card" onclick="loadAndGenerate('Rechenzentrumsstrategie Deutschland: KI-Kapazitäten als Standortfrage')">
+        <span class="result-title">Rechenzentrumsstrategie Deutschland: KI-Kapazitäten werden zur Standort- und Souveränitätsfrage</span>
+        <div class="result-source">bmds.bund.de · 22.03.2026</div>
+        <div class="result-excerpt">Die Infrastrukturperspektive rückt stärker in den Vordergrund: Rechenzentren, Energiebedarf und KI-Wertschöpfung gehören zusammen.</div>
+        <div class="result-footer"><span class="tag">Infrastruktur</span><span class="tag">Souveränität</span><span class="result-date">22.03.</span></div>
       </div>
     </section>
 
