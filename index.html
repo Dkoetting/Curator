@@ -87,8 +87,19 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 .splash-logo-content .splash-copy,
 .splash-logo-content .splash-points,
 .splash-logo-content .splash-footer{width:100%;}
+.splash-logo-only .splash-shell{grid-template-columns:minmax(0,1fr);justify-items:center;}
+.splash-logo-only .splash-logo-stage{display:grid;width:min(100%,900px);padding:clamp(2rem,1.25rem + 2vw,3rem);}
+.splash-logo-only .splash-logo-stack{width:min(100%,760px);gap:var(--space-8);}
+.splash-logo-only .splash-logo-content{gap:var(--space-5);width:min(100%,640px);padding:0;background:none;border:none;backdrop-filter:none;box-shadow:none;text-align:center;}
+.splash-logo-only .splash-logo-content .splash-brand{display:none;}
+.splash-logo-only .splash-logo-content .splash-copy{justify-items:center;}
+.splash-logo-only .splash-logo-content .splash-title{max-width:10ch;}
+.splash-logo-only .splash-logo-content .splash-text{max-width:34ch;text-align:center;}
+.splash-logo-only .splash-logo-content .splash-points{width:min(100%,560px);justify-self:center;}
+.splash-logo-only .splash-logo-content .splash-point{text-align:left;}
+.splash-logo-only .splash-logo-content .splash-footer{width:min(100%,560px);justify-self:center;}
 .splash-logo-only .splash-portrait{display:none;}
-.splash-logo-only .splash-logo-stage{display:block;}
+.splash-logo-only .splash-logo-stage{display:grid;}
 .splash-logo-only .splash-card{display:none;}
 .splash-portrait{position:relative;min-height:460px;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,0.16);background:#132858;box-shadow:0 28px 70px rgba(3,11,35,0.34);}
 .splash-portrait img{width:100%;height:100%;object-fit:cover;display:block;}
