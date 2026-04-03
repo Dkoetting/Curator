@@ -1847,6 +1847,61 @@ function setDraftStatus(id, status) {
   renderDraftDetail();
 }
 
+function deleteDraft(id) {
+  const draft = drafts.find((item) => item.id === id);
+  if (!draft) return;
+
+  const confirmed = confirm(`Entwurf wirklich loeschen?\n\n${draft.title}`);
+  if (!confirmed) return;
+
+  drafts = drafts.filter((item) => item.id !== id);
+  selectedDraftId = drafts[0]?.id || '';
+  persistDraftState();
+  renderDraftLists();
+  renderDraftDetail();
+}
+
+function renderDraftDetail() {
+  ensureDraftSection();
+  const panel = document.getElementById('draft-detail-panel');
+  const selectedNote = document.getElementById('draft-selected-note');
+  if (!panel) return;
+
+  const draft = drafts.find((item) => item.id === selectedDraftId);
+  if (!draft) {
+    panel.innerHTML = '<div class="micro-note">Kein Entwurf ausgewählt.</div>';
+    if (selectedNote) selectedNote.textContent = 'Kein Entwurf ausgewählt';
+    return;
+  }
+
+  if (selectedNote) {
+    selectedNote.textContent = `${draft.kind === 'linkedin' ? 'LinkedIn' : 'Artikel'} · ${getStatusLabel(draft.status)}`;
+  }
+
+  panel.innerHTML = `
+    <div class="draft-detail-head">
+      <div style="display:grid;gap:8px">
+        <div class="draft-detail-title">${escapeHtml(draft.title)}</div>
+        <div class="draft-detail-meta">
+          <span>${escapeHtml(draft.date)}</span>
+          <span>${escapeHtml(draft.format)}</span>
+          <span>${escapeHtml(draft.articleTitle)}</span>
+        </div>
+      </div>
+      <span class="status-chip ${getStatusClass(draft.status)}">${escapeHtml(getStatusLabel(draft.status))}</span>
+    </div>
+    <div class="draft-item-text">${escapeHtml(draft.note)}</div>
+    <div class="draft-detail-body">${escapeHtml(draft.body)}</div>
+    <div class="section-actions">
+      <button class="btn-sm p" onclick="setDraftStatus('${draft.id}','approved')">Freigeben</button>
+      <button class="btn-sm" onclick="setDraftStatus('${draft.id}','revision')">Zur Ueberarbeitung</button>
+      <button class="btn-sm" onclick="setDraftStatus('${draft.id}','published')">Veroeffentlicht</button>
+      <button class="btn-sm" onclick="deleteDraft('${draft.id}')">Loeschen</button>
+      <button class="btn-sm" onclick='loadAndGenerate(${JSON.stringify(draft.articleTitle)})'>Im Generator oeffnen</button>
+    </div>
+  `;
+}
+
 function renderResearchState() {
   const lastResearch = document.getElementById('last-research');
   const progressSources = document.getElementById('progress-sources');
