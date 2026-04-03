@@ -13,8 +13,8 @@ const defaultWatermarks = [
 ];
 
 const defaultPoints = [
-  'Regulatorische Entwicklungen, KRITIS-Signale und Marktbewegungen werden in einem ruhigen, entscheidungsfaehigen Arbeitsfluss verdichtet.',
-  'Quellen, Themen und Entwurfsfreigaben bleiben nachvollziehbar, damit aus Recherche veroeffentlichungsreife Inhalte werden.',
+  'Regulatorische Entwicklungen, KRITIS-Signale und Marktbewegungen werden in einen ruhigen, entscheidungsfaehigen Arbeitsfluss ueberfuehrt.',
+  'Quellen, Themen und Freigaben bleiben nachvollziehbar, damit aus Recherche belastbare Veroeffentlichungen werden.',
 ];
 
 export default function SplashScreen({
@@ -24,12 +24,12 @@ export default function SplashScreen({
   brandKicker = 'Institute Workbench',
   brandName = 'Dr. DirKInstitute',
   personName = 'Dr. Dirk Koetting',
-  personRole = 'KI-Governance, IT-Sicherheit und kuratierte Entscheidungsintelligenz',
+  personRole = 'KI-Governance, IT-Sicherheit und kuratierte Entscheidungsgrundlagen',
   title = 'Content Intelligence fuer belastbare Entscheidungen.',
-  text = 'Der Curator buendelt priorisierte Recherche, redaktionell anschlussfaehige Entwuerfe und ein klares Lagebild fuer KI-Governance im DACH-Raum.',
+  text = 'Der Curator verdichtet priorisierte Recherche, redaktionell anschlussfaehige Entwuerfe und ein belastbares Lagebild fuer KI-Governance im DACH-Raum.',
   points = defaultPoints,
-  statusText = 'Research engine wird vorbereitet',
-  footerText = 'Kuratiertes Monitoring, redaktionelle Vorbereitung und Freigabe in einer Oberflaeche.',
+  statusText = 'Research Briefing wird vorbereitet',
+  footerText = 'Kuratiertes Monitoring, redaktionelle Vorbereitung und Freigabe in einer belastbaren Arbeitsoberflaeche.',
   onComplete,
 }) {
   const [hidden, setHidden] = useState(false);
