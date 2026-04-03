@@ -940,29 +940,91 @@ Viele KMU glauben, sie seien nicht betroffen – weil sie "keine KI entwickeln".
 Unternehmen, die jetzt mit der strukturierten Implementierung beginnen, verschaffen sich einen messbaren Wettbewerbsvorteil. Kunden, Partner und Regulatoren werden zunehmend nach nachweisbarer KI-Kompetenz fragen. Wer wartet, zahlt später – in Form von Bußgeldern, Reputationsschäden und Aufholkosten.
 
 Die gute Nachricht: Mit dem richtigen Framework lässt sich Artikel-13-Compliance in 3-4 Monaten erreichbar machen.`,
-  'fach': `**Transparenzpflichten für Hochrisiko-KI nach EU AI Act Artikel 13: Analyse und Handlungsempfehlungen**
+  'fach': `**Transparenzpflichten für Hochrisiko-KI nach EU AI Act Artikel 13: Analyse, Einordnung und Handlungsempfehlungen**
 
 *Dr. Dirk Kötting, KI-Governance-Experte*
 
 **Abstract**
 
-Mit der Veröffentlichung der finalen Durchführungsbestimmungen zu Artikel 13 des EU AI Acts konkretisiert die Europäische Kommission die Transparenzanforderungen für Hochrisiko-KI-Systeme. Der vorliegende Beitrag analysiert die regulatorischen Anforderungen, identifiziert praktische Umsetzungsherausforderungen und entwickelt einen strukturierten Implementierungsrahmen für Unternehmen.
+Mit der Konkretisierung von Artikel 13 des EU AI Acts verschiebt sich die Debatte über Hochrisiko-KI von einer eher abstrakten Regulierungsfrage zu einer operativen Managementaufgabe. Unternehmen müssen nicht nur nachweisen, dass ein System technisch funktioniert, sondern auch, dass seine Wirkungslogik, seine Grenzen und seine Governance-Struktur nachvollziehbar dokumentiert sind. Gerade für den deutschen Mittelstand ist das relevant, weil Hochrisiko-Systeme nicht nur in Eigenentwicklung entstehen, sondern häufig als eingekaufte HR-, Risiko- oder Diagnostiklösungen eingeführt werden. Der vorliegende Beitrag ordnet die Transparenzpflichten systematisch ein, skizziert die Wechselwirkungen mit NIS-2, KRITIS und ISO-basierten Managementsystemen und leitet daraus einen belastbaren Implementierungsrahmen für Organisationen ab.
 
-**1. Regulatorischer Rahmen**
+**1. Einordnung des regulatorischen Rahmens**
 
-Artikel 13 EU AI Act normiert Informationspflichten für Betreiber von Hochrisiko-KI-Systemen gegenüber natürlichen Personen. Die heute veröffentlichten Durchführungsbestimmungen konkretisieren diese Anforderungen in drei Dimensionen: technische Dokumentation, automatisierte Protokollierung und nutzerorientierte Transparenzkommunikation.
+Artikel 13 ist kein isolierter Einzelparagraph, sondern Teil eines Gesamtmodells des AI Acts. Dieses Modell ist risikobasiert aufgebaut: Verbotene Praktiken bilden die rote Linie, Hochrisiko-Systeme den streng regulierten Kern, während für weniger kritische Anwendungen vor allem Transparenz- und Dokumentationspflichten gelten. Für Hochrisiko-KI ist Transparenz deshalb nicht bloß eine kommunikative Aufgabe, sondern ein rechtsdogmatischer Mechanismus zur Absicherung von Grundrechten, Marktaufsicht und organisationaler Rechenschaft.
 
-**2. Betroffene Systeme**
+Die praktische Relevanz steigt mit dem Hauptanwendungsdatum im August 2026 erheblich. Unternehmen, die KI in Personalentscheidungen, Kreditwürdigkeitsprüfungen, kritischen Infrastrukturen oder sensiblen Diagnostik-Kontexten einsetzen, müssen dann in der Lage sein, Aufsichtsbehörden, internen Prüfern, Auditoren und betroffenen Personen in unterschiedlicher Tiefe Auskunft zu geben. Transparenz ist dabei mehrschichtig: technisch gegenüber Experten, organisatorisch gegenüber Governance-Funktionen und verständlich gegenüber Betroffenen.
 
-Die Klassifizierung als Hochrisiko-KI ergibt sich aus Anhang III EU AI Act und umfasst inter alia Systeme zur biometrischen Identifikation, Systeme in kritischen Infrastrukturen, KI-gestützte Personalentscheidungen sowie Kreditvergabe-Scoring-Systeme. Für den deutschen Mittelstand besonders relevant: Die Betreiber-Eigenschaft entsteht unabhängig davon, ob Systeme selbst entwickelt oder eingekauft wurden.
+Gerade diese Mehrschichtigkeit wird in der Praxis häufig unterschätzt. Viele Organisationen glauben, eine Vendor-Dokumentation oder ein allgemeines Produktdatenblatt reiche aus. Regulatorisch tragfähig ist das aber nur selten. Der Betreiber eines Systems muss nachvollziehen können, wie das System eingebunden ist, welche Daten es verarbeitet, welche Entscheidungen es beeinflusst und welche menschlichen Kontrollmechanismen vorgesehen sind.
 
-**3. Implementierungsrahmen**
+**2. Was Artikel 13 konkret verlangt**
 
-Ein belastbares Compliance-Framework für Artikel 13 umfasst fünf Bausteine: (1) KI-Inventur und Risikoklassifizierung, (2) technische Dokumentation nach Art. 11, (3) Logging-Infrastruktur nach Art. 12, (4) Transparenz-Kommunikationskonzept, (5) Governance-Struktur mit benanntem Verantwortlichen.
+Im Kern adressiert Artikel 13 die Pflicht, Hochrisiko-KI so zu gestalten und zu betreiben, dass ihre Ergebnisse für betroffene Personen angemessen interpretierbar sind. In der operativen Umsetzung bedeutet das mindestens vier Dinge.
 
-**4. Fazit**
+Erstens braucht es eine belastbare technische Dokumentation. Diese muss nicht nur Modell- oder Systemparameter beschreiben, sondern den realen Einsatzkontext, die Eingabedaten, die vorgesehenen Outputs, bekannte Beschränkungen und die erwartbaren Fehlerrisiken umfassen. Ohne diese Basis bleibt jede spätere Governance-Aussage oberflächlich.
 
-Die Einhaltung von Artikel 13 ist nicht nur eine regulatorische Pflicht, sondern die Grundlage für institutionelles Vertrauen in KI-Systeme. Unternehmen, die Compliance als strategisches Asset begreifen, positionieren sich dauerhaft vorteilhaft.`,
+Zweitens ist eine saubere Protokollierung erforderlich. Transparenz ohne Logging bleibt Behauptung. Unternehmen müssen rekonstruieren können, wann ein System verwendet wurde, welche Entscheidung vorbereitet oder ausgelöst wurde, welche Eingaben relevant waren und wie menschliche Freigaben eingebunden waren. Diese Protokollierung ist zugleich eine Schnittstelle zu NIS-2, Incident Management und interner Revision.
+
+Drittens verlangt Artikel 13 nutzerorientierte Transparenz. Das bedeutet: Informationen müssen so aufbereitet sein, dass betroffene Personen verstehen können, dass KI eingesetzt wird, welche Art von Einfluss das System auf Entscheidungen hat und welche Grenzen der maschinellen Bewertung bestehen. Technische Detailtiefe allein genügt nicht.
+
+Viertens setzt die Norm implizit menschliche Aufsicht voraus. Transparenz wird erst dann wirksam, wenn ein benannter Verantwortlicher in der Lage ist, auf Abweichungen, Beschwerden oder regulatorische Nachfragen sachgerecht zu reagieren. Ohne Rollenmodell bleibt Transparenz organisatorisch folgenlos.
+
+**3. Welche Systeme typischerweise betroffen sind**
+
+Für viele Unternehmen ist die eigentliche Herausforderung nicht die Rechtslektüre, sondern die zutreffende Einordnung des eigenen Portfolios. Hochrisiko-KI betrifft gerade nicht nur spektakuläre Spezialfälle. Relevant sind insbesondere Systeme zur Bewerbervorauswahl, Kredit- oder Bonitätsbewertung, medizinischen Unterstützung, biometrischen Identifikation, kritischen Infrastruktursteuerung oder behördlich sensiblen Bewertung.
+
+Im Mittelstand zeigt sich ein typisches Muster: Die Systeme werden nicht selbst trainiert, sondern als SaaS, Plattformmodul oder Spezialsoftware eingekauft. Daraus entsteht häufig die Fehlannahme, dass die Verantwortung beim Anbieter verbleibt. Tatsächlich verschiebt sich die Betreiberverantwortung aber spätestens dort in die Organisation hinein, wo das System in reale Geschäftsprozesse integriert, mit eigenen Daten angereichert oder zur Grundlage individueller Entscheidungen gemacht wird.
+
+Die entscheidende Frage lautet daher nicht: "Haben wir ein eigenes Modell gebaut?" Sondern: "Wo verlassen sich unsere Prozesse auf KI-gestützte Bewertungen, Priorisierungen oder Empfehlungen mit relevanter Wirkung auf Menschen, Sicherheit oder kritische Abläufe?" Erst wenn diese Frage organisationsweit beantwortet ist, kann Transparenz überhaupt systematisch aufgebaut werden.
+
+**4. Wechselwirkungen mit NIS-2, KRITIS und Informationssicherheit**
+
+Die Transparenzpflichten aus dem AI Act stehen nicht isoliert neben der Cyber- und Resilienzregulierung, sondern greifen in dieselben Betriebsstrukturen ein. NIS-2 verlangt ein wirksames Risikomanagement, klare Meldewege und nachvollziehbare Verantwortlichkeiten. Für KI-Systeme bedeutet das: Wer ein hochkritisches oder hochreguliertes System betreibt, muss nicht nur den fachlichen Output verstehen, sondern auch die Resilienz der Daten-, Modell- und Prozesskette absichern.
+
+Besonders im KRITIS-Umfeld entsteht daraus eine doppelte Erwartung. Einerseits muss das System fachlich erklärbar sein, andererseits muss es technisch und organisatorisch widerstandsfähig betrieben werden. Logging, Zugriffsschutz, Lieferkettenkontrolle, Rollenmodelle und Notfallprozesse werden so zu gemeinsamen Bausteinen von KI-Governance und Informationssicherheit.
+
+Hier zeigt sich der Wert eines integrierten Managementansatzes. Ein ISMS nach ISO/IEC 27001 schafft bereits tragfähige Strukturen für Asset-Management, Risikobehandlung, Incident Response und Auditfähigkeit. Ein AIMS nach ISO/IEC 42001 ergänzt diese Basis um KI-spezifische Fragen wie Bias, Modellgrenzen, Transparenz, menschliche Aufsicht und gesellschaftliche Auswirkungen. Organisationen, die beide Perspektiven zusammenführen, vermeiden Doppelstrukturen und erhöhen gleichzeitig ihre Nachweisfähigkeit.
+
+**5. Ein praktikabler Implementierungsrahmen für Unternehmen**
+
+In der Praxis hat sich ein fünfstufiges Vorgehen als besonders belastbar erwiesen.
+
+Schritt eins ist die KI-Inventur. Ziel ist eine vollständige Übersicht aller Systeme, in denen KI oder KI-nahe Logik eingesetzt wird. Diese Übersicht muss nicht nur Systeme erfassen, sondern auch Prozessschritte, verantwortliche Fachbereiche, Datenquellen und Entscheidungsauswirkungen.
+
+Schritt zwei ist die Risikoklassifizierung. Hier wird geprüft, welche Systeme unter Anhang III oder angrenzende Transparenzpflichten fallen und welche Systeme zwar formal nicht hochriskant sind, aber aus Sicht von Reputation, Compliance oder interner Kontrolle ähnlich eng geführt werden sollten.
+
+Schritt drei ist der Aufbau der Evidenzbasis. Dazu gehören technische Dokumentation, Logging-Konzept, Datenherkunft, Rollenmodell, Eskalationswege und gegebenenfalls eine KI-Folgenabschätzung. Dieser Schritt ist arbeitsintensiv, bildet aber das Fundament für Auditierbarkeit.
+
+Schritt vier ist die operative Einbettung in Governance und Betrieb. Transparenz darf nicht als PDF-Ablage enden. Sie muss in Freigaben, Änderungsmanagement, Incident Response, Schulung und Management-Reporting überführt werden. Vor allem die Schnittstelle zwischen Fachbereich, IT, Legal, Compliance und Informationssicherheit muss verbindlich geregelt sein.
+
+Schritt fünf ist die kommunikative Übersetzung. Für betroffene Personen, Kunden, Aufsicht und interne Stakeholder braucht es unterschiedliche Transparenzformate. Ein technischer Systemsteckbrief ist etwas anderes als eine verständliche Betroffeneninformation oder ein Vorstandsbriefing. Gute Organisationen unterscheiden diese Ebenen bewusst.
+
+**6. Typische Fehler in der Umsetzung**
+
+Der häufigste Fehler ist die Verwechslung von Produkttransparenz mit Betreibertransparenz. Anbieterinformationen sind wichtig, ersetzen aber keine organisationsspezifische Bewertung des tatsächlichen Einsatzkontexts.
+
+Ein zweiter Fehler liegt in der Überbetonung des Modells und der Unterschätzung des Prozesses. Viele Risiken entstehen nicht im Modell allein, sondern in Datenschnittstellen, Freigabepfaden, Eskalationslogiken und der Art, wie Menschen Empfehlungen übernehmen.
+
+Drittens wird die Dokumentation oft zu spät begonnen. Transparenz "nachzubauen", nachdem das System längst produktiv genutzt wird, ist deutlich aufwendiger und fehleranfälliger als ein frühzeitig angelegtes Governance-Design.
+
+Viertens fehlt häufig eine klare Managementverantwortung. Solange nicht entschieden ist, wer fachlich, regulatorisch und operativ für KI-Governance einsteht, bleiben Transparenzpflichten in der Organisation verteilt und damit schwach.
+
+**7. Strategische Bewertung**
+
+Unternehmen sollten Artikel 13 nicht nur als Compliance-Pflicht lesen, sondern als Reifegradtest ihrer gesamten KI-Governance. Wer heute nicht erklären kann, wie KI-Systeme in kritischen Prozessen eingesetzt werden, hat meist nicht nur ein Transparenzproblem, sondern auch Defizite in Verantwortung, Risikosteuerung und Kontrollarchitektur.
+
+Gerade darin liegt jedoch auch eine Chance. Organisationen, die Transparenz professionell aufbauen, schaffen Vertrauen bei Kunden, Partnern, Prüfern und Mitarbeitenden. Sie verbessern ihre interne Steuerbarkeit, reduzieren regulatorische Unsicherheit und schaffen Voraussetzungen für skalierbaren KI-Einsatz. Transparenz ist deshalb kein Bremsfaktor, sondern die Voraussetzung dafür, dass KI in sensiblen Anwendungsfeldern dauerhaft legitim und wirtschaftlich betrieben werden kann.
+
+**8. Operative Mindestanforderungen für die ersten 90 Tage**
+
+Für Unternehmen, die noch am Anfang stehen, empfiehlt sich ein pragmatischer 90-Tage-Plan. In den ersten 30 Tagen sollte die Organisation ein vollständiges Verzeichnis relevanter KI-Systeme aufbauen und diese mit Verantwortlichen, Datenquellen und Prozesswirkungen verknüpfen. Parallel dazu sollte eine erste Priorisierung erfolgen: Welche Systeme sind potenziell hochriskant, welche sind reputationskritisch, welche sind bereits produktiv in Entscheidungen eingebunden?
+
+Zwischen Tag 30 und Tag 60 sollte die Evidenzbasis aufgebaut werden. Dazu gehören Systemsteckbriefe, Logging-Anforderungen, eine Übersicht über Vendor-Dokumentationen, vertragliche Verantwortlichkeiten sowie erste Transparenztexte für interne und externe Stakeholder. Genau in dieser Phase zeigt sich, ob die Organisation belastbare Informationen vom Anbieter erhält oder ob blinde Flecken bestehen.
+
+Zwischen Tag 60 und Tag 90 muss die Governance operativ werden. Das bedeutet: Eskalationswege definieren, Freigaben dokumentieren, Review-Rhythmen festlegen, Incidents in bestehende Sicherheitsprozesse einbinden und ein Management-Reporting etablieren. Wer diese ersten 90 Tage sauber strukturiert, schafft die Voraussetzung dafür, dass Transparenz nicht als einmaliges Projekt endet, sondern als dauerhafte Führungs- und Kontrollfunktion verankert wird.
+
+**8. Fazit**
+
+Die Konkretisierung von Artikel 13 markiert einen Wendepunkt. Hochrisiko-KI kann künftig nicht mehr nur nach Leistungsfähigkeit bewertet werden, sondern muss als erklärbares, kontrollierbares und organisatorisch verantwortetes System betrieben werden. Für Unternehmen bedeutet das: KI-Inventur, Risikoklassifizierung, Evidenzaufbau, integrierte Governance und verständliche Kommunikation gehören zusammen. Wer diese Elemente frühzeitig verbindet, erfüllt nicht nur regulatorische Anforderungen, sondern baut die Grundlage für belastbare institutionelle KI-Kompetenz auf.`,
   'news': `📰 **KI Governance Digest – 01. April 2026**
 
 **Top-Meldung:** EU AI Act Artikel 13 – finale Durchführungsbestimmungen in Kraft.
@@ -1064,10 +1126,16 @@ function generate(target) {
 
   setTimeout(() => {
     const text = outputs[fmt] || outputs['li-post'];
+    const plainText = text
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/[`#>]/g, ' ')
+      .trim();
+    const wordCount = plainText ? plainText.split(/\s+/).filter(Boolean).length : 0;
     outEl.style.fontStyle = 'normal';
     outEl.style.color = 'var(--color-text)';
     outEl.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    ccEl.textContent = text.length + ' Zeichen';
+    ccEl.textContent = isLi ? (text.length + ' Zeichen') : (wordCount + ' Wörter · ' + text.length + ' Zeichen');
     if(outLabel) outLabel.textContent = isLi ? 'LinkedIn Vorschau' : 'Ausgabe';
     if(liPrev && isLi && target === 'main') {
       liPrev.style.display = 'block';
