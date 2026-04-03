@@ -1,31 +1,38 @@
 # Curator App Prototype
 
-Dieses Verzeichnis ist jetzt für ein erstes statisches Hosting über `GitHub -> Vercel` vorbereitet.
+Dieses Verzeichnis ist fuer ein erstes Hosting ueber `GitHub -> Vercel` vorbereitet.
 
 ## Aktueller Stand
 
-- `index.html` liefert die aktuelle Curator-Oberfläche aus.
+- `index.html` liefert die aktuelle Curator-Oberflaeche aus.
 - `status.html` zeigt den Projektstatus aus `Status_20260403.txt` lesbar im Browser an.
-- `archive/index-landing-v1.html` enthält die frühere Landingpage als Referenz.
-- Weitere HTML-Snapshots bleiben im Projekt erhalten, damit frühere Iterationen nachvollziehbar bleiben.
+- `archive/index-landing-v1.html` enthaelt die fruehere Landingpage als Referenz.
 
 ## Empfohlener Ablauf
 
-1. Neues Git-Repository in `D:\Curator_APP` initialisieren.
-2. Dateien nach GitHub pushen.
-3. Das GitHub-Repository in Vercel importieren.
-4. Ohne Framework deployen, da es sich aktuell um eine statische HTML-Version handelt.
+1. Dateien nach GitHub pushen.
+2. Das GitHub-Repository in Vercel importieren.
+3. Ohne Framework deployen, solange die App als HTML-Prototyp laeuft.
 
 ## Lokale Vorschau
 
 - Startseite: `index.html`
 - Statusseite: `status.html`
 
-## Nächste technische Ausbaustufe
+## OpenAI Live-Generierung
 
-Wenn aus dem HTML-Prototyp eine echte App wird, ist die saubere nächste Stufe:
+Die UI kann serverseitig die Route `api/generate.js` ansprechen.
 
-- `Next.js` für UI und Routing
-- `Supabase` für Datenbank, Auth und Storage
-- Deploy weiter über `Vercel`
-- später optional Migration auf einen eigenen VPS
+- In Vercel die Umgebungsvariable `OPENAI_API_KEY` setzen
+- Danach neu deployen
+- Der Key gehoert nicht dauerhaft ins Frontend
+- Wenn der Server-Key fehlt oder die Live-Anfrage fehlschlaegt, bleibt die Demo-Ausgabe als Fallback erhalten
+
+## Naechste technische Ausbaustufe
+
+Wenn aus dem HTML-Prototyp eine echte App wird, ist die saubere naechste Stufe:
+
+- `Next.js` fuer UI und Routing
+- `Supabase` fuer Datenbank, Auth und Storage
+- Deploy weiter ueber `Vercel`
+- spaeter optional Migration auf einen eigenen VPS

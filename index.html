@@ -164,6 +164,7 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 .input-field{width:100%;padding:var(--space-2) var(--space-3);background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--color-text);box-shadow:inset 0 1px 2px rgba(16,41,99,0.03);}
 .input-field:focus{outline:2px solid var(--color-primary);outline-offset:2px;border-color:transparent;}
 .input-field::placeholder{color:var(--color-text-faint);}
+.input-help{display:block;margin-top:8px;font-size:11px;line-height:1.5;color:var(--color-text-faint);}
 
 .generate-btn{display:flex;align-items:center;justify-content:center;gap:var(--space-2);width:100%;padding:var(--space-3);background:linear-gradient(90deg,#2147aa 0%,#2d63d5 100%);color:var(--color-text-inverse);border-radius:var(--radius-md);font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-5);box-shadow:0 12px 22px rgba(33,71,170,0.18);}
 .generate-btn:hover{background:linear-gradient(90deg,#18378a 0%,#214fb3 100%);}
@@ -875,51 +876,55 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
         <div class="card">
           <div class="card-header"><span class="card-title">Recherche-API</span></div>
           <div class="input-group"><label class="input-label">Research Provider</label>
-            <select class="input-field">
+            <select class="input-field" id="research-provider">
               <option>Perplexity API</option>
               <option>Tavily Search API</option>
               <option>SerpAPI</option>
             </select>
           </div>
           <div class="input-group"><label class="input-label">Fallback Provider</label>
-            <select class="input-field">
+            <select class="input-field" id="research-fallback-provider">
               <option>Kein Fallback</option>
               <option>Tavily Search API</option>
               <option>SerpAPI</option>
             </select>
           </div>
-          <div class="input-group"><label class="input-label">API Key</label><input class="input-field" type="password" placeholder="pplx-..."></div>
+          <div class="input-group"><label class="input-label">API Key</label><input class="input-field" id="research-api-key" type="password" placeholder="pplx-..."></div>
         </div>
         <div class="card">
           <div class="card-header"><span class="card-title">Schreib- und Review-Modelle</span></div>
           <div class="input-group"><label class="input-label">Bevorzugter Writing Provider</label>
-            <select class="input-field">
+            <select class="input-field" id="writing-provider">
               <option>OpenAI</option>
               <option>Anthropic</option>
             </select>
           </div>
           <div class="input-group"><label class="input-label">OpenAI Modell</label>
-            <select class="input-field">
+            <select class="input-field" id="openai-model">
               <option>GPT-4o</option>
               <option>GPT-4.1</option>
               <option>GPT-4.1 mini</option>
             </select>
           </div>
           <div class="input-group"><label class="input-label">Anthropic Modell</label>
-            <select class="input-field">
+            <select class="input-field" id="anthropic-model">
               <option>Claude 3.7 Sonnet</option>
               <option>Claude 3.5 Sonnet</option>
             </select>
           </div>
           <div class="input-group"><label class="input-label">Fallback Writing Provider</label>
-            <select class="input-field">
+            <select class="input-field" id="writing-fallback-provider">
               <option>Anthropic</option>
               <option>OpenAI</option>
               <option>Kein Fallback</option>
             </select>
           </div>
-          <div class="input-group"><label class="input-label">OpenAI API Key</label><input class="input-field" type="password" placeholder="sk-openai-..."></div>
-          <div class="input-group"><label class="input-label">Anthropic API Key</label><input class="input-field" type="password" placeholder="sk-ant-..."></div>
+          <div class="input-group">
+            <label class="input-label">OpenAI API Key</label>
+            <input class="input-field" id="openai-api-key" type="password" placeholder="sk-openai-...">
+            <span class="input-help">Fuer Produktion bitte als Vercel-Umgebungsvariable `OPENAI_API_KEY` setzen. Ein hier eingetragener Key wird nur fuer diese Browser-Sitzung genutzt.</span>
+          </div>
+          <div class="input-group"><label class="input-label">Anthropic API Key</label><input class="input-field" id="anthropic-api-key" type="password" placeholder="sk-ant-..."></div>
         </div>
       </div>
     </section>
@@ -1428,6 +1433,20 @@ Wie viel Transparenz ist zumutbar, ohne Geschäftsgeheimnisse zu gefährden? Wer
 };
 
 const liFormats = ['li-post','li-story','li-list','li-question','li-news','li-article'];
+const formatSpecs = {
+  'li-post': 'LinkedIn Post, 900-1500 Zeichen, klarer Hook in den ersten 2-3 Zeilen, sachlich-autoritativer DACH-Ton.',
+  'li-story': 'LinkedIn Story-Post, 900-1600 Zeichen, szenischer Einstieg, kurze Absaetze, glaubwuerdig statt werblich.',
+  'li-list': 'LinkedIn Listen-Post mit starkem Hook und 5-7 praezisen Punkten, 900-1600 Zeichen.',
+  'li-question': 'LinkedIn Frage-Post mit fachlich starkem Einstieg und klarer Abschlussfrage, 800-1400 Zeichen.',
+  'li-news': 'LinkedIn News-Kommentar mit Einordnung und Relevanz fuer Unternehmen, 900-1500 Zeichen.',
+  'li-article': 'LinkedIn Artikel mit Hook, klarer Struktur und Dr.-Dirk-Koetting-Tonalitaet, 900-1400 Woerter.',
+  'blog': 'SEO-Blog-Artikel mit Zwischenueberschriften, klarer Suchintention und 800-1200 Woertern.',
+  'fach': 'Fachbeitrag mit sauberer Argumentation und 1500-2500 Woertern.',
+  'news': 'Newsletter-Beitrag als kuratierte Einordnung, kompakt und scanbar, etwa 300-500 Woerter.',
+  'exec': 'Executive Summary fuer C-Level, eine Seite, verdichtet, mit Implikationen und Empfehlung.',
+  'diskussion': 'Diskussionsgrundlage mit Thesen, Gegenpositionen und Moderationsfragen.',
+  'analyse': 'Kurzanalyse mit Risiko-, Chancen- und Handlungsteil, klar priorisiert.'
+};
 
 function formatResearchTimestamp(date = new Date()) {
   return new Intl.DateTimeFormat('de-DE', {
@@ -1495,6 +1514,130 @@ function generate(target) {
       liBody.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     }
   }, 900);
+}
+
+function getFieldValue(id) {
+  return document.getElementById(id)?.value?.trim() || '';
+}
+
+function getWritingConfig() {
+  const provider = getFieldValue('writing-provider') || 'OpenAI';
+  return {
+    provider,
+    model: provider === 'Anthropic'
+      ? (getFieldValue('anthropic-model') || 'Claude 3.7 Sonnet')
+      : (getFieldValue('openai-model') || 'GPT-4.1'),
+    apiKey: provider === 'Anthropic' ? getFieldValue('anthropic-api-key') : getFieldValue('openai-api-key')
+  };
+}
+
+function normalizeModelName(label) {
+  const map = {
+    'GPT-4o': 'gpt-4o',
+    'GPT-4.1': 'gpt-4.1',
+    'GPT-4.1 mini': 'gpt-4.1-mini'
+  };
+  return map[label] || label.toLowerCase();
+}
+
+function formatOutputHtml(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+}
+
+function getPlainTextStats(text) {
+  const plainText = text
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/[`#>]/g, ' ')
+    .trim();
+  return {
+    plainText,
+    wordCount: plainText ? plainText.split(/\s+/).filter(Boolean).length : 0
+  };
+}
+
+function renderOutput(target, text, sourceLabel = '') {
+  const isLi = liFormats.includes(fmt);
+  const outEl = document.getElementById(target === 'dash' ? 'dash-out' : 'main-out');
+  const ccEl = document.getElementById(target === 'dash' ? 'dash-cc' : 'main-cc');
+  const liPrev = document.getElementById('li-prev');
+  const liBody = document.getElementById('li-body');
+  const outLabel = document.getElementById('out-label');
+  const { wordCount } = getPlainTextStats(text);
+
+  outEl.style.fontStyle = 'normal';
+  outEl.style.color = 'var(--color-text)';
+  outEl.innerHTML = formatOutputHtml(text);
+  ccEl.textContent = isLi ? (text.length + ' Zeichen') : (wordCount + ' Woerter · ' + text.length + ' Zeichen');
+  if(outLabel) {
+    const baseLabel = isLi ? 'LinkedIn Vorschau' : 'Ausgabe';
+    outLabel.textContent = sourceLabel ? (baseLabel + ' · ' + sourceLabel) : baseLabel;
+  }
+  if(liPrev && isLi && target === 'main') {
+    liPrev.style.display = 'block';
+    liBody.innerHTML = formatOutputHtml(text);
+  } else if(liPrev) {
+    liPrev.style.display = 'none';
+  }
+}
+
+function buildPromptPayload() {
+  return {
+    articleTitle: selectedArticle,
+    format: fmt,
+    requirement: formatSpecs[fmt] || 'Praezise, belastbare deutsche Fachkommunikation.',
+    fallbackText: outputs[fmt] || outputs['li-post']
+  };
+}
+
+async function generate(target) {
+  const isLi = liFormats.includes(fmt);
+  const outEl = document.getElementById(target === 'dash' ? 'dash-out' : 'main-out');
+  const ccEl = document.getElementById(target === 'dash' ? 'dash-cc' : 'main-cc');
+  const liPrev = document.getElementById('li-prev');
+  const outLabel = document.getElementById('out-label');
+  const writing = getWritingConfig();
+  const fallbackText = outputs[fmt] || outputs['li-post'];
+
+  outEl.style.fontStyle = 'italic';
+  outEl.style.color = 'var(--color-text-faint)';
+  outEl.textContent = 'Generiere live ...';
+  ccEl.textContent = '';
+  if(outLabel) outLabel.textContent = isLi ? 'LinkedIn Vorschau' : 'Ausgabe';
+  if(liPrev) liPrev.style.display = 'none';
+
+  if(writing.provider !== 'OpenAI') {
+    setTimeout(() => renderOutput(target, fallbackText, 'Demo'), 500);
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        provider: writing.provider,
+        model: normalizeModelName(writing.model),
+        apiKey: writing.apiKey,
+        ...buildPromptPayload()
+      })
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if(!response.ok) {
+      throw new Error(data.error || 'Die Live-Generierung konnte nicht gestartet werden.');
+    }
+
+    renderOutput(target, data.text || fallbackText, data.sourceLabel || 'OpenAI Live');
+  } catch (error) {
+    console.error(error);
+    renderOutput(target, fallbackText, 'Demo-Fallback');
+    ccEl.textContent = error?.message ? ('Live-Fehler: ' + error.message) : 'Live-Fehler: Fallback aktiviert.';
+  }
 }
 
 function runResearch() {
