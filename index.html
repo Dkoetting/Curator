@@ -50,6 +50,41 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 input,select,textarea{font:inherit;color:inherit;}
 h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 
+.splash-active{overflow:hidden;}
+.splash-screen{position:fixed;inset:0;z-index:2400;display:grid;place-items:center;padding:var(--space-6);background:
+  radial-gradient(circle at top left, rgba(108,165,255,0.28), transparent 32%),
+  radial-gradient(circle at bottom right, rgba(33,71,170,0.24), transparent 30%),
+  linear-gradient(145deg, #09132f 0%, #133271 48%, #eff4ff 100%);
+  transition:opacity .7s ease, visibility .7s ease;
+}
+.splash-screen.is-hidden{opacity:0;visibility:hidden;pointer-events:none;}
+.splash-shell{width:min(1040px,100%);display:grid;grid-template-columns:minmax(260px,.9fr) minmax(320px,1.1fr);gap:var(--space-6);align-items:stretch;}
+.splash-portrait{position:relative;min-height:460px;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,0.16);background:#132858;box-shadow:0 28px 70px rgba(3,11,35,0.34);}
+.splash-portrait img{width:100%;height:100%;object-fit:cover;display:block;}
+.splash-portrait::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(9,19,47,0.02) 0%, rgba(9,19,47,0.12) 38%, rgba(9,19,47,0.56) 100%);}
+.splash-portrait-badge{position:absolute;left:var(--space-5);bottom:var(--space-5);z-index:1;display:grid;gap:6px;padding:var(--space-4) var(--space-5);border-radius:22px;background:rgba(9,19,47,0.58);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.14);color:#f4f7ff;}
+.splash-portrait-badge strong{font-size:var(--text-base);font-weight:800;letter-spacing:-.02em;}
+.splash-portrait-badge span{font-size:var(--text-xs);color:rgba(244,247,255,0.76);}
+.splash-card{display:grid;gap:var(--space-5);align-content:center;padding:clamp(1.5rem, 1rem + 2vw, 2.75rem);border-radius:30px;background:rgba(255,255,255,0.9);border:1px solid rgba(255,255,255,0.48);backdrop-filter:blur(20px);box-shadow:0 30px 80px rgba(8,18,48,0.26);}
+.splash-brand{display:flex;align-items:center;gap:var(--space-4);}
+.splash-brand img{width:58px;height:58px;border-radius:18px;object-fit:cover;border:1px solid rgba(33,71,170,0.1);box-shadow:0 12px 28px rgba(26,53,125,0.18);}
+.splash-kicker{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#5d75b0;}
+.splash-brand-name{font-size:var(--text-base);font-weight:800;color:#203878;letter-spacing:-.02em;}
+.splash-title{font-size:clamp(2rem, 1.5rem + 1.6vw, 3.4rem);font-weight:800;line-height:1.02;letter-spacing:-.05em;color:#0f214c;max-width:12ch;}
+.splash-copy{display:grid;gap:var(--space-3);}
+.splash-text{font-size:var(--text-base);line-height:1.75;color:#42557f;max-width:54ch;}
+.splash-points{display:grid;gap:10px;}
+.splash-point{display:flex;align-items:flex-start;gap:10px;font-size:var(--text-sm);line-height:1.6;color:#314669;}
+.splash-point::before{content:"";width:9px;height:9px;border-radius:999px;flex:0 0 auto;margin-top:8px;background:linear-gradient(135deg,#2147aa,#6ca5ff);box-shadow:0 0 0 5px rgba(33,71,170,0.08);}
+.splash-footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-3);padding-top:var(--space-4);border-top:1px solid rgba(33,71,170,0.12);}
+.splash-status{display:grid;gap:8px;min-width:min(320px,100%);}
+.splash-status-line{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#5a72a8;}
+.splash-status-dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(135deg,#2147aa,#6ca5ff);box-shadow:0 0 0 8px rgba(33,71,170,0.08);animation:pulse 1.4s ease-in-out infinite;}
+.splash-progress{height:8px;border-radius:999px;background:#dbe5f8;overflow:hidden;}
+.splash-progress > span{display:block;width:100%;height:100%;background:linear-gradient(90deg,#2147aa 0%, #2d63d5 55%, #9ab7ff 100%);transform-origin:left center;animation:splashLoad 1.8s cubic-bezier(0.16,1,0.3,1) forwards;}
+.splash-meta{font-size:12px;color:#6077ab;}
+@keyframes splashLoad{0%{transform:scaleX(.08);opacity:.35;}100%{transform:scaleX(1);opacity:1;}}
+
 .app-layout{display:grid;grid-template-columns:240px 1fr;grid-template-rows:56px 1fr;min-height:100dvh;}
 .topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 var(--space-6);border-bottom:1px solid rgba(255,255,255,0.18);background:linear-gradient(90deg,#1c338b 0%,#2b5fd3 100%);box-shadow:0 12px 28px rgba(22,54,130,0.18);color:var(--color-text-inverse);position:sticky;top:0;z-index:100;--color-text-muted:rgba(255,255,255,0.82);--color-text-faint:rgba(255,255,255,0.62);--color-border:rgba(255,255,255,0.18);}
 .sidebar{background:linear-gradient(180deg,#f8fbff 0%,#eef3fb 100%);border-right:1px solid var(--color-divider);padding:var(--space-4) 0;overflow-y:auto;}
@@ -148,6 +183,9 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 .inbox-stat-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-faint);}
 
 @media (max-width: 980px){
+  .splash-shell{grid-template-columns:1fr;}
+  .splash-portrait{min-height:320px;max-height:380px;}
+  .splash-card{order:-1;}
   .overview-row{grid-template-columns:1fr;gap:10px;}
   .overview-row.head{display:none;}
 }
@@ -244,6 +282,12 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 }
 
 @media (max-width: 640px){
+  .splash-screen{padding:var(--space-4);}
+  .splash-card{padding:var(--space-5);}
+  .splash-brand{align-items:flex-start;}
+  .splash-brand img{width:52px;height:52px;}
+  .splash-title{max-width:none;}
+  .splash-footer{align-items:flex-start;}
   .progress-steps{grid-template-columns:1fr;}
 }
 
@@ -256,6 +300,41 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 </style>
 </head>
 <body>
+<div class="splash-screen" id="splash-screen" aria-hidden="true">
+  <div class="splash-shell">
+    <div class="splash-portrait">
+      <img src="./assets/dirk-portrait.jpg" alt="Dr. Dirk Koetting Portrait">
+      <div class="splash-portrait-badge">
+        <strong>Dr. Dirk K&ouml;tting</strong>
+        <span>KI-Governance, IT-Sicherheit und kuratierte Entscheidungsintelligenz</span>
+      </div>
+    </div>
+    <div class="splash-card">
+      <div class="splash-brand">
+        <img src="./assets/Logo.jpg" alt="Dr. DirKInstitute Logo">
+        <div>
+          <div class="splash-kicker">Institute Workbench</div>
+          <div class="splash-brand-name">Dr. DirKInstitute</div>
+        </div>
+      </div>
+      <div class="splash-copy">
+        <h1 class="splash-title">Content Intelligence fuer belastbare Entscheidungen.</h1>
+        <p class="splash-text">Der Curator buendelt priorisierte Recherche, redaktionell anschlussfaehige Entwuerfe und ein klares Lagebild fuer KI-Governance im DACH-Raum.</p>
+      </div>
+      <div class="splash-points">
+        <div class="splash-point">Regulatorische Entwicklungen, KRITIS-Signale und Marktbewegungen werden in einem ruhigen, entscheidungsfaehigen Arbeitsfluss verdichtet.</div>
+        <div class="splash-point">Quellen, Themen und Entwurfsfreigaben bleiben nachvollziehbar, damit aus Recherche veroeffentlichungsreife Inhalte werden.</div>
+      </div>
+      <div class="splash-footer">
+        <div class="splash-status">
+          <div class="splash-status-line"><span class="splash-status-dot"></span>Research engine wird vorbereitet</div>
+          <div class="splash-progress"><span></span></div>
+        </div>
+        <div class="splash-meta">Kuratiertes Monitoring, redaktionelle Vorbereitung und Freigabe in einer Oberflaeche.</div>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="app-layout">
 
   <header class="topbar">
@@ -2295,6 +2374,18 @@ async function addSrc() {
 
 initializeDashboardState();
 loadSheetData();
+
+// Splash screen
+(function(){
+  const splash = document.getElementById('splash-screen');
+  if (!splash) return;
+
+  document.body.classList.add('splash-active');
+  window.setTimeout(() => {
+    splash.classList.add('is-hidden');
+    document.body.classList.remove('splash-active');
+  }, 1800);
+})();
 
 // Theme toggle
 (function(){
