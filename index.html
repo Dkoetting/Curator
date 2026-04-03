@@ -101,9 +101,20 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 .draft-list{display:grid;gap:var(--space-3);}
 .draft-item{display:grid;gap:6px;padding:var(--space-4);border-radius:var(--radius-lg);background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);border:1px solid var(--color-border);cursor:pointer;box-shadow:0 6px 18px rgba(24,46,110,0.04);}
 .draft-item:hover{box-shadow:var(--shadow-md);border-color:#9db3eb;}
+.draft-item.selected{border-color:var(--color-primary);background:var(--color-primary-hl);}
 .draft-item-title{font-size:var(--text-sm);font-weight:700;line-height:1.4;color:var(--color-text);}
 .draft-item-meta{display:flex;flex-wrap:wrap;gap:var(--space-2);font-size:11px;color:var(--color-text-faint);font-family:var(--font-mono);}
 .draft-item-text{font-size:var(--text-xs);line-height:1.6;color:var(--color-text-muted);}
+.draft-detail{display:grid;gap:var(--space-4);}
+.draft-detail-head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:var(--space-3);}
+.draft-detail-title{font-size:var(--text-lg);font-weight:800;letter-spacing:-.02em;color:#203878;line-height:1.25;}
+.draft-detail-meta{display:flex;flex-wrap:wrap;gap:var(--space-2);font-size:11px;color:var(--color-text-faint);font-family:var(--font-mono);}
+.draft-detail-body{font-size:var(--text-sm);line-height:1.75;color:var(--color-text);white-space:pre-wrap;padding:var(--space-4);border-radius:var(--radius-lg);background:linear-gradient(180deg,#f8fbff 0%,#edf3fc 100%);border:1px solid var(--color-border);}
+.status-chip{display:inline-flex;align-items:center;padding:0 var(--space-2);height:22px;border-radius:var(--radius-full);font-size:11px;font-weight:700;border:1px solid transparent;}
+.status-chip.review{background:var(--color-blue-hl);color:var(--color-blue);}
+.status-chip.revision{background:var(--color-gold-hl);color:var(--color-gold);}
+.status-chip.approved{background:#e4f5eb;color:#1f6b44;}
+.status-chip.published{background:var(--color-primary-hl);color:var(--color-primary);}
 .micro-note{font-size:var(--text-xs);color:var(--color-text-faint);}
 .overview-table{display:grid;gap:var(--space-3);}
 .overview-row{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(150px,.8fr) minmax(120px,.7fr) minmax(140px,.9fr);gap:var(--space-3);align-items:center;padding:var(--space-4);border:1px solid var(--color-border);border-radius:var(--radius-lg);background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);box-shadow:0 6px 18px rgba(24,46,110,0.04);cursor:pointer;}
@@ -1461,6 +1472,36 @@ const defaultSources = [
 ];
 let currentTopics = [...defaultTopics];
 let currentSources = [...defaultSources];
+const storageKeys = {
+  research: 'curator.researchState',
+  drafts: 'curator.drafts',
+  selectedDraft: 'curator.selectedDraft'
+};
+const defaultResearchState = {
+  lastResearch: '01.04.2026 · 06:00',
+  sources: 47,
+  clusters: 12,
+  focus: 'Authority + Signals',
+  percent: 0,
+  caption: 'idle'
+};
+const defaultDrafts = [
+  { id: 'li-1', kind: 'linkedin', title: 'Artikel 13 ist kein Technikthema. Es ist ein Steuerungsthema.', articleTitle: 'EU AI Act Artikel 13: Transparenzpflichten für Hochrisiko-KI', format: 'li-post', status: 'review', date: '03.04.2026', note: 'Hook + Governance-Fokus', body: 'Viele Unternehmen diskutieren noch über Tools.\n\nSie müssten längst über Verantwortlichkeit sprechen.\n\nArtikel 13 des EU AI Acts macht genau das sichtbar: Wer Hochrisiko-KI einsetzt, muss erklären können, wie Systeme eingebunden sind, welche Risiken bestehen und wer intern Verantwortung trägt.\n\nDas ist keine reine Compliance-Frage.\nEs ist eine Führungsfrage.\n\nWer Transparenz erst dann ernst nimmt, wenn die Prüfung ansteht, ist zu spät.\n\n#EUAIAct #KIGovernance #Compliance' },
+  { id: 'li-2', kind: 'linkedin', title: 'NIS2 + KI in KRITIS: Die Pflicht ist organisatorisch, nicht nur technisch.', articleTitle: 'BSI NIS2 Leitfaden: KI-Sicherheit in KRITIS-Sektoren', format: 'li-news', status: 'review', date: '03.04.2026', note: 'BSI-Einordnung', body: 'Der neue BSI-Leitfaden zeigt ziemlich klar:\n\nKI in KRITIS lässt sich nicht über Technik allein absichern.\n\nEs geht um Incident Response, Lieferketten, Logging und klare Eskalation.\n\nGerade dort wird sichtbar, wie eng KI-Governance und Informationssicherheit inzwischen zusammenliegen.\n\n#NIS2 #KRITIS #BSI #KIGovernance' },
+  { id: 'li-3', kind: 'linkedin', title: 'ISO 42001 wird für Mittelstand und Aufsicht zum Reifegradtest.', articleTitle: 'ISO 42001 Zertifizierung Deutschland: Erste Praxisberichte KMU', format: 'li-post', status: 'revision', date: '03.04.2026', note: 'Mehr Praxisbezug nötig', body: 'ISO 42001 ist kein Papierthema.\n\nFür viele Organisationen wird die Norm zum sichtbaren Beleg, ob KI-Verantwortung wirklich operationalisiert ist.\n\nSpannend ist jetzt die Frage:\nWie viel davon ist Governance-Struktur und wie viel davon ist gelebte Praxis?' },
+  { id: 'li-4', kind: 'linkedin', title: 'Autonome Agenten brauchen Governance vor Skalierung.', articleTitle: 'Agentic AI Governance: 7 Dimensionen für autonome KI-Agenten', format: 'li-story', status: 'review', date: '03.04.2026', note: 'Signal-Thema', body: 'Viele Teams sprechen über Agentic AI, als wäre es nur ein Produktivitätsthema.\n\nIst es nicht.\n\nSobald Systeme delegiert handeln, entstehen neue Fragen zu Kontrolle, Grenzen und Verantwortlichkeit.' },
+  { id: 'li-5', kind: 'linkedin', title: 'DSGVO und LLMs: Das Erklärungsproblem bleibt.', articleTitle: 'DSGVO und KI: Datenschutz-Anforderungen für LLM-basierte Systeme 2026', format: 'li-question', status: 'approved', date: '02.04.2026', note: 'zur Veröffentlichung bereit', body: 'Die wichtigste Frage bei LLMs ist aus meiner Sicht nicht nur, welche Daten genutzt wurden.\n\nSondern ob Unternehmen Betroffenen überhaupt erklären können, wie Datenflüsse, Modellgrenzen und Verantwortlichkeit zusammenhängen.\n\nWie sauber ist das in Ihrer Organisation heute geregelt?' },
+  { id: 'li-6', kind: 'linkedin', title: 'AI Factories sind Infrastrukturpolitik, nicht nur Tech-Förderung.', articleTitle: 'AI Factories in Europa: Was die EuroHPC-Initiative für Souveränität bedeutet', format: 'li-news', status: 'review', date: '02.04.2026', note: 'Souveränität', body: 'Wer über europäische KI-Souveränität spricht, muss über Infrastruktur sprechen.\n\nAI Factories sind deshalb mehr als ein Förderprogramm.\nSie sind industriepolitische Architektur.' },
+  { id: 'li-7', kind: 'linkedin', title: 'Future Skills werden zum Governance-Thema.', articleTitle: 'WEF Future of Jobs 2025: Welche KI-Skills jetzt wirklich zählen', format: 'li-list', status: 'review', date: '02.04.2026', note: 'Skill-Perspektive', body: '5 KI-Skills, die 2026 nicht nice-to-have, sondern Organisationsrisiko sind:\n1. KI-Literacy\n2. Datenverständnis\n3. Governance-Kompetenz\n4. Prompting mit Urteilskraft\n5. Review-Fähigkeit' },
+  { id: 'li-8', kind: 'linkedin', title: 'KI-Ethik ohne Umsetzung bleibt folgenlos.', articleTitle: 'UNESCO KI-Ethik: Warum Governance ohne gesellschaftliche Perspektive zu kurz greift', format: 'li-article', status: 'published', date: '01.04.2026', note: 'bereits veröffentlicht', body: 'Ethik-Rahmenwerke sind wichtig.\n\nAber sie helfen Organisationen erst dann wirklich, wenn sie sich in Entscheidungen, Rollen, Kontrollen und Kommunikation niederschlagen.' },
+  { id: 'art-1', kind: 'article', title: 'Blog: Artikel 13 des EU AI Acts als Reifegradtest für Governance', articleTitle: 'EU AI Act Artikel 13: Transparenzpflichten für Hochrisiko-KI', format: 'blog', status: 'review', date: '03.04.2026', note: 'SEO-Blog', body: 'Viele Unternehmen haben kein KI-Problem. Sie haben ein Erklärungsproblem.\n\nGenau deshalb wird Artikel 13 des EU AI Acts für Betreiber von Hochrisiko-KI zum Reifegradtest. Der Beitrag ordnet ein, warum Transparenz, Nachvollziehbarkeit und Verantwortlichkeit nicht bloß regulatorische Pflicht sind, sondern die Voraussetzung für belastbare KI-Governance.' },
+  { id: 'art-2', kind: 'article', title: 'Fachbeitrag: KI in KRITIS zwischen NIS2 und Governance', articleTitle: 'BSI NIS2 Leitfaden: KI-Sicherheit in KRITIS-Sektoren', format: 'fach', status: 'review', date: '03.04.2026', note: 'Langform mit BSI-Bezug', body: 'Der BSI-Leitfaden zeigt, dass KI-Sicherheit in KRITIS längst kein Randthema mehr ist. Wer KI-Systeme in kritischen Infrastrukturen betreibt, muss technische, organisatorische und regulatorische Resilienz zusammendenken. Der Beitrag strukturiert diese Verantwortung entlang von NIS2, Incident Response und Governance.' },
+  { id: 'art-3', kind: 'article', title: 'Blog: Agentic AI Governance praktisch einordnen', articleTitle: 'Agentic AI Governance: 7 Dimensionen für autonome KI-Agenten', format: 'blog', status: 'revision', date: '02.04.2026', note: 'These schärfen', body: 'Agentic AI wird oft als Effizienzversprechen verkauft. In Wirklichkeit verschiebt sie die Governance-Frage. Der Artikel beschreibt, welche Kontrollen Organisationen aufbauen müssen, bevor autonome Systeme produktiv skaliert werden.' },
+  { id: 'art-4', kind: 'article', title: 'Fachbeitrag: Future Skills im KI-Zeitalter', articleTitle: 'WEF Future of Jobs 2025: Welche KI-Skills jetzt wirklich zählen', format: 'fach', status: 'approved', date: '02.04.2026', note: 'bereit für Veröffentlichung', body: 'KI verändert nicht nur Prozesse, sondern Kompetenzprofile. Der Beitrag verbindet WEF-Daten, Governance-Anforderungen und Bildungsperspektiven zu einem strategischen Bild für Unternehmen, Hochschulen und öffentliche Verwaltung.' }
+];
+let researchState = { ...defaultResearchState };
+let drafts = defaultDrafts.map((draft) => ({ ...draft }));
+let selectedDraftId = defaultDrafts[0].id;
 
 function formatResearchTimestamp(date = new Date()) {
   return new Intl.DateTimeFormat('de-DE', {
@@ -1601,6 +1642,235 @@ async function loadSheetData() {
     if (subtitle) subtitle.textContent = 'Themenfelder und Quell-URLs fuer die taegliche Recherche konfigurieren · Demo-Fallback aktiv';
     console.error(error);
   }
+}
+
+function loadStoredState() {
+  try {
+    const savedResearch = JSON.parse(localStorage.getItem(storageKeys.research) || 'null');
+    if (savedResearch && typeof savedResearch === 'object') {
+      researchState = { ...defaultResearchState, ...savedResearch };
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  try {
+    const savedDrafts = JSON.parse(localStorage.getItem(storageKeys.drafts) || 'null');
+    if (Array.isArray(savedDrafts) && savedDrafts.length) {
+      drafts = savedDrafts;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  selectedDraftId = localStorage.getItem(storageKeys.selectedDraft) || drafts[0]?.id || '';
+}
+
+function persistResearchState() {
+  localStorage.setItem(storageKeys.research, JSON.stringify(researchState));
+}
+
+function persistDraftState() {
+  localStorage.setItem(storageKeys.drafts, JSON.stringify(drafts));
+  localStorage.setItem(storageKeys.selectedDraft, selectedDraftId || '');
+}
+
+function getStatusLabel(status) {
+  return {
+    review: 'bereit zur Prüfung',
+    revision: 'zur Überarbeitung',
+    approved: 'freigegeben',
+    published: 'veröffentlicht'
+  }[status] || status;
+}
+
+function getStatusClass(status) {
+  return {
+    review: 'review',
+    revision: 'revision',
+    approved: 'approved',
+    published: 'published'
+  }[status] || 'review';
+}
+
+function getDraftMetrics(kind) {
+  const items = drafts.filter((draft) => draft.kind === kind);
+  return {
+    total: items.length,
+    review: items.filter((draft) => draft.status === 'review').length,
+    approved: items.filter((draft) => draft.status === 'approved').length,
+    published: items.filter((draft) => draft.status === 'published').length
+  };
+}
+
+function ensureDraftSection() {
+  if (document.getElementById('draft-detail-panel')) return;
+  const dashboard = document.getElementById('s-dashboard');
+  const overviewCard = Array.from(dashboard.querySelectorAll('.card')).find((card) => card.textContent.includes('ArtikelÃ¼bersicht'));
+  const draftAnchor = overviewCard || dashboard.lastElementChild;
+  if (!draftAnchor) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'draft-grid';
+  wrap.style.marginBottom = 'var(--space-5)';
+  wrap.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Entwurfs-Inbox</span>
+        <span class="micro-note" id="draft-summary-note">LinkedIn und Artikel zur Freigabe</span>
+      </div>
+      <div class="draft-grid">
+        <div class="draft-list" id="linkedin-draft-list"></div>
+        <div class="draft-list" id="article-draft-list"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Entwurf ansehen & freigeben</span>
+        <span class="micro-note" id="draft-selected-note">Noch kein Entwurf ausgewählt</span>
+      </div>
+      <div class="draft-detail" id="draft-detail-panel">
+        <div class="micro-note">Wähle links einen LinkedIn- oder Artikel-Entwurf aus, um ihn zu prüfen, freizugeben oder zur Überarbeitung zu markieren.</div>
+      </div>
+    </div>
+  `;
+  draftAnchor.insertAdjacentElement('beforebegin', wrap);
+}
+
+function updateKpiCards() {
+  const linkedinMetrics = getDraftMetrics('linkedin');
+  const articleMetrics = getDraftMetrics('article');
+  const kpiCards = Array.from(document.querySelectorAll('#s-dashboard .kpi-card'));
+  const liCard = kpiCards.find((card) => card.textContent.includes('LinkedIn-Entw'));
+  const articleCard = kpiCards.find((card) => card.textContent.includes('Artikel-Entw'));
+  const articleOverviewNote = document.getElementById('article-overview-note')
+    || Array.from(document.querySelectorAll('#s-dashboard .micro-note')).find((node) => node.textContent.includes('priorisierte Themen'));
+
+  if (liCard) {
+    liCard.querySelector('.kpi-value').textContent = linkedinMetrics.total;
+    liCard.querySelector('.kpi-delta').textContent = `${linkedinMetrics.review} bereit zur Prüfung`;
+  }
+
+  if (articleCard) {
+    articleCard.querySelector('.kpi-value').textContent = articleMetrics.total;
+    articleCard.querySelector('.kpi-delta').textContent = `${articleMetrics.review} offen · ${articleMetrics.approved} freigegeben`;
+  }
+
+  if (articleOverviewNote) {
+    articleOverviewNote.textContent = `5 priorisierte Themen · ${linkedinMetrics.total} LinkedIn-Entwürfe · ${articleMetrics.total} Artikelentwürfe`;
+  }
+
+  const draftSummaryNote = document.getElementById('draft-summary-note');
+  if (draftSummaryNote) {
+    draftSummaryNote.textContent = `${linkedinMetrics.review + articleMetrics.review} Entwürfe warten auf Prüfung`;
+  }
+}
+
+function renderDraftLists() {
+  ensureDraftSection();
+  const linkedinList = document.getElementById('linkedin-draft-list');
+  const articleList = document.getElementById('article-draft-list');
+  if (!linkedinList || !articleList) return;
+
+  const renderList = (kind, title) => {
+    const items = drafts.filter((draft) => draft.kind === kind);
+    const html = [`<div class="micro-note">${title} · ${items.length} Entwürfe</div>`];
+    items.forEach((draft) => {
+      html.push(`
+        <button class="draft-item${draft.id === selectedDraftId ? ' selected' : ''}" onclick="openDraft('${draft.id}')">
+          <div class="draft-item-title">${escapeHtml(draft.title)}</div>
+          <div class="draft-item-meta">
+            <span>${escapeHtml(draft.date)}</span>
+            <span>${escapeHtml(draft.format)}</span>
+            <span class="status-chip ${getStatusClass(draft.status)}">${escapeHtml(getStatusLabel(draft.status))}</span>
+          </div>
+          <div class="draft-item-text">${escapeHtml(draft.note)}</div>
+        </button>
+      `);
+    });
+    return html.join('');
+  };
+
+  linkedinList.innerHTML = renderList('linkedin', 'LinkedIn');
+  articleList.innerHTML = renderList('article', 'Artikel');
+  updateKpiCards();
+}
+
+function renderDraftDetail() {
+  ensureDraftSection();
+  const panel = document.getElementById('draft-detail-panel');
+  const selectedNote = document.getElementById('draft-selected-note');
+  if (!panel) return;
+
+  const draft = drafts.find((item) => item.id === selectedDraftId);
+  if (!draft) {
+    panel.innerHTML = '<div class="micro-note">Kein Entwurf ausgewählt.</div>';
+    return;
+  }
+
+  if (selectedNote) selectedNote.textContent = `${draft.kind === 'linkedin' ? 'LinkedIn' : 'Artikel'} · ${getStatusLabel(draft.status)}`;
+  panel.innerHTML = `
+    <div class="draft-detail-head">
+      <div style="display:grid;gap:8px">
+        <div class="draft-detail-title">${escapeHtml(draft.title)}</div>
+        <div class="draft-detail-meta">
+          <span>${escapeHtml(draft.date)}</span>
+          <span>${escapeHtml(draft.format)}</span>
+          <span>${escapeHtml(draft.articleTitle)}</span>
+        </div>
+      </div>
+      <span class="status-chip ${getStatusClass(draft.status)}">${escapeHtml(getStatusLabel(draft.status))}</span>
+    </div>
+    <div class="draft-item-text">${escapeHtml(draft.note)}</div>
+    <div class="draft-detail-body">${escapeHtml(draft.body)}</div>
+    <div class="section-actions">
+      <button class="btn-sm p" onclick="setDraftStatus('${draft.id}','approved')">Freigeben</button>
+      <button class="btn-sm" onclick="setDraftStatus('${draft.id}','revision')">Zur Überarbeitung</button>
+      <button class="btn-sm" onclick="setDraftStatus('${draft.id}','published')">Veröffentlicht</button>
+      <button class="btn-sm" onclick='loadAndGenerate(${JSON.stringify(draft.articleTitle)})'>Im Generator öffnen</button>
+    </div>
+  `;
+}
+
+function openDraft(id) {
+  selectedDraftId = id;
+  persistDraftState();
+  renderDraftLists();
+  renderDraftDetail();
+}
+
+function setDraftStatus(id, status) {
+  drafts = drafts.map((draft) => draft.id === id ? { ...draft, status } : draft);
+  selectedDraftId = id;
+  persistDraftState();
+  renderDraftLists();
+  renderDraftDetail();
+}
+
+function renderResearchState() {
+  const lastResearch = document.getElementById('last-research');
+  const progressSources = document.getElementById('progress-sources');
+  const progressClusters = document.getElementById('progress-clusters');
+  const progressFocus = document.getElementById('progress-focus');
+  const researchPercent = document.getElementById('research-percent');
+  const researchCaption = document.getElementById('research-caption');
+  const fill = document.getElementById('pfill');
+
+  if (lastResearch) lastResearch.textContent = researchState.lastResearch;
+  if (progressSources) progressSources.textContent = researchState.sources;
+  if (progressClusters) progressClusters.textContent = researchState.clusters;
+  if (progressFocus) progressFocus.textContent = researchState.focus;
+  if (researchPercent) researchPercent.textContent = `${researchState.percent}%`;
+  if (researchCaption) researchCaption.textContent = researchState.caption;
+  if (fill) fill.style.width = `${researchState.percent}%`;
+}
+
+function initializeDashboardState() {
+  loadStoredState();
+  ensureDraftSection();
+  renderResearchState();
+  renderDraftLists();
+  renderDraftDetail();
 }
 
 async function writeSheetRow(kind, data) {
@@ -1826,6 +2096,51 @@ function runResearch() {
   }, 280);
 }
 
+function runResearch() {
+  const btn = document.getElementById('run-btn');
+  const st = document.getElementById('status-text');
+  const fill = document.getElementById('pfill');
+  const lastResearch = document.getElementById('last-research');
+  const progressSources = document.getElementById('progress-sources');
+  const progressClusters = document.getElementById('progress-clusters');
+  const progressFocus = document.getElementById('progress-focus');
+  const researchPercent = document.getElementById('research-percent');
+  const researchCaption = document.getElementById('research-caption');
+
+  btn.textContent = 'Recherche läuft ...';
+  st.textContent = 'Recherche läuft...';
+  let p = 0;
+  const iv = setInterval(() => {
+    p += Math.random() * 14;
+    if (researchPercent) researchPercent.textContent = `${Math.min(Math.round(p),100)}%`;
+    if (researchCaption) researchCaption.textContent = p >= 100 ? 'complete' : 'running';
+    if(p >= 100) {
+      p = 100;
+      clearInterval(iv);
+      const trackedSources = Math.floor(Math.random()*8+45);
+      const clusterCount = Math.floor(Math.random()*5+10);
+      const timestamp = formatResearchTimestamp(new Date());
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Recherche starten';
+      st.textContent = '47 neue Artikel';
+      document.getElementById('kpi-s').textContent = trackedSources;
+      if(lastResearch) lastResearch.textContent = timestamp;
+      if(progressSources) progressSources.textContent = trackedSources;
+      if(progressClusters) progressClusters.textContent = clusterCount;
+      if(progressFocus) progressFocus.textContent = 'Top-Themen aktiv';
+      researchState = {
+        lastResearch: timestamp,
+        sources: trackedSources,
+        clusters: clusterCount,
+        focus: 'Top-Themen aktiv',
+        percent: 100,
+        caption: 'complete'
+      };
+      persistResearchState();
+    }
+    fill.style.width = Math.min(p,100) + '%';
+  }, 280);
+}
+
 function copyOut() {
   const el = document.getElementById('main-out');
   navigator.clipboard?.writeText(el.textContent).then(() => alert('Kopiert!'));
@@ -1923,6 +2238,7 @@ async function addSrc() {
   }
 }
 
+initializeDashboardState();
 loadSheetData();
 
 // Theme toggle
