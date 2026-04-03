@@ -1502,6 +1502,33 @@ function renderTopics(topics = currentTopics) {
   `).join('');
 }
 
+function ensureSheetStatusNodes() {
+  const topicList = document.getElementById('topic-list');
+  const srcList = document.getElementById('src-list');
+  const sourcesSection = document.getElementById('s-sources');
+  const subtitle = sourcesSection?.querySelector('.page-subtitle');
+
+  let topicNote = document.getElementById('topic-source-note');
+  if (!topicNote && topicList?.parentElement) {
+    topicNote = document.createElement('div');
+    topicNote.id = 'topic-source-note';
+    topicNote.className = 'micro-note';
+    topicNote.style.marginTop = 'var(--space-3)';
+    topicList.insertAdjacentElement('afterend', topicNote);
+  }
+
+  let sourceNote = document.getElementById('source-registry-note');
+  if (!sourceNote && srcList?.parentElement) {
+    sourceNote = document.createElement('div');
+    sourceNote.id = 'source-registry-note';
+    sourceNote.className = 'micro-note';
+    sourceNote.style.marginTop = 'var(--space-3)';
+    srcList.insertAdjacentElement('afterend', sourceNote);
+  }
+
+  return { topicNote, sourceNote, subtitle };
+}
+
 function groupSourcesByCategory(sources = currentSources) {
   return sources.reduce((acc, source) => {
     const isActive = (source.Aktiv || 'Ja').toLowerCase() !== 'nein';
@@ -1541,8 +1568,12 @@ function renderSources(sources = currentSources) {
 }
 
 async function loadSheetData() {
+  const { topicNote, sourceNote, subtitle } = ensureSheetStatusNodes();
   renderTopics(currentTopics);
   renderSources(currentSources);
+  if (subtitle) subtitle.textContent = 'Themenfelder und Quell-URLs fuer die taegliche Recherche konfigurieren · Google Sheets wird geladen';
+  if (topicNote) topicNote.textContent = `Demo-Fallback aktiv · ${currentTopics.length} Themen sichtbar`;
+  if (sourceNote) sourceNote.textContent = `Demo-Fallback aktiv · ${currentSources.length} Quellen sichtbar`;
 
   try {
     const response = await fetch('/api/sheet-data');
@@ -1557,13 +1588,17 @@ async function loadSheetData() {
         countLabel: topic.countLabel || '0 heute'
       }));
       renderTopics(currentTopics);
+      if (topicNote) topicNote.textContent = `Google Sheets aktiv · ${currentTopics.length} Themen geladen`;
     }
 
     if (Array.isArray(data.sources) && data.sources.length) {
       currentSources = data.sources;
       renderSources(currentSources);
+      if (sourceNote) sourceNote.textContent = `Google Sheets aktiv · ${currentSources.length} Quellen geladen`;
     }
+    if (subtitle) subtitle.textContent = 'Themenfelder und Quell-URLs fuer die taegliche Recherche konfigurieren · Sync mit Google Sheets aktiv';
   } catch (error) {
+    if (subtitle) subtitle.textContent = 'Themenfelder und Quell-URLs fuer die taegliche Recherche konfigurieren · Demo-Fallback aktiv';
     console.error(error);
   }
 }
