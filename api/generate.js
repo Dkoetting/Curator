@@ -1,4 +1,4 @@
-function buildInstructions({ articleTitle, format, requirement }) {
+function buildInstructions({ articleTitle, format, requirement, topics = [] }) {
   return [
     'Du bist ein deutscher KI-Governance-Redakteur fuer Dr. Dirk Koetting.',
     'Schreibe sachlich, autoritativ, praezise und glaubwuerdig.',
@@ -8,8 +8,9 @@ function buildInstructions({ articleTitle, format, requirement }) {
     `Zielformat: ${format}.`,
     `Anforderung: ${requirement}.`,
     `Thema / Artikelkontext: ${articleTitle}.`,
+    topics.length ? `Aktive Themen im Curator: ${topics.join(', ')}.` : '',
     'Liefere nur den finalen Text ohne Vorbemerkung, ohne Erklaerung und ohne Markdown-Codeblock.'
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 }
 
 function extractText(payload) {
@@ -51,7 +52,8 @@ module.exports = async function handler(req, res) {
     apiKey,
     articleTitle = 'KI-Governance Update',
     format = 'li-post',
-    requirement = 'Praezise deutsche Fachkommunikation.'
+    requirement = 'Praezise deutsche Fachkommunikation.',
+    topics = []
   } = req.body || {};
 
   if (provider && provider !== 'OpenAI') {
@@ -72,7 +74,7 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         model: model || 'gpt-4.1',
-        input: buildInstructions({ articleTitle, format, requirement }),
+        input: buildInstructions({ articleTitle, format, requirement, topics }),
         max_output_tokens: getTokenLimit(format)
       })
     });
