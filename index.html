@@ -1944,27 +1944,136 @@ function enrichResearchItem(item, sourceMatch = null) {
   };
 }
 
+function buildSourceDrivenInboxItems(activeSources = []) {
+  const patterns = [
+    {
+      match: /nytimes|new york times/i,
+      item: {
+        title: 'NYTimes Tech: KI verschiebt die nächste Plattformdebatte',
+        articleTitle: 'NYTimes Tech: KI, Plattformen und Regulierung 2026',
+        excerpt: 'US-Tech-Berichterstattung mit Blick auf Plattformmacht, Regulierung und die gesellschaftliche Wirkung neuer KI-Systeme.',
+        tags: ['NYTimes', 'Media', 'USA'],
+        accent: 'b'
+      }
+    },
+    {
+      match: /deepmind/i,
+      item: {
+        title: 'Google DeepMind: Neue Forschungssignale für Frontier-KI',
+        articleTitle: 'Google DeepMind: Forschungssignale und Frontier-KI',
+        excerpt: 'DeepMind liefert relevante Forschungs- und Produktimpulse für Modellfähigkeiten, Sicherheit und agentische Systeme.',
+        tags: ['DeepMind', 'Research', 'Frontier'],
+        accent: 'p'
+      }
+    },
+    {
+      match: /techcrunch/i,
+      item: {
+        title: 'TechCrunch: Startups und KI-Produkte setzen neue Signale',
+        articleTitle: 'TechCrunch: Startups, Produkte und Marktbewegungen in KI',
+        excerpt: 'TechCrunch bündelt Signale aus dem Startup- und Produktmarkt rund um Agenten, Tools und neue Finanzierungsdynamiken.',
+        tags: ['TechCrunch', 'Startups', 'USA'],
+        accent: 'b'
+      }
+    },
+    {
+      match: /businessinsider/i,
+      item: {
+        title: 'Business Insider: KI-Markt und Unternehmen unter Zugzwang',
+        articleTitle: 'Business Insider: Markt- und Unternehmenssignale zu KI',
+        excerpt: 'Business Insider ordnet ein, wie KI-Strategien, Managementdruck und Marktdynamik auf Unternehmen wirken.',
+        tags: ['Business Insider', 'Market', 'USA'],
+        accent: 'b'
+      }
+    },
+    {
+      match: /bloomberg/i,
+      item: {
+        title: 'Bloomberg: Neue KI-Regelwerke verschieben die Risikologik in regulierten Märkten',
+        articleTitle: 'Bloomberg: KI-Regulierung und Marktbewegungen 2026',
+        excerpt: 'Bloomberg ordnet ein, wie neue KI-Vorgaben, Investitionsdynamik und Marktreaktionen in Finanz-, Industrie- und Infrastruktursektoren zusammenlaufen.',
+        tags: ['Bloomberg', 'Markt', 'Regulierung'],
+        accent: 'b'
+      }
+    },
+    {
+      match: /cursor/i,
+      item: {
+        title: 'Cursor Blog: Neue Produktivitätsmuster im KI-Coding',
+        articleTitle: 'Cursor Blog: KI-Coding und Produktivitätsmuster',
+        excerpt: 'Der Cursor Blog liefert Signale für Tooling, Agenten-Workflows und neue Arbeitsweisen in der Softwareentwicklung.',
+        tags: ['Cursor', 'Tools', 'Coding'],
+        accent: 'p'
+      }
+    },
+    {
+      match: /alibaba/i,
+      item: {
+        title: 'Alibaba Cloud: APAC-Signale für Cloud und KI-Infrastruktur',
+        articleTitle: 'Alibaba Cloud: APAC-Signale für KI und Cloud',
+        excerpt: 'Alibaba Cloud gibt Einblick in APAC-Perspektiven zu KI-Infrastruktur, Cloud-Strategien und Produktentwicklung.',
+        tags: ['Alibaba', 'Cloud', 'APAC'],
+        accent: 'b'
+      }
+    },
+    {
+      match: /france24/i,
+      item: {
+        title: 'France24: Internationale Nachrichtenlage zu KI und Regulierung',
+        articleTitle: 'France24: Internationale KI-Nachrichtenlage',
+        excerpt: 'France24 ergänzt die Inbox um internationale Signale zu Regulierung, Geopolitik und gesellschaftlicher Wirkung von KI.',
+        tags: ['France24', 'Media', 'Global'],
+        accent: ''
+      }
+    },
+    {
+      match: /semantic scholar/i,
+      item: {
+        title: 'Semantic Scholar: Neue evidenzbasierte Recherchesignale',
+        articleTitle: 'Semantic Scholar: evidenzbasierte Recherchesignale',
+        excerpt: 'Semantic Scholar unterstützt die Kuratierung wissenschaftlicher Evidenz zu KI-Governance, Sicherheit und Arbeitswelt.',
+        tags: ['Semantic Scholar', 'Research', 'Evidence'],
+        accent: 'p'
+      }
+    },
+    {
+      match: /consensus/i,
+      item: {
+        title: 'Consensus: Forschung schneller in belastbare Aussagen überführen',
+        articleTitle: 'Consensus: Forschung in belastbare Aussagen überführen',
+        excerpt: 'Consensus hilft, wissenschaftliche Ergebnisse schneller in redaktionell anschlussfähige Aussagen zu übersetzen.',
+        tags: ['Consensus', 'Research', 'Evidence'],
+        accent: 'p'
+      }
+    }
+  ];
+
+  return activeSources.flatMap((source, index) => {
+    const text = `${source.Titel || ''} ${source.URL || ''}`;
+    const pattern = patterns.find((entry) => entry.match.test(text));
+    if (!pattern) return [];
+
+    const day = String((index % 18) + 3).padStart(2, '0');
+    const hour = String(7 + (index % 10)).padStart(2, '0');
+    const minute = String((index * 9) % 60).padStart(2, '0');
+    return [enrichResearchItem({
+      ...pattern.item,
+      source: inferSourceDomain(source.URL || ''),
+      date: `${day}.04.2026`,
+      time: `${hour}:${minute}`
+    }, source)];
+  });
+}
+
 function buildResearchInboxItems(targetCount = 47) {
   const activeTopics = currentTopics
     .filter((topic) => (topic.Aktiv || 'Ja').toLowerCase() !== 'nein')
     .map((topic) => topic.Thema || topic.title)
     .filter(Boolean);
   const activeSources = currentSources.filter((source) => (source.Aktiv || 'Ja').toLowerCase() !== 'nein');
-  const items = defaultResearchInboxItems.map((item) => enrichResearchItem(item));
-  const bloombergSource = activeSources.find((source) => /bloomberg/i.test(`${source.Titel || ''} ${source.URL || ''}`));
-
-  if (bloombergSource && !items.some((item) => /bloomberg/i.test(item.source))) {
-    items.unshift(enrichResearchItem({
-      title: 'Bloomberg: Neue KI-Regelwerke verschieben die Risikologik in regulierten Märkten',
-      articleTitle: 'Bloomberg: KI-Regulierung und Marktbewegungen 2026',
-      source: inferSourceDomain(bloombergSource.URL || 'https://www.bloomberg.com'),
-      date: '02.04.2026',
-      time: '09:12',
-      excerpt: 'Bloomberg ordnet ein, wie neue KI-Vorgaben, Investitionsdynamik und Marktreaktionen in Finanz-, Industrie- und Infrastruktursektoren zusammenlaufen.',
-      tags: ['Bloomberg', 'Markt', 'Regulierung'],
-      accent: 'b'
-    }, bloombergSource));
-  }
+  const sourceDrivenItems = buildSourceDrivenInboxItems(activeSources);
+  const items = [...sourceDrivenItems, ...defaultResearchInboxItems.map((item) => enrichResearchItem(item))]
+    .filter((item, index, array) => array.findIndex((entry) => (entry.articleTitle || entry.title) === (item.articleTitle || item.title)) === index);
 
   const sourcePool = activeSources.length ? activeSources : defaultSources;
   const topicPool = activeTopics.length ? activeTopics : ['KI-Governance', 'NIS2 & KRITIS', 'Agentic AI'];
