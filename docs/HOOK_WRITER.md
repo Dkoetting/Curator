@@ -59,7 +59,7 @@ Schwache Hooks sollen in scroll-stoppende Hooks transformiert werden, die:
 
 ## Verwendung im Curator
 
-Die Hook-Regeln werden derzeit serverseitig in `api/generate.js` bei allen LinkedIn-Formaten verstaerkt:
+Die Hook-Regeln werden serverseitig in `api/generate.js` bei allen LinkedIn-Formaten verstaerkt:
 - `li-post`
 - `li-story`
 - `li-list`
@@ -71,12 +71,23 @@ Zusatzsignale aus der UI:
 - `focus`
 - `tone`
 - `articleTitle`
+- `currentHook`
+- `personalAngle`
 - aktive `topics`
+
+Zusätzlich gibt es einen sichtbaren Hook-Coach in der Generator-UI:
+- UI: `index.html`
+- API: `api/hook-coach.js`
+
+Der Hook Coach liefert:
+- kurze Hook-Analyse
+- optional eine Rueckfrage zum persoenlichen Bezug
+- 5 Hook-Varianten nach unterschiedlichen Formeln
+- direkte Uebernahme einer Variante in die LinkedIn-Generierung
 
 ## Naechster Ausbauschritt
 
-Ein eigener Hook-Coach-Modus kann spaeter ergaenzt werden mit:
-- Hook-Analyse
-- persoenlichem Bezug
-- 5 Varianten nach unterschiedlichen Formeln
-- mobilem Preview-Check
+Ein naechster Feinschliff kann spaeter ergaenzt werden mit:
+- mobilem Preview-Check pro Variante
+- Bewertung der ersten Zeile auf echte Zeichenlaenge
+- bevorzugten Hook-Typen pro LinkedIn-Format

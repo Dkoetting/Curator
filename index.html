@@ -277,6 +277,21 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 .generate-btn:hover{background:linear-gradient(90deg,#18378a 0%,#214fb3 100%);}
 
 .output-wrap{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--shadow-sm);}
+.hook-coach-shell{display:grid;gap:var(--space-4);}
+.hook-draft-field{min-height:108px;resize:vertical;}
+.hook-coach-empty{font-size:var(--text-sm);line-height:1.7;color:var(--color-text-muted);}
+.hook-coach-analysis{padding:var(--space-3);border-radius:var(--radius-md);background:linear-gradient(180deg,#f8fbff 0%,#eef4ff 100%);border:1px solid var(--color-border);font-size:var(--text-sm);line-height:1.7;color:var(--color-text);}
+.hook-coach-question{padding:var(--space-3);border-radius:var(--radius-md);background:var(--color-gold-hl);border:1px solid rgba(191,123,21,.18);font-size:var(--text-sm);line-height:1.7;color:#6d4d17;}
+.hook-variant-list{display:grid;gap:var(--space-3);}
+.hook-variant{padding:var(--space-4);border-radius:var(--radius-lg);border:1px solid var(--color-border);background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);box-shadow:0 6px 18px rgba(24,46,110,0.04);}
+.hook-variant-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-2);margin-bottom:var(--space-2);}
+.hook-variant-title{font-size:var(--text-sm);font-weight:700;color:#203878;}
+.hook-variant-copy{display:grid;gap:2px;padding:var(--space-3);border-radius:var(--radius-md);background:#0f214c;color:#f4f7ff;margin-bottom:var(--space-3);}
+.hook-variant-line{font-size:var(--text-base);font-weight:700;letter-spacing:-.02em;line-height:1.3;}
+.hook-variant-gap{height:10px;}
+.hook-variant-why{font-size:var(--text-xs);line-height:1.7;color:var(--color-text-muted);}
+.hook-variant-actions{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-3);}
+.hook-selected-note{font-size:var(--text-xs);color:var(--color-blue);font-weight:700;}
 .output-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);}
 .output-label{font-size:var(--text-xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--color-primary);}
 .output-actions{display:flex;gap:var(--space-2);}
@@ -861,6 +876,27 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
           <div class="card">
             <div class="card-header"><span class="card-title">📋 Format wählen</span></div>
 
+            <div class="card" id="hook-coach-card" style="margin-bottom:var(--space-5)">
+              <div class="card-header">
+                <span class="card-title">Hook Coach fuer LinkedIn</span>
+                <span class="micro-note" id="hook-coach-mode">Aktiv fuer LinkedIn-Formate</span>
+              </div>
+              <div class="hook-coach-shell">
+                <div class="input-group" style="margin-bottom:0">
+                  <label class="input-label">Aktuelle Hook / erster Entwurf</label>
+                  <textarea class="input-field hook-draft-field" id="hook-draft" placeholder="z.B. Viele Unternehmen reden ueber KI. Kaum jemand ueber Verantwortung."></textarea>
+                </div>
+                <div class="input-group" style="margin-bottom:0">
+                  <label class="input-label">Persoenlicher Bezug oder berufliche Perspektive</label>
+                  <input class="input-field" id="hook-angle" placeholder="z.B. Aus meiner Beratung sehe ich gerade drei typische Denkfehler in deutschen KMU.">
+                </div>
+                <div class="section-actions" style="margin-top:0">
+                  <button class="btn-sm p" type="button" id="hook-coach-btn" onclick="runHookCoach()">Hook Coach starten</button>
+                  <span class="micro-note" id="hook-coach-hint">Analysiert deine Hook und erzeugt 5 scroll-stoppende Varianten fuer LinkedIn.</span>
+                </div>
+              </div>
+            </div>
+
             <!-- LINKEDIN -->
             <div class="format-section-title">🔗 LinkedIn-Formate</div>
             <div class="format-grid">
@@ -951,6 +987,16 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 
         <!-- RIGHT: Output -->
         <div>
+          <div class="output-wrap" id="hook-coach-panel" style="margin-bottom:var(--space-5);display:none">
+            <div class="output-header">
+              <span class="output-label">Hook Coach</span>
+              <div class="output-actions">
+                <button class="btn-sm" type="button" onclick="clearHookCoach()">Zuruecksetzen</button>
+              </div>
+            </div>
+            <div id="hook-coach-out" class="hook-coach-empty">Noch keine Hook analysiert.</div>
+          </div>
+
           <div class="output-wrap">
             <div class="output-header">
               <span class="output-label" id="out-label">Ausgabe</span>
@@ -1205,6 +1251,7 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 <script>
 let fmt = 'li-post';
 let selectedArticle = 'EU AI Act: Finale Durchführungsbestimmungen – Artikel 13 Transparenz';
+let hookCoachState = { variants: [], selectedText: '', analysis: '', personalQuestion: '' };
 
 const outputs = {
   'li-post': `Viele Unternehmen werden 2026 kein KI-Problem haben.
@@ -2567,6 +2614,7 @@ function selectFmt(el, f) {
   document.querySelectorAll('.format-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   fmt = f;
+  updateHookCoachState();
 }
 
 function loadAndGenerate(title) {
@@ -2629,6 +2677,163 @@ function generatePreviewLegacy(target) {
 
 function getFieldValue(id) {
   return document.getElementById(id)?.value?.trim() || '';
+}
+
+function isLinkedInFormat(format = fmt) {
+  return liFormats.includes(format);
+}
+
+function resetHookCoachState() {
+  hookCoachState = { variants: [], selectedText: '', analysis: '', personalQuestion: '' };
+}
+
+function clearHookCoach() {
+  resetHookCoachState();
+  const panel = document.getElementById('hook-coach-panel');
+  const out = document.getElementById('hook-coach-out');
+  if (panel) panel.style.display = 'none';
+  if (out) out.innerHTML = 'Noch keine Hook analysiert.';
+}
+
+function updateHookCoachState() {
+  const isActive = isLinkedInFormat();
+  const button = document.getElementById('hook-coach-btn');
+  const mode = document.getElementById('hook-coach-mode');
+  const hint = document.getElementById('hook-coach-hint');
+  const card = document.getElementById('hook-coach-card');
+
+  if (button) {
+    button.disabled = !isActive;
+    button.style.opacity = isActive ? '1' : '.55';
+    button.style.cursor = isActive ? 'pointer' : 'not-allowed';
+  }
+
+  if (mode) {
+    mode.textContent = isActive ? 'Aktiv fuer LinkedIn-Formate' : 'Nur fuer LinkedIn-Formate aktiv';
+  }
+
+  if (hint) {
+    hint.textContent = isActive
+      ? 'Analysiert deine Hook und erzeugt 5 scroll-stoppende Varianten fuer LinkedIn.'
+      : 'Wechsle auf ein LinkedIn-Format, um Hook-Varianten zu erzeugen.';
+  }
+
+  if (card) {
+    card.style.opacity = isActive ? '1' : '.82';
+  }
+}
+
+function renderHookCoachResult(data) {
+  const panel = document.getElementById('hook-coach-panel');
+  const out = document.getElementById('hook-coach-out');
+  if (!panel || !out) return;
+
+  const variants = Array.isArray(data?.variants) ? data.variants : [];
+  hookCoachState.analysis = data?.analysis || '';
+  hookCoachState.personalQuestion = data?.personalQuestion || '';
+  hookCoachState.variants = variants;
+
+  const analysisHtml = data?.analysis
+    ? `<div class="hook-coach-analysis"><strong>Kurze Analyse:</strong> ${escapeHtml(data.analysis)}</div>`
+    : '';
+  const questionHtml = data?.personalQuestion
+    ? `<div class="hook-coach-question"><strong>Persoenlicher Bezug fehlt noch:</strong> ${escapeHtml(data.personalQuestion)}</div>`
+    : '';
+
+  const variantsHtml = variants.length ? `
+    <div class="hook-variant-list">
+      ${variants.map((variant, index) => {
+        const line1 = escapeHtml(variant.line1 || '');
+        const line2 = escapeHtml(variant.line2 || '');
+        const selectedText = `${variant.line1 || ''}${variant.line2 ? `\n\n${variant.line2}` : ''}`.trim();
+        const isSelected = selectedText && selectedText === hookCoachState.selectedText;
+        return `
+          <div class="hook-variant">
+            <div class="hook-variant-head">
+              <div class="hook-variant-title">Variante ${index + 1} - ${escapeHtml(variant.formula || 'Hook')}</div>
+              ${isSelected ? '<span class="hook-selected-note">Aktuell uebernommen</span>' : ''}
+            </div>
+            <div class="hook-variant-copy">
+              <div class="hook-variant-line">${line1 || '&nbsp;'}</div>
+              ${line2 ? '<div class="hook-variant-gap"></div><div class="hook-variant-line">' + line2 + '</div>' : ''}
+            </div>
+            <div class="hook-variant-why"><strong>Warum das funktioniert:</strong> ${escapeHtml(variant.why || 'Schafft mehr Neugier und klarere Positionierung.')}</div>
+            <div class="hook-variant-actions">
+              <button class="btn-sm p" type="button" onclick="applyHookVariant(${index})">Hook uebernehmen</button>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  ` : '<div class="hook-coach-empty">Noch keine Varianten verfuegbar.</div>';
+
+  panel.style.display = 'block';
+  out.innerHTML = [analysisHtml, questionHtml, variantsHtml].filter(Boolean).join('');
+}
+
+async function runHookCoach() {
+  if (!isLinkedInFormat()) {
+    alert('Der Hook Coach ist nur fuer LinkedIn-Formate aktiv.');
+    return;
+  }
+
+  const writing = getWritingConfig();
+  if (writing.provider !== 'OpenAI') {
+    alert('Der Hook Coach ist aktuell nur mit OpenAI live angebunden.');
+    return;
+  }
+
+  const panel = document.getElementById('hook-coach-panel');
+  const out = document.getElementById('hook-coach-out');
+  if (panel) panel.style.display = 'block';
+  if (out) out.innerHTML = '<div class="hook-coach-empty">Analysiere Hook und erstelle Varianten ...</div>';
+
+  try {
+    const response = await fetch('/api/hook-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        provider: writing.provider,
+        model: normalizeModelName(writing.model),
+        articleTitle: selectedArticle,
+        currentHook: getFieldValue('hook-draft') || '',
+        personalAngle: getFieldValue('hook-angle') || '',
+        focus: getFieldValue('focus') || '',
+        tone: getFieldValue('tone') || 'auth',
+        topics: currentTopics
+          .filter((topic) => (topic.Aktiv || 'Ja').toLowerCase() !== 'nein')
+          .map((topic) => topic.Thema || topic.title)
+          .filter(Boolean)
+          .slice(0, 12)
+      })
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || 'Der Hook Coach konnte nicht gestartet werden.');
+    }
+
+    renderHookCoachResult(data);
+  } catch (error) {
+    if (out) {
+      out.innerHTML = `<div class="hook-coach-question"><strong>Hook Coach Fehler:</strong> ${escapeHtml(error?.message || 'Unbekannter Fehler.')}</div>`;
+    }
+  }
+}
+
+function applyHookVariant(index) {
+  const variant = hookCoachState.variants[index];
+  if (!variant) return;
+
+  const text = `${variant.line1 || ''}${variant.line2 ? `\n\n${variant.line2}` : ''}`.trim();
+  const draftField = document.getElementById('hook-draft');
+  if (draftField) draftField.value = text;
+  hookCoachState.selectedText = text;
+  renderHookCoachResult({
+    analysis: hookCoachState.analysis,
+    personalQuestion: hookCoachState.personalQuestion,
+    variants: hookCoachState.variants
+  });
 }
 
 function normalizeAudioProvider(label) {
@@ -2744,6 +2949,8 @@ function buildPromptPayload() {
     requirement: formatSpecs[fmt] || 'Praezise, belastbare deutsche Fachkommunikation.',
     focus: getFieldValue('focus') || '',
     tone: getFieldValue('tone') || 'auth',
+    currentHook: getFieldValue('hook-draft') || '',
+    personalAngle: getFieldValue('hook-angle') || '',
     topics: currentTopics
       .filter((topic) => (topic.Aktiv || 'Ja').toLowerCase() !== 'nein')
       .map((topic) => topic.Thema || topic.title)
@@ -3086,6 +3293,7 @@ async function addSrc() {
 
 initializeDashboardState();
 syncAudioButtons();
+updateHookCoachState();
 loadSheetData();
 
 // Splash screen
