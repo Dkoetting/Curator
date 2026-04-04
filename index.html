@@ -721,15 +721,15 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
         </div>
         <div class="inbox-stats">
           <div class="inbox-stat">
-            <span class="inbox-stat-value">12</span>
+            <span class="inbox-stat-value" id="research-total-count">13</span>
             <span class="inbox-stat-label">kuratierte Artikel</span>
           </div>
           <div class="inbox-stat">
-            <span class="inbox-stat-value">8</span>
+            <span class="inbox-stat-value" id="research-linkedin-count">8</span>
             <span class="inbox-stat-label">LinkedIn-Entwürfe</span>
           </div>
           <div class="inbox-stat">
-            <span class="inbox-stat-value">4</span>
+            <span class="inbox-stat-value" id="research-article-count">4</span>
             <span class="inbox-stat-label">Artikelentwürfe</span>
           </div>
         </div>
@@ -940,6 +940,8 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
             <div class="output-header">
               <span class="output-label" id="out-label">Ausgabe</span>
               <div class="output-actions">
+                <button class="btn-sm" onclick="sendToNotebookLM()">Podcast via NotebookLM</button>
+                <button class="btn-sm" onclick="downloadMp3()">MP3</button>
                 <button class="btn-sm" onclick="copyOut()">📋 Kopieren</button>
                 <button class="btn-sm" onclick="generate('main')">↺ Neu</button>
                 <button class="btn-sm p" onclick="exportOut()">↓ Export</button>
@@ -1708,6 +1710,21 @@ const defaultDrafts = [
   { id: 'art-3', kind: 'article', title: 'Blog: Agentic AI Governance praktisch einordnen', articleTitle: 'Agentic AI Governance: 7 Dimensionen für autonome KI-Agenten', format: 'blog', status: 'revision', date: '02.04.2026', note: 'These schärfen', body: 'Agentic AI wird oft als Effizienzversprechen verkauft. In Wirklichkeit verschiebt sie die Governance-Frage. Der Artikel beschreibt, welche Kontrollen Organisationen aufbauen müssen, bevor autonome Systeme produktiv skaliert werden.' },
   { id: 'art-4', kind: 'article', title: 'Fachbeitrag: Future Skills im KI-Zeitalter', articleTitle: 'WEF Future of Jobs 2025: Welche KI-Skills jetzt wirklich zählen', format: 'fach', status: 'approved', date: '02.04.2026', note: 'bereit für Veröffentlichung', body: 'KI verändert nicht nur Prozesse, sondern Kompetenzprofile. Der Beitrag verbindet WEF-Daten, Governance-Anforderungen und Bildungsperspektiven zu einem strategischen Bild für Unternehmen, Hochschulen und öffentliche Verwaltung.' }
 ];
+const defaultResearchInboxItems = [
+  { title: 'EU AI Act: Finale Durchführungsbestimmungen – Artikel 13 Transparenz für Hochrisiko-KI', articleTitle: 'EU AI Act Artikel 13: Transparenzpflichten für Hochrisiko-KI', source: 'euractiv.com', date: '01.04.2026', time: '10:14', excerpt: 'Die finalen technischen Spezifikationen definieren Informationspflichten für Betreiber von Hochrisiko-KI in Finanz-, Gesundheits- und Personalentscheidungssystemen.', tags: ['EU AI Act', 'Art. 13', 'Compliance'], accent: 'p' },
+  { title: 'BSI Leitfaden: KI-Systeme in KRITIS – NIS2-konforme Sicherheitsanforderungen', articleTitle: 'BSI NIS2 Leitfaden: KI in KRITIS – Sicherheitsanforderungen', source: 'bsi.bund.de', date: '01.04.2026', time: '07:31', excerpt: 'Neue BSI-Empfehlungen für KI-Systeme in kritischen Infrastrukturen: Risikoanalyse, Incident Management, Lieferkettensicherheit.', tags: ['NIS2', 'KRITIS', 'BSI'], accent: 'b' },
+  { title: 'Erste ISO 42001-Zertifizierungen in Deutschland: Praxisbericht und Lessons Learned', articleTitle: 'ISO 42001 Zertifizierung Deutschland: Erste Praxisberichte KMU', source: 'computerwoche.de', date: '01.04.2026', time: '06:45', excerpt: 'Drei Mittelständler berichten über Implementierung des KI-Managementsystems nach ISO/IEC 42001 – Hürden, Aufwand, Nutzen.', tags: ['ISO 42001', 'KMU', 'Praxisbericht'], accent: 'g' },
+  { title: 'Agentic AI: Governance-Rahmenwerk für autonome KI-Agenten – 7 Dimensionen', articleTitle: 'Agentic AI Governance: 7 Dimensionen für autonome KI-Agenten', source: 'heise.de', date: '31.03.2026', time: 'gestern', excerpt: 'Gartner-Studie liefert Governance-Framework für autonome KI-Agenten – integrierbar in bestehende Compliance-Strukturen.', tags: ['Agentic AI', 'Governance'], accent: 'b' },
+  { title: 'DSGVO trifft KI: Was LLM-Betreiber 2026 wissen müssen', articleTitle: 'DSGVO und KI: Datenschutz-Anforderungen für LLM-basierte Systeme 2026', source: 'lto.de', date: '30.03.2026', time: '30.03.', excerpt: 'Neue Urteile und Leitlinien zur DSGVO-Konformität bei LLM-Systemen: Trainingsdaten, Auskunftspflichten, Löschrechte.', tags: ['DSGVO', 'LLM'], accent: 'p' },
+  { title: 'EU AI Office: Leitlinien konkretisieren GPAI-Compliance und Trainingsdaten-Transparenz', articleTitle: 'EU AI Office: Neue Leitlinien für GPAI-Compliance und Modelltransparenz', source: 'digital-strategy.ec.europa.eu', date: '29.03.2026', time: '29.03.', excerpt: 'Neue Hinweise zur Dokumentation von Basismodellen und zur Offenlegung von Trainingsdaten im Kontext des EU AI Acts.', tags: ['GPAI', 'AI Office', 'EU'], accent: 'p' },
+  { title: 'AI Factories in Europa: EuroHPC öffnet den nächsten Hebel für digitale Souveränität', articleTitle: 'AI Factories in Europa: Was die EuroHPC-Initiative für Souveränität bedeutet', source: 'eurohpc-ju.europa.eu', date: '28.03.2026', time: '28.03.', excerpt: 'Die europäische AI-Factories-Initiative schafft Infrastruktur für Startups, Forschung und staatliche KI-Strategien.', tags: ['Europa', 'Souveränität'], accent: 'b' },
+  { title: 'WEF Future of Jobs 2025: Diese KI-Skills werden für Unternehmen zum Engpass', articleTitle: 'WEF Future of Jobs 2025: Welche KI-Skills jetzt wirklich zählen', source: 'weforum.org', date: '27.03.2026', time: '27.03.', excerpt: 'Der Bericht zeigt, welche Future Skills in KI, Datenkompetenz und Transformation realen Marktdruck erzeugen.', tags: ['Future Skills', 'Arbeitsmarkt'], accent: '' },
+  { title: 'UNESCO KI-Ethik: Warum Governance ohne gesellschaftliche Perspektive zu kurz greift', articleTitle: 'UNESCO KI-Ethik: Warum Governance ohne gesellschaftliche Perspektive zu kurz greift', source: 'unesco.org', date: '26.03.2026', time: '26.03.', excerpt: 'Die globale Ethik-Perspektive verschiebt den Blick von rein technischer Compliance hin zu Verantwortung, Fairness und Teilhabe.', tags: ['Ethik', 'UNESCO'], accent: '' },
+  { title: 'Semantic Scholar und Consensus: Welche Recherche-Tools ein moderner Curator wirklich braucht', articleTitle: 'Semantic Scholar und Consensus: Welche Recherche-Tools Kuratoren wirklich brauchen', source: 'semanticscholar.org / consensus.app', date: '25.03.2026', time: '25.03.', excerpt: 'Vergleich zweier Research-Tools für evidenzbasierte Kuratierung wissenschaftlicher und regulatorischer Inhalte.', tags: ['Research', 'Tools'], accent: 'b' },
+  { title: 'Google Cloud und Anthropic: Agentic Workflows werden Schritt für Schritt Enterprise-Realität', articleTitle: 'Google Cloud und Anthropic: Agentic Workflows werden Enterprise-Realität', source: 'cloud.google.com / anthropic.com', date: '24.03.2026', time: '24.03.', excerpt: 'Neue Plattformen und Event-Ankündigungen zeigen, wie Agenten in Produktivumgebungen operationalisiert werden.', tags: ['Agentic AI', 'Enterprise'], accent: 'b' },
+  { title: 'BSI Grundschutz und ISO 42001: Wie Informationssicherheit und KI-Governance zusammenwachsen', articleTitle: 'BSI Grundschutz und ISO 42001: Wie Informationssicherheit und KI-Governance zusammenwachsen', source: 'bsi.bund.de / isms.online', date: '23.03.2026', time: '23.03.', excerpt: 'Warum der integrierte Blick auf ISMS und AIMS für regulierte Unternehmen organisatorisch immer relevanter wird.', tags: ['ISO 42001', 'ISMS'], accent: '' },
+  { title: 'Rechenzentrumsstrategie Deutschland: KI-Kapazitäten werden zur Standort- und Souveränitätsfrage', articleTitle: 'Rechenzentrumsstrategie Deutschland: KI-Kapazitäten als Standortfrage', source: 'bmds.bund.de', date: '22.03.2026', time: '22.03.', excerpt: 'Die Infrastrukturperspektive rückt stärker in den Vordergrund: Rechenzentren, Energiebedarf und KI-Wertschöpfung gehören zusammen.', tags: ['Infrastruktur', 'Souveränität'], accent: '' }
+];
 let researchState = { ...defaultResearchState };
 let drafts = defaultDrafts.map((draft) => ({ ...draft }));
 let selectedDraftId = defaultDrafts[0].id;
@@ -1817,10 +1834,105 @@ function renderSources(sources = currentSources) {
   }).join('') || '<div class="micro-note">Keine Quellen gefunden.</div>';
 }
 
+function inferSourceDomain(url = '') {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '') || 'Quelle';
+  } catch {
+    return 'Quelle';
+  }
+}
+
+function buildResearchInboxItems(targetCount = 47) {
+  const activeTopics = currentTopics
+    .filter((topic) => (topic.Aktiv || 'Ja').toLowerCase() !== 'nein')
+    .map((topic) => topic.Thema || topic.title)
+    .filter(Boolean);
+  const activeSources = currentSources.filter((source) => (source.Aktiv || 'Ja').toLowerCase() !== 'nein');
+  const items = defaultResearchInboxItems.map((item) => ({ ...item }));
+  const bloombergSource = activeSources.find((source) => /bloomberg/i.test(`${source.Titel || ''} ${source.URL || ''}`));
+
+  if (bloombergSource && !items.some((item) => /bloomberg/i.test(item.source))) {
+    items.unshift({
+      title: 'Bloomberg: Neue KI-Regelwerke verschieben die Risikologik in regulierten Märkten',
+      articleTitle: 'Bloomberg: KI-Regulierung und Marktbewegungen 2026',
+      source: inferSourceDomain(bloombergSource.URL || 'https://www.bloomberg.com'),
+      date: '02.04.2026',
+      time: '09:12',
+      excerpt: 'Bloomberg ordnet ein, wie neue KI-Vorgaben, Investitionsdynamik und Marktreaktionen in Finanz-, Industrie- und Infrastruktursektoren zusammenlaufen.',
+      tags: ['Bloomberg', 'Markt', 'Regulierung'],
+      accent: 'b'
+    });
+  }
+
+  const sourcePool = activeSources.length ? activeSources : defaultSources;
+  const topicPool = activeTopics.length ? activeTopics : ['KI-Governance', 'NIS2 & KRITIS', 'Agentic AI'];
+  const titleFragments = [
+    'Neue Einordnung für Betreiber und Aufsicht',
+    'Was Unternehmen jetzt konkret vorbereiten sollten',
+    'Welche Wirkung das für Governance und Betrieb entfaltet',
+    'Warum sich Verantwortlichkeiten 2026 verschieben',
+    'Welche Signale jetzt im DACH-Raum relevant werden'
+  ];
+
+  for (let idx = 0; items.length < targetCount; idx += 1) {
+    const source = sourcePool[idx % sourcePool.length] || {};
+    const topic = topicPool[idx % topicPool.length] || 'KI-Governance';
+    const fragment = titleFragments[idx % titleFragments.length];
+    const domain = inferSourceDomain(source.URL || '');
+    const category = source.Kategorie || 'Research';
+    const day = String((idx % 18) + 3).padStart(2, '0');
+    const hour = String(8 + (idx % 9)).padStart(2, '0');
+    const minute = String((idx * 7) % 60).padStart(2, '0');
+    items.push({
+      title: `${topic}: ${fragment}`,
+      articleTitle: `${topic}: ${fragment}`,
+      source: domain,
+      date: `${day}.04.2026`,
+      time: `${hour}:${minute}`,
+      excerpt: `${source.Titel || category} liefert neue Hinweise für ${topic} mit Blick auf Verantwortung, Priorisierung und belastbare Umsetzung in Organisationen.`,
+      tags: [topic, category, source.Region || 'Global'],
+      accent: idx % 3 === 0 ? 'p' : idx % 3 === 1 ? 'b' : ''
+    });
+  }
+
+  return items.slice(0, targetCount);
+}
+
+function renderResearchInbox() {
+  const section = document.getElementById('s-results');
+  if (!section) return;
+
+  const items = buildResearchInboxItems();
+  section.querySelectorAll('.result-card').forEach((card) => card.remove());
+
+  let list = document.getElementById('results-list');
+  if (!list) {
+    list = document.createElement('div');
+    list.id = 'results-list';
+    section.appendChild(list);
+  }
+
+  list.innerHTML = items.map((item) => `
+    <div class="result-card" onclick="loadAndGenerate(${JSON.stringify(item.articleTitle || item.title)})">
+      <span class="result-title">${escapeHtml(item.title)}</span>
+      <div class="result-source">${escapeHtml(item.source)} · ${escapeHtml(item.date)}</div>
+      <div class="result-excerpt">${escapeHtml(item.excerpt)}</div>
+      <div class="result-footer">
+        ${(item.tags || []).slice(0, 3).map((tag, index) => `<span class="tag${index === 0 && item.accent ? ` ${item.accent}` : ''}">${escapeHtml(tag)}</span>`).join('')}
+        <span class="result-date">${escapeHtml(item.time)}</span>
+      </div>
+    </div>
+  `).join('');
+
+  const totalCount = document.getElementById('research-total-count');
+  if (totalCount) totalCount.textContent = String(items.length);
+}
+
 async function loadSheetData() {
   const { topicNote, sourceNote, subtitle } = ensureSheetStatusNodes();
   renderTopics(currentTopics);
   renderSources(currentSources);
+  renderResearchInbox();
   if (subtitle) subtitle.textContent = 'Themenfelder und Quell-URLs fuer die taegliche Recherche konfigurieren · Google Sheets wird geladen';
   if (topicNote) topicNote.textContent = `Demo-Fallback aktiv · ${currentTopics.length} Themen sichtbar`;
   if (sourceNote) sourceNote.textContent = `Demo-Fallback aktiv · ${currentSources.length} Quellen sichtbar`;
@@ -1844,6 +1956,7 @@ async function loadSheetData() {
     if (Array.isArray(data.sources) && data.sources.length) {
       currentSources = data.sources;
       renderSources(currentSources);
+      renderResearchInbox();
       if (sourceNote) sourceNote.textContent = `Google Sheets aktiv · ${currentSources.length} Quellen geladen`;
     }
     if (subtitle) subtitle.textContent = 'Themenfelder und Quell-URLs fuer die taegliche Recherche konfigurieren · Sync mit Google Sheets aktiv';
@@ -2419,6 +2532,57 @@ function exportOut() {
   a.click();
 }
 
+function getCurrentOutputText() {
+  return document.getElementById('main-out')?.innerText?.trim() || '';
+}
+
+async function sendToNotebookLM() {
+  const text = getCurrentOutputText();
+  if (!text || /Format w/.test(text)) {
+    alert('Bitte zuerst einen Inhalt generieren.');
+    return;
+  }
+
+  try {
+    await navigator.clipboard?.writeText(text);
+  } catch {}
+
+  window.open('https://notebooklm.google.com/', '_blank', 'noopener');
+  alert('Der Text wurde in die Zwischenablage kopiert. In NotebookLM kannst du ihn direkt einfügen und daraus eine Audio Overview / Podcast-Version erzeugen.');
+}
+
+async function downloadMp3() {
+  const text = getCurrentOutputText();
+  if (!text || /Format w/.test(text)) {
+    alert('Bitte zuerst einen Inhalt generieren.');
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text,
+        title: selectedArticle || 'curator-audio'
+      })
+    });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      throw new Error(payload.error || 'Die MP3 konnte nicht erstellt werden.');
+    }
+
+    const blob = await response.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'curator-podcast.mp3';
+    a.click();
+  } catch (error) {
+    alert(error?.message || 'Die MP3 konnte nicht erstellt werden.');
+  }
+}
+
 function addT() {
   const n = prompt('Neues Thema:');
   if(!n) return;
@@ -2468,6 +2632,7 @@ async function addT() {
     await writeSheetRow('topic', topic);
     currentTopics.push(topic);
     renderTopics(currentTopics);
+    renderResearchInbox();
     const topicNote = document.getElementById('topic-source-note');
     if (topicNote) topicNote.textContent = `Google Sheets aktiv · ${currentTopics.length} Themen geladen`;
   } catch (error) {
@@ -2494,6 +2659,7 @@ async function addSrc() {
     await writeSheetRow('source', source);
     currentSources.push(source);
     renderSources(currentSources);
+    renderResearchInbox();
     document.getElementById('src-url').value = '';
     const sourceNote = document.getElementById('source-registry-note');
     if (sourceNote) sourceNote.textContent = `Google Sheets aktiv · ${currentSources.length} Quellen geladen`;
