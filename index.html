@@ -940,7 +940,7 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
             <div class="output-header">
               <span class="output-label" id="out-label">Ausgabe</span>
               <div class="output-actions">
-                <button class="btn-sm" onclick="sendToNotebookLM()">Podcast via NotebookLM</button>
+                <button class="btn-sm" id="google-podcast-btn" onclick="downloadGooglePodcast()">Google Podcast</button>
                 <button class="btn-sm" id="audio-download-btn" onclick="downloadMp3()">MP3</button>
                 <button class="btn-sm" onclick="copyOut()">📋 Kopieren</button>
                 <button class="btn-sm" onclick="generate('main')">↺ Neu</button>
@@ -2393,7 +2393,7 @@ function syncAudioButtons() {
 
   if (audio.provider === 'notebooklm-manual') {
     button.textContent = 'MP3 deaktiviert';
-    button.title = 'Bitte im Button "Podcast via NotebookLM" den manuellen Workflow nutzen.';
+    button.title = 'Bitte fuer Automatik den Button "Google Podcast" oder den OpenAI-MP3-Button nutzen.';
     return;
   }
 
@@ -2634,7 +2634,7 @@ async function downloadMp3() {
   }
 
   if (audio.provider === 'notebooklm-manual') {
-    alert('Im aktuellen Audio-Provider ist NotebookLM als manueller Workflow aktiv. Bitte den Button "Podcast via NotebookLM" nutzen.');
+    alert('Im aktuellen Audio-Provider ist NotebookLM als manueller Workflow aktiv. Bitte den Button "Google Podcast" oder OpenAI MP3 nutzen.');
     return;
   }
 
@@ -2675,6 +2675,54 @@ async function downloadMp3() {
     a.click();
   } catch (error) {
     alert(error?.message || 'Die MP3 konnte nicht erstellt werden.');
+  }
+}
+
+async function downloadGooglePodcast() {
+  const text = getCurrentOutputText();
+  const audio = getAudioConfig();
+  if (!text || /Format w/.test(text)) {
+    alert('Bitte zuerst einen Inhalt generieren.');
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text,
+        title: selectedArticle || 'curator-google-podcast',
+        provider: 'google-podcast',
+        podcastLength: audio.podcastLength,
+        languageCode: audio.languageCode,
+        focus: audio.focus,
+        projectId: audio.projectId
+      })
+    });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      throw new Error(payload.error || 'Der Google Podcast konnte nicht erstellt werden.');
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const payload = await response.json().catch(() => ({}));
+      if (payload?.status === 'pending') {
+        alert(payload.message || 'Der Google Podcast wird noch erstellt. Bitte gleich noch einmal versuchen.');
+        return;
+      }
+      throw new Error(payload.error || 'Der Google Podcast konnte nicht erstellt werden.');
+    }
+
+    const blob = await response.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'curator-google-podcast.mp3';
+    a.click();
+  } catch (error) {
+    alert(error?.message || 'Der Google Podcast konnte nicht erstellt werden.');
   }
 }
 
