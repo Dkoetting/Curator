@@ -2633,6 +2633,8 @@ function buildPromptPayload() {
     articleTitle: selectedArticle,
     format: fmt,
     requirement: formatSpecs[fmt] || 'Praezise, belastbare deutsche Fachkommunikation.',
+    focus: getFieldValue('focus') || '',
+    tone: getFieldValue('tone') || 'auth',
     topics: currentTopics
       .filter((topic) => (topic.Aktiv || 'Ja').toLowerCase() !== 'nein')
       .map((topic) => topic.Thema || topic.title)

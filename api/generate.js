@@ -1,13 +1,43 @@
-function buildInstructions({ articleTitle, format, requirement, topics = [] }) {
+const LINKEDIN_FORMATS = new Set(['li-post', 'li-story', 'li-list', 'li-question', 'li-news', 'li-article']);
+
+function getToneInstruction(tone) {
+  const map = {
+    auth: 'Ton: autoritativ-sachlich, ruhig, belastbar, Dr.-Dirk-Koetting-Stil.',
+    prov: 'Ton: pointiert, kontrastreich, aber weiterhin glaubwuerdig und fachlich sauber.',
+    acad: 'Ton: akademisch-praktisch, klar argumentiert, evidenznah.',
+    sol: 'Ton: beratend-loesungsorientiert, konkret, umsetzungsnah.'
+  };
+  return map[tone] || 'Ton: sachlich, autoritativ, praezise und glaubwuerdig.';
+}
+
+function buildLinkedInHookInstructions({ focus, articleTitle }) {
+  return [
+    'Fuer LinkedIn gelten harte Hook-Regeln.',
+    'Die ersten 2 Zeilen muessen scroll-stoppend sein und mobil funktionieren.',
+    'Hook-Zeile 1: maximal 8 bis 10 Woerter und idealerweise nicht mehr als ca. 38 bis 40 Zeichen.',
+    'Hook-Zeile 2: eigene Zeile mit Re-Hook, ebenfalls kurz und mobil lesbar.',
+    'Zwischen Hook-Zeile 1 und Hook-Zeile 2 steht eine Leerzeile.',
+    'Die Hook darf die Pointe nicht verraten, sondern muss Neugier erzeugen.',
+    'Nutze nach Moeglichkeit persoenlichen Bezug, klare Position oder Kontrast statt generischem How-to.',
+    'Verwende bevorzugt eine der bewaehrten Hook-Formeln: Ich-hab-Twist, Gegensatz, Zitat-plus-Konter, Gestaendnis-mit-Klammer, Zahlen-plus-persoenlicher-Proof oder starkes Statement.',
+    'Wenn kein offensichtlicher persoenlicher Bezug aus dem Thema kommt, nutze eine glaubwuerdige professionelle Perspektive von Dr. Dirk Koetting als Beobachter, Einordner oder Governance-Praktiker.',
+    focus ? `Gewuenschter Blickwinkel fuer die Hook und den Post: ${focus}.` : '',
+    `Der Hook muss zum Thema passen: ${articleTitle}.`
+  ].filter(Boolean);
+}
+
+function buildInstructions({ articleTitle, format, requirement, topics = [], focus = '', tone = '' }) {
   return [
     'Du bist ein deutscher KI-Governance-Redakteur fuer Dr. Dirk Koetting.',
-    'Schreibe sachlich, autoritativ, praezise und glaubwuerdig.',
-    'Vermeide generisches Marketing-Sprech und leere AI-Phrasen.',
+    getToneInstruction(tone),
+    'Vermeide generisches Marketing-Sprech, leere AI-Phrasen und austauschbare Business-Floskeln.',
     'Nutze klare deutsche Sprache fuer eine DACH-Zielgruppe.',
-    'Die ersten 2-3 Zeilen muessen bei LinkedIn-Formaten als Hook funktionieren.',
+    LINKEDIN_FORMATS.has(format) ? 'Die ersten 2-3 Zeilen muessen bei LinkedIn-Formaten als Hook funktionieren.' : '',
+    ...(LINKEDIN_FORMATS.has(format) ? buildLinkedInHookInstructions({ focus, articleTitle }) : []),
     `Zielformat: ${format}.`,
     `Anforderung: ${requirement}.`,
     `Thema / Artikelkontext: ${articleTitle}.`,
+    focus ? `Inhaltlicher Schwerpunkt: ${focus}.` : '',
     topics.length ? `Aktive Themen im Curator: ${topics.join(', ')}.` : '',
     'Liefere nur den finalen Text ohne Vorbemerkung, ohne Erklaerung und ohne Markdown-Codeblock.'
   ].filter(Boolean).join('\n');
@@ -53,7 +83,9 @@ module.exports = async function handler(req, res) {
     articleTitle = 'KI-Governance Update',
     format = 'li-post',
     requirement = 'Praezise deutsche Fachkommunikation.',
-    topics = []
+    topics = [],
+    focus = '',
+    tone = ''
   } = req.body || {};
 
   if (provider && provider !== 'OpenAI') {
@@ -74,7 +106,7 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         model: model || 'gpt-4.1',
-        input: buildInstructions({ articleTitle, format, requirement, topics }),
+        input: buildInstructions({ articleTitle, format, requirement, topics, focus, tone }),
         max_output_tokens: getTokenLimit(format)
       })
     });
