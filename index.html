@@ -1996,7 +1996,7 @@ function renderResearchInbox() {
       ${item.sourceComment ? `<div class="result-note">${escapeHtml(item.sourceComment)}</div>` : ''}
       <div class="result-links">
         ${item.sourceUrl ? `<a class="result-link" href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noreferrer" onclick="event.stopPropagation()">Quelle oeffnen</a>` : ''}
-        <button class="result-link-button" type="button" onclick="event.stopPropagation(); loadAndGenerate(${JSON.stringify(item.articleTitle || item.title)})">Im Generator oeffnen</button>
+        <button class="result-link-button" type="button" onclick="return openInGeneratorFromInbox(${JSON.stringify(item.articleTitle || item.title)})">Im Generator oeffnen</button>
       </div>
       <div class="result-footer">
         ${(item.tags || []).slice(0, 3).map((tag, index) => `<span class="tag${index === 0 && item.accent ? ` ${item.accent}` : ''}">${escapeHtml(tag)}</span>`).join('')}
@@ -2396,10 +2396,30 @@ async function writeSheetRow(kind, data) {
 }
 
 function nav(id, el) {
-  document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-  document.getElementById('s-'+id).classList.add('active');
-  el.classList.add('active');
+  activateSection(id, el);
+}
+
+function activateSection(id, explicitSidebarEl = null) {
+  document.querySelectorAll('.tab-content').forEach((section) => section.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach((item) => item.classList.remove('active'));
+
+  const section = document.getElementById('s-' + id);
+  if (section) section.classList.add('active');
+
+  if (explicitSidebarEl) {
+    explicitSidebarEl.classList.add('active');
+    return;
+  }
+
+  const sidebarMap = {
+    dashboard: 0,
+    results: 1,
+    generate: 2,
+    sources: 3,
+    settings: 4
+  };
+  const sidebarItem = document.querySelectorAll('.sidebar-item')[sidebarMap[id]];
+  if (sidebarItem) sidebarItem.classList.add('active');
 }
 
 function selectFmt(el, f) {
@@ -2414,12 +2434,13 @@ function loadAndGenerate(title) {
   if(el) el.textContent = title;
   const picker = document.getElementById('article-picker');
   if (picker) picker.value = title;
-  // Navigate to generate
-  document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-  document.getElementById('s-generate').classList.add('active');
-  document.querySelectorAll('.sidebar-item')[2]?.classList.add('active');
+  activateSection('generate');
   generate('main');
+}
+
+function openInGeneratorFromInbox(title) {
+  loadAndGenerate(title);
+  return false;
 }
 
 function generate(target) {
