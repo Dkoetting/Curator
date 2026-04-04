@@ -941,7 +941,7 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
               <span class="output-label" id="out-label">Ausgabe</span>
               <div class="output-actions">
                 <button class="btn-sm" onclick="sendToNotebookLM()">Podcast via NotebookLM</button>
-                <button class="btn-sm" onclick="downloadMp3()">MP3</button>
+                <button class="btn-sm" id="audio-download-btn" onclick="downloadMp3()">MP3</button>
                 <button class="btn-sm" onclick="copyOut()">📋 Kopieren</button>
                 <button class="btn-sm" onclick="generate('main')">↺ Neu</button>
                 <button class="btn-sm p" onclick="exportOut()">↓ Export</button>
@@ -1147,6 +1147,39 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
             <span class="input-help">Fuer Produktion bitte als Vercel-Umgebungsvariable `OPENAI_API_KEY` setzen. Ein hier eingetragener Key wird nur fuer diese Browser-Sitzung genutzt.</span>
           </div>
           <div class="input-group"><label class="input-label">Anthropic API Key</label><input class="input-field" id="anthropic-api-key" type="password" placeholder="sk-ant-..."></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:var(--space-6)">
+        <div class="card-header"><span class="card-title">Audio & Podcast</span></div>
+        <div class="grid-2">
+          <div class="input-group">
+            <label class="input-label">Audio Provider</label>
+            <select class="input-field" id="audio-provider" onchange="syncAudioButtons()">
+              <option>OpenAI MP3</option>
+              <option>Google Podcast API</option>
+              <option>NotebookLM manuell</option>
+            </select>
+            <span class="input-help">OpenAI ist der stabile Standard. Google ist als optionaler Podcast-Pfad vorbereitet und setzt Discovery Engine / Podcast API Zugriff voraus.</span>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Podcast-Laenge</label>
+            <select class="input-field" id="audio-length">
+              <option>SHORT</option>
+              <option>STANDARD</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Sprache</label>
+            <input class="input-field" id="audio-language" type="text" value="de-DE" placeholder="de-DE">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Google Project ID (optional)</label>
+            <input class="input-field" id="google-project-id" type="text" placeholder="Wenn leer, wird das Projekt aus GOOGLE_SERVICE_ACCOUNT_JSON verwendet">
+          </div>
+          <div class="input-group" style="grid-column:1 / -1">
+            <label class="input-label">Podcast-Fokus</label>
+            <input class="input-field" id="audio-focus" type="text" value="Erstelle ein ruhiges, belastbares Audio-Briefing fuer KI-Governance im DACH-Raum." placeholder="Fokus des Podcasts">
+          </div>
         </div>
       </div>
     </section>
@@ -2327,6 +2360,47 @@ function getFieldValue(id) {
   return document.getElementById(id)?.value?.trim() || '';
 }
 
+function normalizeAudioProvider(label) {
+  const map = {
+    'OpenAI MP3': 'openai',
+    'Google Podcast API': 'google-podcast',
+    'NotebookLM manuell': 'notebooklm-manual'
+  };
+  return map[label] || 'openai';
+}
+
+function getAudioConfig() {
+  return {
+    providerLabel: getFieldValue('audio-provider') || 'OpenAI MP3',
+    provider: normalizeAudioProvider(getFieldValue('audio-provider') || 'OpenAI MP3'),
+    podcastLength: getFieldValue('audio-length') || 'SHORT',
+    languageCode: getFieldValue('audio-language') || 'de-DE',
+    focus: getFieldValue('audio-focus') || 'Erstelle ein ruhiges, belastbares Audio-Briefing fuer KI-Governance im DACH-Raum.',
+    projectId: getFieldValue('google-project-id') || ''
+  };
+}
+
+function syncAudioButtons() {
+  const button = document.getElementById('audio-download-btn');
+  const audio = getAudioConfig();
+  if (!button) return;
+
+  if (audio.provider === 'google-podcast') {
+    button.textContent = 'Podcast MP3';
+    button.title = 'Erstellt ein MP3 ueber die Google Podcast API.';
+    return;
+  }
+
+  if (audio.provider === 'notebooklm-manual') {
+    button.textContent = 'MP3 deaktiviert';
+    button.title = 'Bitte im Button "Podcast via NotebookLM" den manuellen Workflow nutzen.';
+    return;
+  }
+
+  button.textContent = 'MP3';
+  button.title = 'Erstellt eine MP3 ueber OpenAI Text-to-Speech.';
+}
+
 function getWritingConfig() {
   const provider = getFieldValue('writing-provider') || 'OpenAI';
   return {
@@ -2553,8 +2627,14 @@ async function sendToNotebookLM() {
 
 async function downloadMp3() {
   const text = getCurrentOutputText();
+  const audio = getAudioConfig();
   if (!text || /Format w/.test(text)) {
     alert('Bitte zuerst einen Inhalt generieren.');
+    return;
+  }
+
+  if (audio.provider === 'notebooklm-manual') {
+    alert('Im aktuellen Audio-Provider ist NotebookLM als manueller Workflow aktiv. Bitte den Button "Podcast via NotebookLM" nutzen.');
     return;
   }
 
@@ -2564,12 +2644,27 @@ async function downloadMp3() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         text,
-        title: selectedArticle || 'curator-audio'
+        title: selectedArticle || 'curator-audio',
+        provider: audio.provider,
+        podcastLength: audio.podcastLength,
+        languageCode: audio.languageCode,
+        focus: audio.focus,
+        projectId: audio.projectId
       })
     });
 
     if (!response.ok) {
       const payload = await response.json().catch(() => ({}));
+      throw new Error(payload.error || 'Die MP3 konnte nicht erstellt werden.');
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const payload = await response.json().catch(() => ({}));
+      if (payload?.status === 'pending') {
+        alert(payload.message || 'Der Podcast wird noch erzeugt. Bitte gleich noch einmal versuchen.');
+        return;
+      }
       throw new Error(payload.error || 'Die MP3 konnte nicht erstellt werden.');
     }
 
@@ -2669,6 +2764,7 @@ async function addSrc() {
 }
 
 initializeDashboardState();
+syncAudioButtons();
 loadSheetData();
 
 // Splash screen
