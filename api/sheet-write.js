@@ -103,6 +103,25 @@ function buildAppendPayload(kind, data) {
     };
   }
 
+  if (kind === 'run') {
+    const finishedAt = String(data?.['Finished At'] || data?.finishedAt || '').trim();
+    const startedAt = String(data?.['Started At'] || data?.startedAt || finishedAt || '').trim();
+    return {
+      range: 'Runs!A:I',
+      values: [[
+        String(data?.['Run Name'] || data?.runName || 'Research Run').trim(),
+        String(data?.Region || data?.region || 'Global').trim(),
+        startedAt,
+        finishedAt,
+        String(data?.Quellen || data?.sources || '').trim(),
+        String(data?.Cluster || data?.clusters || '').trim(),
+        String(data?.Fokus || data?.focus || '').trim(),
+        String(data?.Status || data?.status || 'completed').trim(),
+        String(data?.Summary || data?.summary || '').trim()
+      ]]
+    };
+  }
+
   throw new Error('Unbekannter Schreibtyp.');
 }
 

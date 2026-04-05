@@ -1820,7 +1820,9 @@ const defaultResearchState = {
   clusters: 12,
   focus: 'Authority + Signals',
   percent: 0,
-  caption: 'idle'
+  caption: 'idle',
+  runName: 'Curator bereit',
+  summary: 'Noch kein synchronisierter Lauf vorhanden.'
 };
 const defaultDrafts = [
   { id: 'li-1', kind: 'linkedin', title: 'Artikel 13 ist kein Technikthema. Es ist ein Steuerungsthema.', articleTitle: 'EU AI Act Artikel 13: Transparenzpflichten für Hochrisiko-KI', format: 'li-post', status: 'review', date: '03.04.2026', note: 'Hook + Governance-Fokus', body: 'Viele Unternehmen diskutieren noch über Tools.\n\nSie müssten längst über Verantwortlichkeit sprechen.\n\nArtikel 13 des EU AI Acts macht genau das sichtbar: Wer Hochrisiko-KI einsetzt, muss erklären können, wie Systeme eingebunden sind, welche Risiken bestehen und wer intern Verantwortung trägt.\n\nDas ist keine reine Compliance-Frage.\nEs ist eine Führungsfrage.\n\nWer Transparenz erst dann ernst nimmt, wenn die Prüfung ansteht, ist zu spät.\n\n#EUAIAct #KIGovernance #Compliance' },
@@ -1863,6 +1865,66 @@ function formatResearchTimestamp(date = new Date()) {
     hour: '2-digit',
     minute: '2-digit'
   }).format(date).replace(',', ' ·');
+}
+
+function formatRuntimeTimestamp(value) {
+  if (!value) return '';
+  if (typeof value === 'string' && value.includes('Â·')) return value;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return formatResearchTimestamp(date);
+}
+
+function toPositiveInt(value, fallback = 0) {
+  const parsed = Number.parseInt(String(value ?? '').trim(), 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+function getLatestRunRecord(runs = []) {
+  if (!Array.isArray(runs) || !runs.length) return null;
+  const enriched = runs.map((run) => {
+    const finishedRaw = run['Finished At'] || run.finishedAt || run['Started At'] || run.startedAt || '';
+    const timestamp = Date.parse(finishedRaw);
+    return { ...run, __sort: Number.isNaN(timestamp) ? 0 : timestamp };
+  });
+  enriched.sort((a, b) => b.__sort - a.__sort);
+  return enriched[0] || null;
+}
+
+function applyRunRecordToResearchState(run, source = 'sheet') {
+  if (!run) return;
+
+  const runName = run['Run Name'] || run.runName || 'Research Run';
+  const status = (run.Status || run.status || 'completed').toLowerCase();
+  const summary = run.Summary || run.summary || `${runName} synchronisiert`;
+  const caption = status === 'completed' ? (source === 'sheet' ? 'sync' : 'complete') : status;
+
+  researchState = {
+    ...researchState,
+    lastResearch: formatRuntimeTimestamp(run['Finished At'] || run.finishedAt || run['Started At'] || run.startedAt || researchState.lastResearch),
+    sources: toPositiveInt(run.Quellen || run.sources, researchState.sources),
+    clusters: toPositiveInt(run.Cluster || run.clusters, researchState.clusters),
+    focus: String(run.Fokus || run.focus || researchState.focus || 'Top-Themen aktiv').trim() || 'Top-Themen aktiv',
+    percent: status === 'completed' ? 100 : researchState.percent,
+    caption,
+    runName,
+    summary
+  };
+
+  persistResearchState();
+  renderResearchState();
+
+  const statusText = document.getElementById('status-text');
+  if (statusText) statusText.textContent = source === 'sheet' ? `${runName} synchronisiert` : `${runName} abgeschlossen`;
+
+  const researchLabel = document.getElementById('research-label');
+  if (researchLabel) researchLabel.textContent = source === 'sheet' ? 'Research-Status · Job-Sync' : 'Recherche-Status';
+
+  const researchPhase = document.getElementById('research-phase');
+  if (researchPhase) researchPhase.textContent = runName;
+
+  const researchDetail = document.getElementById('research-detail');
+  if (researchDetail) researchDetail.textContent = summary;
 }
 
 function escapeHtml(value) {
@@ -2277,6 +2339,11 @@ async function loadSheetData() {
       renderResearchInbox();
       if (sourceNote) sourceNote.textContent = `Google Sheets aktiv · ${currentSources.length} Quellen geladen`;
     }
+
+    const latestRun = getLatestRunRecord(data.runs || []);
+    if (latestRun) {
+      applyRunRecordToResearchState(latestRun, 'sheet');
+    }
     if (subtitle) subtitle.textContent = 'Themenfelder und Quell-URLs fuer die taegliche Recherche konfigurieren · Sync mit Google Sheets aktiv';
   } catch (error) {
     if (subtitle) subtitle.textContent = 'Themenfelder und Quell-URLs fuer die taegliche Recherche konfigurieren · Demo-Fallback aktiv';
@@ -2549,6 +2616,8 @@ function renderResearchState() {
   const progressFocus = document.getElementById('progress-focus');
   const researchPercent = document.getElementById('research-percent');
   const researchCaption = document.getElementById('research-caption');
+  const researchPhase = document.getElementById('research-phase');
+  const researchDetail = document.getElementById('research-detail');
   const fill = document.getElementById('pfill');
 
   if (lastResearch) lastResearch.textContent = researchState.lastResearch;
@@ -2557,6 +2626,8 @@ function renderResearchState() {
   if (progressFocus) progressFocus.textContent = researchState.focus;
   if (researchPercent) researchPercent.textContent = `${researchState.percent}%`;
   if (researchCaption) researchCaption.textContent = researchState.caption;
+  if (researchPhase && researchState.runName) researchPhase.textContent = researchState.runName;
+  if (researchDetail && researchState.summary) researchDetail.textContent = researchState.summary;
   if (fill) fill.style.width = `${researchState.percent}%`;
 }
 
@@ -3031,12 +3102,9 @@ function runResearch() {
   const btn = document.getElementById('run-btn');
   const st = document.getElementById('status-text');
   const fill = document.getElementById('pfill');
-  const lastResearch = document.getElementById('last-research');
-  const progressSources = document.getElementById('progress-sources');
-  const progressClusters = document.getElementById('progress-clusters');
-  const progressFocus = document.getElementById('progress-focus');
   const researchPercent = document.getElementById('research-percent');
   const researchCaption = document.getElementById('research-caption');
+  const startedAtIso = new Date().toISOString();
 
   btn.textContent = 'Recherche läuft ...';
   st.textContent = 'Recherche läuft...';
@@ -3050,23 +3118,24 @@ function runResearch() {
       clearInterval(iv);
       const trackedSources = Math.floor(Math.random()*8+45);
       const clusterCount = Math.floor(Math.random()*5+10);
-      const timestamp = formatResearchTimestamp(new Date());
+      const finishedAt = new Date();
+      const finishedAtIso = finishedAt.toISOString();
       btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Recherche starten';
-      st.textContent = '47 neue Artikel';
+      st.textContent = 'Manueller Research synchronisiert';
       document.getElementById('kpi-s').textContent = trackedSources;
-      if(lastResearch) lastResearch.textContent = timestamp;
-      if(progressSources) progressSources.textContent = trackedSources;
-      if(progressClusters) progressClusters.textContent = clusterCount;
-      if(progressFocus) progressFocus.textContent = 'Top-Themen aktiv';
-      researchState = {
-        lastResearch: timestamp,
-        sources: trackedSources,
-        clusters: clusterCount,
-        focus: 'Top-Themen aktiv',
-        percent: 100,
-        caption: 'complete'
+      const runRecord = {
+        'Run Name': 'Manueller Research',
+        Region: 'Dashboard',
+        'Started At': startedAtIso,
+        'Finished At': finishedAtIso,
+        Quellen: trackedSources,
+        Cluster: clusterCount,
+        Fokus: 'Top-Themen aktiv',
+        Status: 'completed',
+        Summary: 'Manuell gestartete Recherche wurde im Curator abgeschlossen.'
       };
-      persistResearchState();
+      applyRunRecordToResearchState(runRecord, 'manual');
+      writeSheetRow('run', runRecord).catch((error) => console.error('Run konnte nicht nach Google Sheets geschrieben werden.', error));
     }
     fill.style.width = Math.min(p,100) + '%';
   }, 280);

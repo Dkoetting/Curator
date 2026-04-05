@@ -99,6 +99,18 @@ async function fetchRange(spreadsheetId, range, accessToken) {
   return mapRows(payload.values);
 }
 
+async function fetchRangeSafe(spreadsheetId, range, accessToken) {
+  try {
+    return await fetchRange(spreadsheetId, range, accessToken);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : '';
+    if (/Unable to parse range|Range .* not found|Requested entity was not found/i.test(message)) {
+      return [];
+    }
+    throw error;
+  }
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
@@ -113,14 +125,16 @@ module.exports = async function handler(req, res) {
 
     const serviceAccount = parseServiceAccount();
     const accessToken = await getAccessToken(serviceAccount);
-    const [topics, sources] = await Promise.all([
+    const [topics, sources, runs] = await Promise.all([
       fetchRange(spreadsheetId, 'Themen!A:Z', accessToken),
-      fetchRange(spreadsheetId, 'Quellen!A:Z', accessToken)
+      fetchRange(spreadsheetId, 'Quellen!A:Z', accessToken),
+      fetchRangeSafe(spreadsheetId, 'Runs!A:Z', accessToken)
     ]);
 
     return res.status(200).json({
       topics,
-      sources
+      sources,
+      runs
     });
   } catch (error) {
     return res.status(500).json({
