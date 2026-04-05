@@ -39,6 +39,8 @@ function buildInstructions({ articleTitle, format, requirement, topics = [], foc
     `Zielformat: ${format}.`,
     `Anforderung: ${requirement}.`,
     `Thema / Artikelkontext: ${articleTitle}.`,
+    format === 'fach' ? 'Der Fachbeitrag muss substanziell sein und mindestens 12000 Zeichen umfassen. Zielkorridor: etwa 1500 bis 2200 Woerter.' : '',
+    format === 'fach' ? 'Wenn der Text in Gefahr ist zu kurz zu werden, erweitere Analyse, Einordnung, Praxisimplikationen, typische Fehler, Implementierungsrahmen und Schlussfolgerung, bis die Mindestlaenge sicher erreicht ist.' : '',
     focus ? `Inhaltlicher Schwerpunkt: ${focus}.` : '',
     personalAngle ? `Persoenliche oder professionelle Perspektive: ${personalAngle}.` : '',
     topics.length ? `Aktive Themen im Curator: ${topics.join(', ')}.` : '',
@@ -67,10 +69,56 @@ function extractText(payload) {
 }
 
 function getTokenLimit(format) {
-  if (format === 'fach') return 2800;
-  if (format === 'blog') return 1800;
-  if (format === 'li-article') return 2200;
+  if (format === 'fach') return 5200;
+  if (format === 'blog') return 2200;
+  if (format === 'li-article') return 3200;
   return 900;
+}
+
+function getLengthGuard(format) {
+  if (format === 'fach') {
+    return {
+      minChars: 12000,
+      label: 'mindestens 12.000 Zeichen'
+    };
+  }
+
+  return null;
+}
+
+function buildExpansionInstructions({ articleTitle, format, focus = '', text = '', guard }) {
+  return [
+    'Der folgende Text ist fuer das Zielformat noch zu kurz.',
+    `Zielformat: ${format}.`,
+    `Thema: ${articleTitle}.`,
+    focus ? `Inhaltlicher Schwerpunkt: ${focus}.` : '',
+    guard ? `Erweitere ihn jetzt auf ${guard.label}.` : '',
+    'Wichtig: Nicht nur aufblasen, sondern substanziell vertiefen.',
+    'Erweitere Einordnung, Praxisbeispiele, typische Fehler, Governance-Implikationen, Umsetzungsrahmen und Fazit.',
+    'Vermeide Wiederholungen und leere Floskeln.',
+    'Liefere nur die vollstaendige, ueberarbeitete Endfassung.',
+    '',
+    'Aktuelle Fassung:',
+    text
+  ].filter(Boolean).join('\n');
+}
+
+async function requestOpenAI({ effectiveKey, model, input, maxOutputTokens }) {
+  const upstream = await fetch('https://api.openai.com/v1/responses', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${effectiveKey}`
+    },
+    body: JSON.stringify({
+      model: model || 'gpt-4.1',
+      input,
+      max_output_tokens: maxOutputTokens
+    })
+  });
+
+  const payload = await upstream.json();
+  return { upstream, payload };
 }
 
 module.exports = async function handler(req, res) {
@@ -103,28 +151,49 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const upstream = await fetch('https://api.openai.com/v1/responses', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${effectiveKey}`
-      },
-      body: JSON.stringify({
-        model: model || 'gpt-4.1',
-        input: buildInstructions({ articleTitle, format, requirement, topics, focus, tone, currentHook, personalAngle }),
-        max_output_tokens: getTokenLimit(format)
-      })
+    const initialInput = buildInstructions({ articleTitle, format, requirement, topics, focus, tone, currentHook, personalAngle });
+    const { upstream, payload } = await requestOpenAI({
+      effectiveKey,
+      model,
+      input: initialInput,
+      maxOutputTokens: getTokenLimit(format)
     });
 
-    const payload = await upstream.json();
     if (!upstream.ok) {
       const errorMessage = payload?.error?.message || 'OpenAI request failed.';
       return res.status(upstream.status).json({ error: errorMessage });
     }
 
-    const text = extractText(payload);
+    let text = extractText(payload);
     if (!text) {
       return res.status(502).json({ error: 'OpenAI hat keinen Text zurueckgegeben.' });
+    }
+
+    const guard = getLengthGuard(format);
+    if (guard && text.length < guard.minChars) {
+      const expansionInput = buildExpansionInstructions({ articleTitle, format, focus, text, guard });
+      const retry = await requestOpenAI({
+        effectiveKey,
+        model,
+        input: expansionInput,
+        maxOutputTokens: getTokenLimit(format)
+      });
+
+      if (!retry.upstream.ok) {
+        const retryError = retry.payload?.error?.message || 'OpenAI expansion request failed.';
+        return res.status(retry.upstream.status).json({ error: retryError });
+      }
+
+      const expandedText = extractText(retry.payload);
+      if (expandedText) {
+        text = expandedText;
+      }
+    }
+
+    if (guard && text.length < guard.minChars) {
+      return res.status(502).json({
+        error: `Der ${format === 'fach' ? 'Fachbeitrag' : 'Text'} ist noch zu kurz (${text.length} Zeichen). Erwartet werden ${guard.label}.`
+      });
     }
 
     return res.status(200).json({
