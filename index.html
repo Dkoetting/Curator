@@ -278,6 +278,9 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
 
 .output-wrap{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--shadow-sm);}
 .hook-coach-shell{display:grid;gap:var(--space-4);}
+.hook-coach-toggle{display:flex;align-items:center;gap:10px;font-size:var(--text-sm);color:var(--color-text);}
+.hook-coach-toggle input{width:16px;height:16px;accent-color:var(--color-accent);}
+.hook-coach-toggle span{font-weight:600;}
 .hook-draft-field{min-height:108px;resize:vertical;}
 .hook-coach-empty{font-size:var(--text-sm);line-height:1.7;color:var(--color-text-muted);}
 .hook-coach-analysis{padding:var(--space-3);border-radius:var(--radius-md);background:linear-gradient(180deg,#f8fbff 0%,#eef4ff 100%);border:1px solid var(--color-border);font-size:var(--text-sm);line-height:1.7;color:var(--color-text);}
@@ -882,6 +885,10 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
                 <span class="micro-note" id="hook-coach-mode">Aktiv fuer LinkedIn-Formate</span>
               </div>
               <div class="hook-coach-shell">
+                <label class="hook-coach-toggle" for="hook-coach-enabled">
+                  <input type="checkbox" id="hook-coach-enabled" checked onchange="updateHookCoachState()">
+                  <span>Hook Coach aktivieren</span>
+                </label>
                 <div class="input-group" style="margin-bottom:0">
                   <label class="input-label">Aktuelle Hook / erster Entwurf</label>
                   <textarea class="input-field hook-draft-field" id="hook-draft" placeholder="z.B. Viele Unternehmen reden ueber KI. Kaum jemand ueber Verantwortung."></textarea>
@@ -935,6 +942,12 @@ h1,h2,h3,h4{text-wrap:balance;line-height:1.2;}
                 <div class="format-icon">📰</div>
                 <div class="format-label">LinkedIn Artikel</div>
                 <div class="format-desc">Langer Fachbeitrag</div>
+              </div>
+              <div class="format-card li-card" onclick="selectFmt(this,'li-carousel')">
+                <span class="format-limit">8-10</span>
+                <div class="format-icon">🎠</div>
+                <div class="format-label">LinkedIn Carousel</div>
+                <div class="format-desc">Slide-fuer-Slide Outline</div>
               </div>
             </div>
 
@@ -1530,6 +1543,38 @@ reduziert nicht nur regulatorisches Risiko.
 Er schafft die Grundlage für vertrauenswürdige, belastbare und dauerhaft führbare KI-Systeme.
 
 Und genau darum wird es 2026 gehen.`,
+  'li-carousel': `**Slide 1 - Titel**
+Der Mittelstand hat kein Forschungsproblem.
+
+Er hat ein Übersetzungsproblem.
+
+**Slide 2 - Realität**
+Forschung ist da.
+Im Unternehmen kommt davon oft erstaunlich wenig an.
+
+**Slide 3 - Kernproblem**
+Die Lücke liegt selten in der Idee.
+Sie liegt zwischen Erkenntnis und Entscheidung.
+
+**Slide 4 - Warum das passiert**
+Hochschule optimiert auf Publikation.
+Unternehmen optimiert auf Wirkung, Tempo und Verantwortung.
+
+**Slide 5 - Hebel 1**
+Den Übersetzungsauftrag explizit vergeben.
+Wer macht aus Erkenntnissen eine Entscheidungsvorlage?
+
+**Slide 6 - Hebel 2**
+Governance vor Kooperation klären.
+IP, EU AI Act und Verwertungslogik zuerst.
+
+**Slide 7 - Hebel 3**
+ROI-Anker vor Projektstart setzen.
+Welche Entscheidung wird später anders getroffen?
+
+**Slide 8 - Schlussfolie**
+Forschung ist kein Wettbewerbsvorteil.
+Die Fähigkeit, sie in Handlung zu übersetzen, schon.`,
   'blog': `**EU AI Act Artikel 13: Was die neuen Transparenzpflichten für Unternehmen jetzt konkret bedeuten**
 
 Die neuen Transparenzpflichten des EU AI Acts werden für viele Unternehmen schneller relevant, als es derzeit intern wahrgenommen wird. Mit der Konkretisierung von Artikel 13 rückt nicht mehr nur die Frage in den Vordergrund, *ob* KI reguliert wird, sondern *wie* Organisationen den Einsatz ihrer Systeme nachvollziehbar, dokumentiert und gegenüber Betroffenen erklärbar machen. Gerade für mittelständische Unternehmen ist das ein Wendepunkt: Wer KI in HR, Kreditbewertung, Diagnostik oder sensiblen Entscheidungsprozessen einsetzt, muss künftig sehr viel genauer darlegen können, wie diese Systeme arbeiten und wie sie kontrolliert werden.
@@ -1749,7 +1794,7 @@ Wie viel Transparenz ist zumutbar, ohne Geschäftsgeheimnisse zu gefährden? Wer
 **Bottom Line:** Compliance ist in 3 Monaten erreichbar – mit dem richtigen Framework. Ohne: kritisch.`
 };
 
-const liFormats = ['li-post','li-story','li-list','li-question','li-news','li-article'];
+const liFormats = ['li-post','li-story','li-list','li-question','li-news','li-article','li-carousel'];
 const formatSpecs = {
   'li-post': 'LinkedIn Post, 900-1500 Zeichen, klarer Hook in den ersten 2-3 Zeilen, sachlich-autoritativer DACH-Ton.',
   'li-story': 'LinkedIn Story-Post, 900-1600 Zeichen, szenischer Einstieg, kurze Absaetze, glaubwuerdig statt werblich.',
@@ -1757,6 +1802,7 @@ const formatSpecs = {
   'li-question': 'LinkedIn Frage-Post mit fachlich starkem Einstieg und klarer Abschlussfrage, 800-1400 Zeichen.',
   'li-news': 'LinkedIn News-Kommentar mit Einordnung und Relevanz fuer Unternehmen, 900-1500 Zeichen.',
   'li-article': 'LinkedIn Artikel mit Hook, klarer Struktur und Dr.-Dirk-Koetting-Tonalitaet, 900-1400 Woerter.',
+  'li-carousel': 'LinkedIn Carousel als Slide-by-Slide-Konzept mit starkem Hook auf Slide 1, 8-10 Slides, klare Ueberschriften und kurze Kernaussagen pro Slide.',
   'blog': 'SEO-Blog-Artikel mit Zwischenueberschriften, klarer Suchintention und 800-1200 Woertern.',
   'fach': 'Fachbeitrag mit sauberer Argumentation, 1500-2500 Woertern und mindestens 12000 Zeichen.',
   'news': 'Newsletter-Beitrag als kuratierte Einordnung, kompakt und scanbar, etwa 300-500 Woerter.',
@@ -2768,30 +2814,48 @@ function clearHookCoach() {
 
 function updateHookCoachState() {
   const isActive = isLinkedInFormat();
+  const checkbox = document.getElementById('hook-coach-enabled');
   const button = document.getElementById('hook-coach-btn');
   const mode = document.getElementById('hook-coach-mode');
   const hint = document.getElementById('hook-coach-hint');
   const card = document.getElementById('hook-coach-card');
+  const draft = document.getElementById('hook-draft');
+  const angle = document.getElementById('hook-angle');
+  const isEnabled = Boolean(checkbox?.checked) && isActive;
+
+  if (checkbox) {
+    checkbox.disabled = !isActive;
+  }
 
   if (button) {
-    button.disabled = !isActive;
-    button.style.opacity = isActive ? '1' : '.55';
-    button.style.cursor = isActive ? 'pointer' : 'not-allowed';
+    button.disabled = !isEnabled;
+    button.style.opacity = isEnabled ? '1' : '.55';
+    button.style.cursor = isEnabled ? 'pointer' : 'not-allowed';
   }
 
   if (mode) {
-    mode.textContent = isActive ? 'Aktiv fuer LinkedIn-Formate' : 'Nur fuer LinkedIn-Formate aktiv';
+    mode.textContent = !isActive
+      ? 'Nur fuer LinkedIn-Formate verfuegbar'
+      : (checkbox?.checked ? 'Aktiv fuer dieses LinkedIn-Format' : 'Per Haekchen aktivierbar');
   }
 
   if (hint) {
-    hint.textContent = isActive
+    hint.textContent = isEnabled
       ? 'Analysiert deine Hook und erzeugt 5 scroll-stoppende Varianten fuer LinkedIn.'
-      : 'Wechsle auf ein LinkedIn-Format, um Hook-Varianten zu erzeugen.';
+      : (!isActive
+        ? 'Wechsle auf ein LinkedIn-Format, um Hook-Varianten zu erzeugen.'
+        : 'Setze das Haekchen, um den Hook Coach fuer dieses Format zu nutzen.');
   }
 
   if (card) {
     card.style.opacity = isActive ? '1' : '.82';
   }
+
+  [draft, angle].forEach((field) => {
+    if (!field) return;
+    field.disabled = !isEnabled;
+    field.style.opacity = isEnabled ? '1' : '.72';
+  });
 }
 
 function renderHookCoachResult(data) {
@@ -2845,6 +2909,11 @@ function renderHookCoachResult(data) {
 async function runHookCoach() {
   if (!isLinkedInFormat()) {
     alert('Der Hook Coach ist nur fuer LinkedIn-Formate aktiv.');
+    return;
+  }
+
+  if (!document.getElementById('hook-coach-enabled')?.checked) {
+    alert('Bitte aktiviere zuerst den Hook Coach per Haekchen.');
     return;
   }
 
@@ -3014,14 +3083,15 @@ function renderOutput(target, text, sourceLabel = '') {
 }
 
 function buildPromptPayload() {
+  const hookCoachEnabled = isLinkedInFormat() && Boolean(document.getElementById('hook-coach-enabled')?.checked);
   return {
     articleTitle: selectedArticle,
     format: fmt,
     requirement: formatSpecs[fmt] || 'Praezise, belastbare deutsche Fachkommunikation.',
     focus: getFieldValue('focus') || '',
     tone: getFieldValue('tone') || 'auth',
-    currentHook: getFieldValue('hook-draft') || '',
-    personalAngle: getFieldValue('hook-angle') || '',
+    currentHook: hookCoachEnabled ? (getFieldValue('hook-draft') || '') : '',
+    personalAngle: hookCoachEnabled ? (getFieldValue('hook-angle') || '') : '',
     topics: currentTopics
       .filter((topic) => (topic.Aktiv || 'Ja').toLowerCase() !== 'nein')
       .map((topic) => topic.Thema || topic.title)

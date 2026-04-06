@@ -1,4 +1,4 @@
-const LINKEDIN_FORMATS = new Set(['li-post', 'li-story', 'li-list', 'li-question', 'li-news', 'li-article']);
+const LINKEDIN_FORMATS = new Set(['li-post', 'li-story', 'li-list', 'li-question', 'li-news', 'li-article', 'li-carousel']);
 
 function getToneInstruction(tone) {
   const map = {
@@ -39,6 +39,9 @@ function buildInstructions({ articleTitle, format, requirement, topics = [], foc
     `Zielformat: ${format}.`,
     `Anforderung: ${requirement}.`,
     `Thema / Artikelkontext: ${articleTitle}.`,
+    format === 'li-carousel' ? 'Erstelle ein LinkedIn Carousel als klare Slide-by-Slide-Struktur mit 8 bis 10 Slides.' : '',
+    format === 'li-carousel' ? 'Jede Slide braucht eine kurze Ueberschrift und 1 bis 3 kurze Aussagezeilen. Slide 1 muss den Hook tragen.' : '',
+    format === 'li-carousel' ? 'Formatiere eindeutig als Slide 1, Slide 2 usw., damit der Text direkt in ein Carousel ueberfuehrt werden kann.' : '',
     format === 'fach' ? 'Der Fachbeitrag muss substanziell sein und mindestens 12000 Zeichen umfassen. Zielkorridor: etwa 1500 bis 2200 Woerter.' : '',
     format === 'fach' ? 'Wenn der Text in Gefahr ist zu kurz zu werden, erweitere Analyse, Einordnung, Praxisimplikationen, typische Fehler, Implementierungsrahmen und Schlussfolgerung, bis die Mindestlaenge sicher erreicht ist.' : '',
     focus ? `Inhaltlicher Schwerpunkt: ${focus}.` : '',
@@ -72,6 +75,7 @@ function getTokenLimit(format) {
   if (format === 'fach') return 5200;
   if (format === 'blog') return 2200;
   if (format === 'li-article') return 3200;
+  if (format === 'li-carousel') return 1600;
   return 900;
 }
 
