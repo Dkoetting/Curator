@@ -28,6 +28,24 @@ function buildLinkedInHookInstructions({ focus, articleTitle, currentHook, perso
   ].filter(Boolean);
 }
 
+function buildCarouselInstructions({ articleTitle, focus, topics = [], personalAngle = '' }) {
+  return [
+    'Nutze fuer Carousel-Formate eine feste Slide-Dramaturgie statt frei fliessendem LinkedIn-Text.',
+    'Bevorzuge 7 Slides in dieser Reihenfolge: Hero, Problem, Loesung, Features, Details, How-To, CTA.',
+    'Wenn das Thema mehr Tiefe braucht, sind 8 bis 10 Slides erlaubt, aber nur wenn jede Slide klar begruendet ist.',
+    'Slide 1 muss den Hook tragen und sofort scroll-stoppend sein.',
+    'Die letzte Slide braucht eine klare CTA- oder Diskussionsfrage.',
+    'Jede Slide soll eine kurze Ueberschrift und 1 bis 3 kurze Aussagezeilen haben.',
+    'Keine langen Absatzfolien, kein Fliesstext, keine generischen Buzzword-Slides.',
+    'Formatiere exakt als "Slide 1 - ...", "Slide 2 - ..." usw.',
+    'Denke in swipebarer Dramaturgie: Jede Slide muss die naechste Slide rechtfertigen.',
+    focus ? `Carousel-Schwerpunkt: ${focus}.` : '',
+    personalAngle ? `Persoenliche oder professionelle Perspektive, die im Carousel sichtbar werden soll: ${personalAngle}.` : '',
+    topics.length ? `Relevante Curator-Themen fuer das Carousel: ${topics.join(', ')}.` : '',
+    `Das Carousel muss zum Thema passen: ${articleTitle}.`
+  ].filter(Boolean);
+}
+
 function buildInstructions({ articleTitle, format, requirement, topics = [], focus = '', tone = '', currentHook = '', personalAngle = '' }) {
   return [
     'Du bist ein deutscher KI-Governance-Redakteur fuer Dr. Dirk Koetting.',
@@ -36,12 +54,10 @@ function buildInstructions({ articleTitle, format, requirement, topics = [], foc
     'Nutze klare deutsche Sprache fuer eine DACH-Zielgruppe.',
     LINKEDIN_FORMATS.has(format) ? 'Die ersten 2-3 Zeilen muessen bei LinkedIn-Formaten als Hook funktionieren.' : '',
     ...(LINKEDIN_FORMATS.has(format) ? buildLinkedInHookInstructions({ focus, articleTitle, currentHook, personalAngle }) : []),
+    ...(format === 'li-carousel' ? buildCarouselInstructions({ articleTitle, focus, topics, personalAngle }) : []),
     `Zielformat: ${format}.`,
     `Anforderung: ${requirement}.`,
     `Thema / Artikelkontext: ${articleTitle}.`,
-    format === 'li-carousel' ? 'Erstelle ein LinkedIn Carousel als klare Slide-by-Slide-Struktur mit 8 bis 10 Slides.' : '',
-    format === 'li-carousel' ? 'Jede Slide braucht eine kurze Ueberschrift und 1 bis 3 kurze Aussagezeilen. Slide 1 muss den Hook tragen.' : '',
-    format === 'li-carousel' ? 'Formatiere eindeutig als Slide 1, Slide 2 usw., damit der Text direkt in ein Carousel ueberfuehrt werden kann.' : '',
     format === 'fach' ? 'Der Fachbeitrag muss substanziell sein und mindestens 12000 Zeichen umfassen. Zielkorridor: etwa 1500 bis 2200 Woerter.' : '',
     format === 'fach' ? 'Wenn der Text in Gefahr ist zu kurz zu werden, erweitere Analyse, Einordnung, Praxisimplikationen, typische Fehler, Implementierungsrahmen und Schlussfolgerung, bis die Mindestlaenge sicher erreicht ist.' : '',
     focus ? `Inhaltlicher Schwerpunkt: ${focus}.` : '',
