@@ -1,4 +1,20 @@
+const fs = require('fs');
+const path = require('path');
+
 const LINKEDIN_FORMATS = new Set(['li-post', 'li-story', 'li-list', 'li-question', 'li-news', 'li-article', 'li-carousel']);
+
+function readReferenceFile(...segments) {
+  try {
+    return fs.readFileSync(path.join(process.cwd(), ...segments), 'utf8').trim();
+  } catch {
+    return '';
+  }
+}
+
+const carouselReference =
+  readReferenceFile('docs', 'carousell.md') ||
+  readReferenceFile('docs', 'CAROUSELL.md') ||
+  readReferenceFile('docs', 'CAROUSEL_CREATOR_SKILL.md');
 
 function getToneInstruction(tone) {
   const map = {
@@ -42,7 +58,8 @@ function buildCarouselInstructions({ articleTitle, focus, topics = [], personalA
     focus ? `Carousel-Schwerpunkt: ${focus}.` : '',
     personalAngle ? `Persoenliche oder professionelle Perspektive, die im Carousel sichtbar werden soll: ${personalAngle}.` : '',
     topics.length ? `Relevante Curator-Themen fuer das Carousel: ${topics.join(', ')}.` : '',
-    `Das Carousel muss zum Thema passen: ${articleTitle}.`
+    `Das Carousel muss zum Thema passen: ${articleTitle}.`,
+    carouselReference ? `Nutze diese interne Carousel-Referenz als zusaetzlichen Produktionsrahmen:\n${carouselReference}` : ''
   ].filter(Boolean);
 }
 
