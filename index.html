@@ -2813,6 +2813,7 @@ window.openInGeneratorFromInbox = openInGeneratorFromInbox;
 
 function generatePreviewLegacy(target) {
   const isLi = liFormats.includes(fmt);
+  const countAsLongform = !isLi || fmt === 'li-article';
   const outEl = document.getElementById(target === 'dash' ? 'dash-out' : 'main-out');
   const ccEl = document.getElementById(target === 'dash' ? 'dash-cc' : 'main-cc');
   const liPrev = document.getElementById('li-prev');
@@ -2835,7 +2836,7 @@ function generatePreviewLegacy(target) {
     outEl.style.fontStyle = 'normal';
     outEl.style.color = 'var(--color-text)';
     outEl.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    ccEl.textContent = isLi ? (text.length + ' Zeichen') : (wordCount + ' Wörter · ' + text.length + ' Zeichen');
+    ccEl.textContent = countAsLongform ? (wordCount + ' Wörter · ' + text.length + ' Zeichen') : (text.length + ' Zeichen');
     if(outLabel) outLabel.textContent = isLi ? 'LinkedIn Vorschau' : 'Ausgabe';
     if(liPrev && isLi && target === 'main') {
       liPrev.style.display = 'block';
@@ -3111,6 +3112,7 @@ function getPlainTextStats(text) {
 
 function renderOutput(target, text, sourceLabel = '') {
   const isLi = liFormats.includes(fmt);
+  const countAsLongform = !isLi || fmt === 'li-article';
   const outEl = document.getElementById(target === 'dash' ? 'dash-out' : 'main-out');
   const ccEl = document.getElementById(target === 'dash' ? 'dash-cc' : 'main-cc');
   const liPrev = document.getElementById('li-prev');
@@ -3121,7 +3123,7 @@ function renderOutput(target, text, sourceLabel = '') {
   outEl.style.fontStyle = 'normal';
   outEl.style.color = 'var(--color-text)';
   outEl.innerHTML = formatOutputHtml(text);
-  ccEl.textContent = isLi ? (text.length + ' Zeichen') : (wordCount + ' Woerter · ' + text.length + ' Zeichen');
+  ccEl.textContent = countAsLongform ? (wordCount + ' Woerter · ' + text.length + ' Zeichen') : (text.length + ' Zeichen');
   if(outLabel) {
     const baseLabel = isLi ? 'LinkedIn Vorschau' : 'Ausgabe';
     outLabel.textContent = sourceLabel ? (baseLabel + ' · ' + sourceLabel) : baseLabel;

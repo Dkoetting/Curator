@@ -75,6 +75,10 @@ function buildInstructions({ articleTitle, format, requirement, topics = [], foc
     `Zielformat: ${format}.`,
     `Anforderung: ${requirement}.`,
     `Thema / Artikelkontext: ${articleTitle}.`,
+    format === 'blog' ? 'Der Blog-Artikel muss mindestens 800 Wörter erreichen und eine klare SEO-Struktur mit Zwischenüberschriften haben.' : '',
+    format === 'blog' ? 'Wenn der Text zu kurz bleibt, erweitere ihn substanziell mit Einordnung, Praxisnutzen, Suchintention, Beispielen und Fazit.' : '',
+    format === 'li-article' ? 'Der LinkedIn Artikel muss mindestens 900 Wörter erreichen und wie ein echter Langformbeitrag lesbar bleiben.' : '',
+    format === 'li-article' ? 'Wenn der Text zu kurz bleibt, erweitere Analyse, Beispiele, Einordnung, Übergänge und Schlussfolgerungen, bis die Mindestlänge klar erreicht ist.' : '',
     format === 'fach' ? 'Der Fachbeitrag muss substanziell sein und mindestens 12000 Zeichen umfassen. Zielkorridor: etwa 1500 bis 2200 Woerter.' : '',
     format === 'fach' ? 'Wenn der Text in Gefahr ist zu kurz zu werden, erweitere Analyse, Einordnung, Praxisimplikationen, typische Fehler, Implementierungsrahmen und Schlussfolgerung, bis die Mindestlaenge sicher erreicht ist.' : '',
     focus ? `Inhaltlicher Schwerpunkt: ${focus}.` : '',
@@ -104,10 +108,20 @@ function extractText(payload) {
   return chunks.join('\n').trim();
 }
 
+function getWordCount(text = '') {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/[`#>]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .length;
+}
+
 function getTokenLimit(format) {
   if (format === 'fach') return 5200;
-  if (format === 'blog') return 2200;
-  if (format === 'li-article') return 3200;
+  if (format === 'blog') return 2800;
+  if (format === 'li-article') return 3800;
   if (format === 'li-carousel') return 1600;
   return 900;
 }
@@ -120,7 +134,31 @@ function getLengthGuard(format) {
     };
   }
 
+  if (format === 'blog') {
+    return {
+      minWords: 800,
+      minChars: 5500,
+      label: 'mindestens 800 Wörter'
+    };
+  }
+
+  if (format === 'li-article') {
+    return {
+      minWords: 900,
+      minChars: 6500,
+      label: 'mindestens 900 Wörter'
+    };
+  }
+
   return null;
+}
+
+function isTooShort(text, guard) {
+  if (!guard) return false;
+  const wordCount = getWordCount(text);
+  if (guard.minWords && wordCount < guard.minWords) return true;
+  if (guard.minChars && text.length < guard.minChars) return true;
+  return false;
 }
 
 function buildExpansionInstructions({ articleTitle, format, focus = '', text = '', guard }) {
@@ -132,6 +170,8 @@ function buildExpansionInstructions({ articleTitle, format, focus = '', text = '
     guard ? `Erweitere ihn jetzt auf ${guard.label}.` : '',
     'Wichtig: Nicht nur aufblasen, sondern substanziell vertiefen.',
     'Erweitere Einordnung, Praxisbeispiele, typische Fehler, Governance-Implikationen, Umsetzungsrahmen und Fazit.',
+    format === 'blog' ? 'Der Blog-Artikel braucht eine saubere SEO-Struktur mit Zwischenueberschriften, klarer Suchintention und belastbaren Abschnitten.' : '',
+    format === 'li-article' ? 'Der LinkedIn Artikel muss wie ein echter Langformbeitrag wirken: Hook, Einordnung, Hauptteil, Verdichtung, Schluss.' : '',
     'Vermeide Wiederholungen und leere Floskeln.',
     'Liefere nur die vollstaendige, ueberarbeitete Endfassung.',
     '',
@@ -207,7 +247,7 @@ module.exports = async function handler(req, res) {
     }
 
     const guard = getLengthGuard(format);
-    if (guard && text.length < guard.minChars) {
+    if (isTooShort(text, guard)) {
       const expansionInput = buildExpansionInstructions({ articleTitle, format, focus, text, guard });
       const retry = await requestOpenAI({
         effectiveKey,
@@ -227,15 +267,20 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    if (guard && text.length < guard.minChars) {
+    if (isTooShort(text, guard)) {
+      const wordCount = getWordCount(text);
       return res.status(502).json({
-        error: `Der ${format === 'fach' ? 'Fachbeitrag' : 'Text'} ist noch zu kurz (${text.length} Zeichen). Erwartet werden ${guard.label}.`
+        error: `Der ${format === 'fach' ? 'Fachbeitrag' : 'Text'} ist noch zu kurz (${wordCount} Wörter, ${text.length} Zeichen). Erwartet werden ${guard.label}.`
       });
     }
 
     return res.status(200).json({
       text,
-      sourceLabel: 'OpenAI Live'
+      sourceLabel: 'OpenAI Live',
+      stats: {
+        wordCount: getWordCount(text),
+        charCount: text.length
+      }
     });
   } catch (error) {
     return res.status(500).json({
