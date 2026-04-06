@@ -1921,6 +1921,62 @@ function formatRuntimeTimestamp(value) {
   return formatResearchTimestamp(date);
 }
 
+function parseResearchAnchorDate(value = researchState.lastResearch) {
+  if (!value) return new Date();
+  if (value instanceof Date && !Number.isNaN(value.getTime())) return new Date(value.getTime());
+
+  const raw = String(value).replace(/\s+/g, ' ').trim();
+  const match = raw.match(/(\d{2})\.(\d{2})\.(\d{4})\s*[·\u00b7]?\s*(\d{2}):(\d{2})/);
+  if (match) {
+    const [, day, month, year, hour, minute] = match;
+    return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
+  }
+
+  const parsedDate = new Date(raw);
+  return Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
+}
+
+function formatInboxDateLabel(date) {
+  return new Intl.DateTimeFormat('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).format(date);
+}
+
+function formatInboxTimeLabel(date) {
+  return new Intl.DateTimeFormat('de-DE', {
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(date);
+}
+
+function buildInboxTimestamp(index = 0, options = {}) {
+  const {
+    baseHour = 8,
+    hourSpread = 5,
+    minuteStep = 7,
+    itemsPerDay = 3
+  } = options;
+
+  const anchor = parseResearchAnchorDate();
+  const safeAnchor = anchor > new Date() ? new Date() : anchor;
+  const result = new Date(safeAnchor.getTime());
+  const dayOffset = Math.floor(index / itemsPerDay);
+  const hourOffset = index % Math.max(1, hourSpread);
+  result.setDate(result.getDate() - dayOffset);
+  result.setHours(Math.max(6, baseHour + hourOffset), (index * minuteStep) % 60, 0, 0);
+
+  if (result > safeAnchor) {
+    result.setTime(safeAnchor.getTime());
+  }
+
+  return {
+    date: formatInboxDateLabel(result),
+    time: formatInboxTimeLabel(result)
+  };
+}
+
 function toPositiveInt(value, fallback = 0) {
   const parsed = Number.parseInt(String(value ?? '').trim(), 10);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
@@ -2208,14 +2264,12 @@ function buildSourceDrivenInboxItems(activeSources = []) {
     const pattern = patterns.find((entry) => entry.match.test(text));
     if (!pattern) return [];
 
-    const day = String((index % 18) + 3).padStart(2, '0');
-    const hour = String(7 + (index % 10)).padStart(2, '0');
-    const minute = String((index * 9) % 60).padStart(2, '0');
+    const stamp = buildInboxTimestamp(index, { baseHour: 7, hourSpread: 6, minuteStep: 9, itemsPerDay: 2 });
     return [enrichResearchItem({
       ...pattern.item,
       source: inferSourceDomain(source.URL || ''),
-      date: `${day}.04.2026`,
-      time: `${hour}:${minute}`
+      date: stamp.date,
+      time: stamp.time
     }, source)];
   });
 }
@@ -2246,15 +2300,13 @@ function buildResearchInboxItems(targetCount = 47) {
     const fragment = titleFragments[idx % titleFragments.length];
     const domain = inferSourceDomain(source.URL || '');
     const category = source.Kategorie || 'Research';
-    const day = String((idx % 18) + 3).padStart(2, '0');
-    const hour = String(8 + (idx % 9)).padStart(2, '0');
-    const minute = String((idx * 7) % 60).padStart(2, '0');
+    const stamp = buildInboxTimestamp(idx + sourceDrivenItems.length, { baseHour: 8, hourSpread: 5, minuteStep: 7, itemsPerDay: 3 });
     items.push(enrichResearchItem({
       title: `${topic}: ${fragment}`,
       articleTitle: `${topic}: ${fragment}`,
       source: domain,
-      date: `${day}.04.2026`,
-      time: `${hour}:${minute}`,
+      date: stamp.date,
+      time: stamp.time,
       excerpt: `${source.Titel || category} liefert neue Hinweise für ${topic} mit Blick auf Verantwortung, Priorisierung und belastbare Umsetzung in Organisationen.`,
       tags: [topic, category, source.Region || 'Global'],
       accent: idx % 3 === 0 ? 'p' : idx % 3 === 1 ? 'b' : ''
