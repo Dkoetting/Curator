@@ -1984,7 +1984,9 @@ function toPositiveInt(value, fallback = 0) {
 
 function getLatestRunRecord(runs = []) {
   if (!Array.isArray(runs) || !runs.length) return null;
-  const enriched = runs.map((run) => {
+  const filteredRuns = runs.filter((run) => !/projektstatus/i.test(String(run['Run Name'] || run.runName || '')));
+  const baseRuns = filteredRuns.length ? filteredRuns : runs;
+  const enriched = baseRuns.map((run) => {
     const finishedRaw = run['Finished At'] || run.finishedAt || run['Started At'] || run.startedAt || '';
     const timestamp = Date.parse(finishedRaw);
     return { ...run, __sort: Number.isNaN(timestamp) ? 0 : timestamp };

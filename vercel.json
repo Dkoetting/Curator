@@ -1,6 +1,21 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
+  "crons": [
+    {
+      "path": "/api/cron-morning-dach",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron-evening-us-apac",
+      "schedule": "30 17 * * *"
+    },
+    {
+      "path": "/api/cron-projektstatus-sync",
+      "schedule": "0 19 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
